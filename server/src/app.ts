@@ -8,7 +8,7 @@ import { RailroadSpace } from './app/entities/spaces/properties/RailroadSpace';
 import { UtilitySpace } from './app/entities/spaces/properties/UtilitySpace';
 import { AuctionSpace } from './app/entities/spaces/AuctionSpace';
 import { FreeParkingSpace } from './app/entities/spaces/FreeParkingSpace';
-import { ChanceSpace } from './app/entities/spaces/ChanceSpace';
+import { ChanceSpace } from './app/entities/spaces/chance/ChanceSpace';
 import { BusTicketSpace } from './app/entities/spaces/BusTicketSpace';
 import { JailSpace } from './app/entities/spaces/JailSpace';
 import { GoToJailSpace } from './app/entities/spaces/GoToJailSpace';
@@ -88,7 +88,74 @@ const communityChestSpace = new CommunityChestSpace({
     ],
 });
 
-const chanceSpace = new ChanceSpace();
+const chanceSpace = new ChanceSpace({
+    cards: [
+        {
+            name: 'Advance to "Go" (Collect $200)',
+            act() {},
+        },
+        {
+            name: 'Advance to Illinois Avenue (If you pass Go, Collect $200)',
+            act() {},
+        },
+        {
+            name: 'Advance to St. Charles Place (If you pass Go, Collect $200)',
+            act() {},
+        },
+        {
+            name: 'Advance token to the nearest Utility. If unowned, you may buy it from the Bank. If owned, throw dice and pay owner a total 10 times the amount thrown. ',
+            act() {},
+        },
+        {
+            name: 'Advance to the nearest Railroad. If unowned, you may buy it from the Bank. If owned, pay owner twice the re tal to which they are otherwise entitled. If Railroad is unowned, you may buy it from the Bank.',
+            act() {},
+        },
+        {
+            name: 'Bank pays you dividend of $50.',
+            act() {},
+        },
+        {
+            name: 'Get out of Jail Free. This card may be kept until needed, or traded/sold.',
+            act() {},
+        },
+        {
+            name: 'Go Back 3 Spaces.',
+            act() {},
+        },
+        {
+            name: 'Go to Jail. Do not pass GO, do not collect $200.',
+            act() {},
+        },
+        {
+            name: 'Make general repairs on all your property: For each house pay $25, For each hotel pay $100.',
+            act() {},
+        },
+        {
+            name: 'Pay poor tax of $15',
+            act() {},
+        },
+        {
+            name: 'Take a trip to Reading Railroad.',
+            act() {},
+        },
+        {
+            name: 'Take a walk on the Boardwalk.',
+            act() {},
+        },
+        {
+            name: 'You have been elected Chairman of the Board. Pay each player $50.',
+            act() {},
+        },
+        {
+            name: 'Your building and loan matures. Collect $150.',
+            act() {},
+        },
+        {
+            name: 'You have won a crossword competition. Collect $100.',
+            act() {},
+        },
+    ],
+});
 
 const spaces = [
     new GoSpace({ salary: 200 }),

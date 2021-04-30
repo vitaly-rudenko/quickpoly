@@ -1,4 +1,4 @@
-export interface CommunityChestCard {
+export interface ChanceCard {
     readonly name: string;
     act(): void;
 }
