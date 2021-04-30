@@ -1,11 +1,42 @@
 {
-  "name": "server",
-  "version": "1.0.0",
-  "description": "Quickpoly API",
-  "main": "app.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "Vitaly Rudenko",
-  "license": "ISC"
+    "name": "server",
+    "version": "1.0.0",
+    "description": "Quickpoly API",
+    "main": "build/app.js",
+    "type": "module",
+    "scripts": {
+        "start": "node --es-module-specifier-resolution=node build/app.js",
+        "build": "rimraf ./build && tsc --pretty",
+        "debug": "ts-node-dev -r esm --transpile-only src/app.ts",
+        "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' ts-node --transpile-only node_modules/mocha/bin/mocha --register ts-node/register test/**/*.test.ts",
+        "test:watch": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' ts-node-dev --transpile-only --respawn --rs --clear node_modules/mocha/bin/mocha --register ts-node/register test/**/*.test.ts",
+        "lint": "eslint ./src/ --ext .ts",
+        "lint:fix": "npm run lint -- --fix"
+    },
+    "author": "Vitaly Rudenko",
+    "license": "ISC",
+    "dependencies": {
+        "chai": "^4.3.4",
+        "express": "^4.17.1",
+        "mocha": "^8.3.2",
+        "sinon": "^10.0.0",
+        "ws": "^7.4.5"
+    },
+    "devDependencies": {
+        "@types/chai": "^4.2.17",
+        "@types/mocha": "^8.2.2",
+        "@types/node": "^15.0.1",
+        "@types/ws": "^7.4.2",
+        "@typescript-eslint/eslint-plugin": "^4.22.0",
+        "@typescript-eslint/parser": "^4.22.0",
+        "eslint": "^7.25.0",
+        "eslint-config-airbnb-base": "^14.2.1",
+        "eslint-plugin-import": "^2.22.1",
+        "esm": "^3.2.25",
+        "nodemon": "^2.0.7",
+        "rimraf": "^3.0.2",
+        "ts-node": "^9.1.1",
+        "ts-node-dev": "^1.1.6",
+        "typescript": "^4.2.4"
+    }
 }
