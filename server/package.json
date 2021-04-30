@@ -7,7 +7,7 @@
     "scripts": {
         "start": "node --es-module-specifier-resolution=node build/app.js",
         "build": "rimraf ./build && tsc --pretty",
-        "debug": "ts-node-dev -r esm --transpile-only src/app.ts",
+        "debug": "ts-node-dev -r esm --transpile-only --inspect=0.0.0.0:9229 --nolazy -- src/app.ts",
         "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' ts-node --transpile-only node_modules/mocha/bin/mocha --register ts-node/register test/**/*.test.ts",
         "test:watch": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' ts-node-dev --transpile-only --respawn --rs --clear node_modules/mocha/bin/mocha --register ts-node/register test/**/*.test.ts",
         "lint": "eslint ./src/ --ext .ts",
