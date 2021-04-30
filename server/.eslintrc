@@ -1,0 +1,21 @@
+{
+    "root": true,
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
+        "@typescript-eslint"
+    ],
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:import/errors",
+        "plugin:import/warnings",
+        "airbnb-base",
+        "plugin:import/typescript"
+    ],
+    "rules": {
+        "indent": ["error", 4],
+        "import/prefer-default-export": ["off"],
+        "import/extensions": ["error", "never"]
+    }
+}
