@@ -1,6 +1,10 @@
 export interface GameState {
+    move: {
+        playerId: string,
+    },
     players: {
+        id: string,
         name: string,
-        position: number,
+        space: number,
     }[]
 }
