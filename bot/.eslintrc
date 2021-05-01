@@ -36,6 +36,12 @@
         "max-classes-per-file": "off",
         "no-use-before-define": "off",
         "arrow-body-style": "off",
-        "arrow-parens": "off"
+        "arrow-parens": "off",
+        "max-len": ["warn", 120],
+        "no-plusplus": "off",
+        "one-var": "off",
+        "one-var-declaration-per-line": "off",
+        "prefer-destructuring": "off",
+        "no-unused-vars": "off"
     }
 }

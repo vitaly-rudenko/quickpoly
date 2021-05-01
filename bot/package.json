@@ -3,19 +3,19 @@
     "version": "1.0.0",
     "description": "Quickpoly Telegram Bot",
     "main": "build/app.js",
-    "type": "module",
     "scripts": {
-        "start": "node --es-module-specifier-resolution=node build/app.js",
+        "start": "node build/app.js",
         "build": "rimraf ./build && tsc --pretty --project tsconfig.build.json",
-        "debug": "ts-node-dev --require esm --transpile-only --rs --respawn --inspect=0.0.0.0:9229 --nolazy -- src/app.ts",
-        "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' ts-node --transpile-only node_modules/mocha/bin/mocha --register ts-node/register test/**/*.test.ts",
-        "test:watch": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' ts-node-dev --transpile-only --respawn --rs --clear node_modules/mocha/bin/mocha --register ts-node/register test/**/*.test.ts",
+        "debug": "ts-node-dev --transpile-only --rs --respawn --inspect=0.0.0.0:9229 --nolazy -- src/app.ts",
+        "test": "ts-node --transpile-only node_modules/mocha/bin/mocha --register ts-node/register test/**/*.test.ts",
+        "test:watch": "ts-node-dev --transpile-only --respawn --rs --clear node_modules/mocha/bin/mocha --register ts-node/register test/**/*.test.ts",
         "lint": "eslint . --ext .ts",
         "lint:fix": "npm run lint -- --fix"
     },
     "author": "Vitaly Rudenko",
     "license": "ISC",
     "dependencies": {
+        "@types/sinon": "^10.0.0",
         "canvas": "^2.7.0",
         "chai": "^4.3.4",
         "mocha": "^8.3.2",
@@ -38,8 +38,10 @@
         "esm": "^3.2.25",
         "nodemon": "^2.0.7",
         "rimraf": "^3.0.2",
+        "sinon-chai": "^3.6.0",
         "ts-node": "^9.1.1",
         "ts-node-dev": "^1.1.6",
+        "ts-sinon": "^2.0.1",
         "typescript": "^4.2.4"
     }
 }
