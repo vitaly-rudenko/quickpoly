@@ -252,6 +252,19 @@ const spaces: Serializable[] = [
             hotelBasePrice: 50,
         }),
     }),
+    new StreetSpace({
+        name: 'Connecticut Avenue',
+        price: 120,
+        color: StreetColor.LIGHT_BLUE,
+        titleDeed: new StreetTitleDeed({
+            baseRent: 8,
+            perHouseRents: [40, 100, 300, 450],
+            hotelRent: 600,
+            mortgageValue: 60,
+            housePrice: 50,
+            hotelBasePrice: 50,
+        }),
+    }),
     new JailSpace(),
     new AuctionSpace(),
     new StreetSpace({
