@@ -31,34 +31,34 @@ export class WinstonLoggerProvider implements LoggerProvider {
     }
 }
 
-class WinstonLogger implements Logger {
+export class WinstonLogger implements Logger {
     private _logger: winston.Logger;
 
     constructor(logger: winston.Logger) {
         this._logger = logger;
     }
 
-    trace(...args: unknown[]) {
-        this._logger.silly(this._format(args));
+    trace(...args: unknown[]): void {
+        this._logger.silly(this.format(args));
     }
 
-    debug(...args: unknown[]) {
-        this._logger.debug(this._format(args));
+    debug(...args: unknown[]): void {
+        this._logger.debug(this.format(args));
     }
 
-    info(...args: unknown[]) {
-        this._logger.info(this._format(args));
+    info(...args: unknown[]): void {
+        this._logger.info(this.format(args));
     }
 
-    warn(...args: unknown[]) {
-        this._logger.warn(this._format(args));
+    warn(...args: unknown[]): void {
+        this._logger.warn(this.format(args));
     }
 
-    error(...args: unknown[]) {
-        this._logger.error(this._format(args));
+    error(...args: unknown[]): void {
+        this._logger.error(this.format(args));
     }
 
-    private _format(args: unknown[]) {
+    format(args: unknown[]): string {
         return args.map(arg => util.formatWithOptions({ colors: true, depth: 10, breakLength: 120 }, arg)).join(' ');
     }
 }
