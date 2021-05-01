@@ -1,7 +1,8 @@
+import { Serializable, SerializableObject } from '../../Serializable';
 import { LandableSpace } from '../LandableSpace';
 import { ChanceCard } from './ChanceCard';
 
-export class ChanceSpace implements LandableSpace {
+export class ChanceSpace implements LandableSpace, Serializable {
     private _cards: ChanceCard[];
 
     constructor(attributes: {
@@ -10,5 +11,9 @@ export class ChanceSpace implements LandableSpace {
         this._cards = attributes.cards;
     }
 
-    land() {}
+    land(): void {}
+
+    serialize(): SerializableObject {
+        return { type: 'chance' };
+    }
 }

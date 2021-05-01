@@ -1,4 +1,6 @@
-export class StreetTitleDeed {
+import { Serializable, SerializableObject } from '../../Serializable';
+
+export class StreetTitleDeed implements Serializable {
     private _baseRent: number;
     private _perHouseRents: number[];
     private _hotelRent: number;
@@ -20,5 +22,16 @@ export class StreetTitleDeed {
         this._mortgageValue = attributes.mortgageValue;
         this._housePrice = attributes.housePrice;
         this._hotelBasePrice = attributes.hotelBasePrice;
+    }
+
+    serialize(): SerializableObject {
+        return {
+            baseRent: this._baseRent,
+            perHouseRents: this._perHouseRents,
+            hotelRent: this._hotelRent,
+            mortgageValue: this._mortgageValue,
+            housePrice: this._housePrice,
+            hotelBasePrice: this._hotelBasePrice,
+        };
     }
 }

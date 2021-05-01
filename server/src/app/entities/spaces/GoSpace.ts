@@ -1,14 +1,24 @@
 import { LandableSpace } from './LandableSpace';
 import { PassableSpace } from '../PassableSpace';
+import { Serializable, SerializableObject } from '../Serializable';
 
-export class GoSpace implements LandableSpace, PassableSpace {
+export class GoSpace implements LandableSpace, PassableSpace, Serializable {
     private _salary: number;
 
     constructor(attributes: { salary: number }) {
         this._salary = attributes.salary;
     }
 
-    land() {}
+    land(): void {}
 
-    pass() {}
+    pass(): void {}
+
+    serialize(): SerializableObject {
+        return {
+            type: 'go',
+            attributes: {
+                salary: this._salary,
+            },
+        };
+    }
 }

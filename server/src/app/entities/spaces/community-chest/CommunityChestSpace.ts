@@ -1,7 +1,8 @@
+import { Serializable, SerializableObject } from '../../Serializable';
 import { LandableSpace } from '../LandableSpace';
 import { CommunityChestCard } from './CommunityChestCard';
 
-export class CommunityChestSpace implements LandableSpace {
+export class CommunityChestSpace implements LandableSpace, Serializable {
     private _cards: CommunityChestCard[];
 
     constructor(attributes: {
@@ -10,5 +11,9 @@ export class CommunityChestSpace implements LandableSpace {
         this._cards = attributes.cards;
     }
 
-    land() {}
+    land(): void {}
+
+    serialize(): SerializableObject {
+        return { type: 'communityChest' };
+    }
 }

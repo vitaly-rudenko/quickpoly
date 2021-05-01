@@ -1,6 +1,7 @@
+import { Serializable, SerializableObject } from '../Serializable';
 import { LandableSpace } from './LandableSpace';
 
-export class IncomeTaxSpace implements LandableSpace {
+export class IncomeTaxSpace implements LandableSpace, Serializable {
     private _amount: number;
     private _percent: number;
 
@@ -9,5 +10,15 @@ export class IncomeTaxSpace implements LandableSpace {
         this._percent = attributes.percent;
     }
 
-    land() {}
+    land(): void {}
+
+    serialize(): SerializableObject {
+        return {
+            type: 'incomeTax',
+            attributes: {
+                amount: this._amount,
+                percent: this._percent,
+            },
+        };
+    }
 }
