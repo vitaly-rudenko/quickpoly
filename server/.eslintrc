@@ -25,6 +25,17 @@
         "no-underscore-dangle": "off",
         "lines-between-class-members": "off",
         "no-shadow": "off",
-        "@typescript-eslint/no-shadow": ["error"]
+        "@typescript-eslint/no-shadow": ["error"],
+        "comma-dangle": ["error", {
+            "arrays": "always-multiline",
+            "objects": "always-multiline",
+            "imports": "only-multiline",
+            "exports": "only-multiline",
+            "functions": "only-multiline"
+        }],
+        "max-classes-per-file": "off",
+        "no-use-before-define": "off",
+        "max-len": ["warn", 120],
+        "arrow-parens": "off"
     }
 }
