@@ -40,6 +40,8 @@
         "max-len": ["warn", 120],
         "no-plusplus": "off",
         "one-var": "off",
-        "one-var-declaration-per-line": "off"
+        "one-var-declaration-per-line": "off",
+        "prefer-destructuring": "off",
+        "no-unused-vars": "off"
     }
 }
