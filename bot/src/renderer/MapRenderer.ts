@@ -56,16 +56,14 @@ const streetColorToSpaceColor: Record<string, string> = {
 };
 
 const playerColors = [
-    'rgba(255, 0, 0, 0.8)',
-    'rgba(0, 255, 0, 0.8)',
-    'rgba(0, 0, 255, 0.8)',
-    'rgba(255, 0, 255, 0.8)',
-    'rgba(255, 255, 0, 0.8)',
-    'rgba(0, 255, 255, 0.8)',
-    'rgba(127, 127, 127, 0.8)',
-    'rgba(0, 127, 255, 0.8)',
-    'rgba(255, 127, 0, 0.8)',
-    'rgba(255, 0, 127, 0.8)',
+    'rgba(220, 17, 0, 0.8)',
+    'rgba(220, 80, 30, 0.8)',
+    'rgba(180, 180, 0, 0.8)',
+    'rgba(0, 137, 36, 0.8)',
+    'rgba(0, 112, 137, 0.8)',
+    'rgba(21, 0, 137, 0.8)',
+    'rgba(137, 0, 114, 0.8)',
+    'rgba(0, 0, 0, 0.8)',
 ];
 
 export class MapRenderer {
@@ -142,7 +140,7 @@ export class MapRenderer {
             const color = playerColors[i % playerColors.length];
 
             if (side === Side.TOP) {
-                const playerWidth = textBoundaries.width + 20;
+                const playerWidth = textBoundaries.width + 40;
                 const playerHeight = 30;
                 const playerX = x + width / 2;
                 const playerY = y + playerHeight / 2 + offset + spacePosition * (playerHeight + offset);
@@ -150,27 +148,27 @@ export class MapRenderer {
                 context.fillStyle = color;
                 context.fillRect(playerX - playerWidth / 2, playerY - playerHeight / 2, playerWidth, playerHeight);
 
-                context.fillStyle = 'black';
+                context.fillStyle = 'white';
                 context.textAlign = 'center';
                 context.textBaseline = 'middle';
-                context.fillText(player.name, playerX, playerY);
+                context.fillText('↑ ' + player.name, playerX, playerY);
             } else if (side === Side.RIGHT) {
                 const playerWidth = 30;
-                const playerHeight = textBoundaries.width + 20;
+                const playerHeight = textBoundaries.width + 40;
                 const playerX = x + width - playerWidth / 2 - offset - spacePosition * (playerWidth + offset);
                 const playerY = y + height / 2;
 
                 context.fillStyle = color;
                 context.fillRect(playerX - playerWidth / 2, playerY - playerHeight / 2, playerWidth, playerHeight);
 
-                context.fillStyle = 'black';
+                context.fillStyle = 'white';
                 context.textAlign = 'center';
                 context.textBaseline = 'middle';
                 context.translate(playerX, playerY);
                 context.rotate(-Math.PI / 2);
-                context.fillText(player.name, 0, 0);
+                context.fillText('↓ ' + player.name, 0, 0);
             } else if (side === Side.BOTTOM) {
-                const playerWidth = textBoundaries.width + 20;
+                const playerWidth = textBoundaries.width + 40;
                 const playerHeight = 30;
                 const playerX = x + width / 2;
                 const playerY = y + height - playerHeight / 2 - offset - spacePosition * (playerHeight + offset);
@@ -178,25 +176,25 @@ export class MapRenderer {
                 context.fillStyle = color;
                 context.fillRect(playerX - playerWidth / 2, playerY - playerHeight / 2, playerWidth, playerHeight);
 
-                context.fillStyle = 'black';
+                context.fillStyle = 'white';
                 context.textAlign = 'center';
                 context.textBaseline = 'middle';
-                context.fillText(player.name, playerX, playerY);
+                context.fillText('↓ ' + player.name, playerX, playerY);
             } else {
                 const playerWidth = 30;
-                const playerHeight = textBoundaries.width + 20;
+                const playerHeight = textBoundaries.width + 40;
                 const playerX = playerWidth / 2 + offset + spacePosition * (playerWidth + offset);
                 const playerY = y + height / 2;
 
                 context.fillStyle = color;
                 context.fillRect(playerX - playerWidth / 2, playerY - playerHeight / 2, playerWidth, playerHeight);
 
-                context.fillStyle = 'black';
+                context.fillStyle = 'white';
                 context.textAlign = 'center';
                 context.textBaseline = 'middle';
                 context.translate(playerX, playerY);
                 context.rotate(-Math.PI / 2);
-                context.fillText(player.name, 0, 0);
+                context.fillText('↑ ' + player.name, 0, 0);
             }
 
             context.restore();
@@ -242,16 +240,6 @@ export class MapRenderer {
             [width, height] = [largeSpaceSize, smallestSpaceSize];
         }
 
-        console.log({
-            space,
-            x,
-            y,
-            width,
-            height,
-            side,
-            direction,
-        });
-
         return {
             x,
             y,
@@ -275,7 +263,7 @@ export class MapRenderer {
     ): void {
         context.save();
 
-        const label = /*this._spaces.indexOf(space) + ' ' + */(space.attributes?.name ?? typeToName[space.type]);
+        const label = (space.attributes?.name ?? typeToName[space.type]);
 
         if (space.attributes?.color) {
             context.fillStyle = streetColorToSpaceColor[space.attributes?.color];

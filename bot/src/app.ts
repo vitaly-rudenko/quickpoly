@@ -15,7 +15,6 @@ async function start() {
     logger.info('Starting the application');
 
     const spaces = await loadSpaces();
-    logger.debug(spaces);
 
     canvas.registerFont(
         path.join(process.cwd(), 'assets', 'Roboto-Regular.ttf'),
