@@ -1,5 +1,6 @@
 import canvas from 'canvas';
-import { GameState } from './GameState';
+import { GameState, OwnedSpace } from './GameState';
+import { Player } from './Player';
 import { Space } from './Space';
 
 enum Side {
@@ -45,25 +46,25 @@ const typeToName: Record<string, string> = {
 };
 
 const streetColorToSpaceColor: Record<string, string> = {
-    brown: '#D26767',
-    lightBlue: '#80CCFF',
-    pink: 'hotPink',
-    orange: '#FFA041',
-    red: '#FF5B5B',
-    yellow: '#FFFF75',
-    green: '#61CA61',
-    blue: '#6E6EFF',
+    brown: '#f5a9a9',
+    lightBlue: '#bde4ff',
+    pink: '#ffc2e0',
+    orange: '#ffcb96',
+    red: '#ffb5b5',
+    yellow: '#fffbb5',
+    green: '#a9f5a9',
+    blue: '#c4d0ff',
 };
 
 const playerColors = [
-    'rgba(220, 17, 0, 0.5)',
-    'rgba(220, 80, 30, 0.5)',
-    'rgba(180, 180, 0, 0.5)',
-    'rgba(0, 137, 36, 0.5)',
-    'rgba(0, 112, 137, 0.5)',
-    'rgba(21, 0, 137, 0.5)',
-    'rgba(137, 0, 114, 0.5)',
-    'rgba(0, 0, 0, 0.5)',
+    [220, 17, 0], // red
+    [21, 0, 137], // blue
+    [0, 137, 36], // green
+    [180, 180, 0], // yellow
+    [0, 112, 137], // light blue
+    [137, 0, 114], // purple
+    [220, 80, 30], // orange
+    [0, 140, 126], // teal
 ];
 
 export class MapRenderer {
@@ -93,14 +94,18 @@ export class MapRenderer {
         const mapCanvas = canvas.createCanvas(this._size, this._size);
         const context = mapCanvas.getContext('2d');
 
-        for (let space = 0; space < this._spaces.length; space++) {
-            const { x, y, width, height, direction } = this.getSpaceBoundaries(space);
+        for (let index = 0; index < this._spaces.length; index++) {
+            const { x, y, width, height, side, direction } = this.getSpaceBoundaries(index);
 
-            this.drawSpace(context, this._spaces[space], {
+            const ownedSpace = gameState.spaces.find(space => space.index === index);
+            const player = ownedSpace && gameState.players.find(p => p.id === ownedSpace.ownerId);
+
+            this.drawSpace(context, this._spaces[index], ownedSpace, player, {
                 x,
                 y,
                 width,
                 height,
+                side,
                 direction,
             });
         }
@@ -118,11 +123,11 @@ export class MapRenderer {
 
     drawPlayers(
         context: canvas.CanvasRenderingContext2D,
-        players: { name: string, space: number }[]
+        players: Player[]
     ): void {
         const perSpaceCount = new Map();
 
-        for (const [i, player] of players.entries()) {
+        for (const player of players) {
             if (!perSpaceCount.has(player.space)) {
                 perSpaceCount.set(player.space, 0);
             }
@@ -134,11 +139,15 @@ export class MapRenderer {
             context.save();
             context.font = `${this._fontSize}px "${this._fontFamily}"`;
 
-            const textBoundaries = this.getTextBoundaries(context, player.name);
+            const playerName = player.name.length > 10
+                ? (player.name.slice(0, 10) + '...')
+                : player.name;
+            const textBoundaries = this.getTextBoundaries(context, playerName);
             const offset = 2;
             const centerOffset = 13;
 
-            const color = playerColors[i % playerColors.length];
+            const nameColor = this.getPlayerColor(player.index, 0.7);
+            const iconColor = this.getPlayerColor(player.index);
 
             if (side === Side.TOP) {
                 const playerWidth = textBoundaries.width + 40;
@@ -146,28 +155,34 @@ export class MapRenderer {
                 const playerX = x + width / 2 - centerOffset;
                 const playerY = y + height + offset + spacePosition * playerHeight;
 
-                context.fillStyle = color;
+                context.fillStyle = nameColor;
                 context.fillRect(playerX, playerY, playerWidth, playerHeight);
 
                 context.beginPath();
-                context.arc(x + 15 + 15 * spacePosition, y + 15, 5, 0, Math.PI * 2);
+                context.lineWidth = 2;
+                context.strokeStyle = 'white';
+                context.fillStyle = iconColor;
+                context.arc(x + width - 15, y + height - 15 - 20 * spacePosition, 8, 0, Math.PI * 2);
                 context.fill();
 
                 context.fillStyle = 'white';
                 context.textAlign = 'left';
                 context.textBaseline = 'top';
-                context.fillText(' ↑ ' + player.name, playerX, playerY);
+                context.fillText(' ↑ ' + playerName, playerX, playerY);
             } else if (side === Side.RIGHT) {
                 const playerWidth = 30;
                 const playerHeight = textBoundaries.width + 40;
                 const playerX = x - playerWidth - offset - spacePosition * playerWidth;
                 const playerY = y + height / 2 - centerOffset;
 
-                context.fillStyle = color;
+                context.fillStyle = nameColor;
                 context.fillRect(playerX, playerY, playerWidth, playerHeight);
 
                 context.beginPath();
-                context.arc(x + 15 + 15 * spacePosition, y + 15, 5, 0, Math.PI * 2);
+                context.lineWidth = 2;
+                context.strokeStyle = 'white';
+                context.fillStyle = iconColor;
+                context.arc(x + 15 + 20 * spacePosition, y + height - 15, 8, 0, Math.PI * 2);
                 context.fill();
 
                 context.fillStyle = 'white';
@@ -175,35 +190,41 @@ export class MapRenderer {
                 context.textBaseline = 'bottom';
                 context.translate(playerX + playerWidth, playerY);
                 context.rotate(-Math.PI / 2);
-                context.fillText(player.name + ' ↓ ', 0, 0);
+                context.fillText(playerName + ' ↓ ', 0, 0);
             } else if (side === Side.BOTTOM) {
                 const playerWidth = textBoundaries.width + 40;
                 const playerHeight = 30;
                 const playerX = x - playerWidth + width / 2 + centerOffset;
                 const playerY = y - playerHeight - offset - spacePosition * playerHeight;
 
-                context.fillStyle = color;
+                context.fillStyle = nameColor;
                 context.fillRect(playerX, playerY, playerWidth, playerHeight);
 
                 context.beginPath();
-                context.arc(x + 15 + 15 * spacePosition, y + 15, 5, 0, Math.PI * 2);
+                context.lineWidth = 2;
+                context.strokeStyle = 'white';
+                context.fillStyle = iconColor;
+                context.arc(x + 15, y + 15 + 20 * spacePosition, 8, 0, Math.PI * 2);
                 context.fill();
 
                 context.fillStyle = 'white';
                 context.textAlign = 'right';
                 context.textBaseline = 'top';
-                context.fillText(player.name + ' ↓ ', playerX + playerWidth, playerY);
+                context.fillText(playerName + ' ↓ ', playerX + playerWidth, playerY);
             } else {
                 const playerWidth = 30;
                 const playerHeight = textBoundaries.width + 40;
                 const playerX = width + offset + spacePosition * playerWidth;
                 const playerY = y + height - playerHeight - centerOffset;
 
-                context.fillStyle = color;
+                context.fillStyle = nameColor;
                 context.fillRect(playerX, playerY, playerWidth, playerHeight);
 
                 context.beginPath();
-                context.arc(x + 15 + 15 * spacePosition, y + 15, 5, 0, Math.PI * 2);
+                context.lineWidth = 2;
+                context.strokeStyle = 'white';
+                context.fillStyle = iconColor;
+                context.arc(x + width - 15 - 20 * spacePosition, y + height - 15, 8, 0, Math.PI * 2);
                 context.fill();
 
                 context.fillStyle = 'white';
@@ -211,14 +232,14 @@ export class MapRenderer {
                 context.textBaseline = 'top';
                 context.translate(playerX, playerY + playerHeight);
                 context.rotate(-Math.PI / 2);
-                context.fillText(' ↑ ' + player.name, 0, 0);
+                context.fillText(' ↑ ' + playerName, 0, 0);
             }
 
             context.restore();
         }
     }
 
-    getSpaceBoundaries(space: number): {
+    getSpaceBoundaries(index: number): {
         x: number,
         y: number,
         width: number,
@@ -230,8 +251,8 @@ export class MapRenderer {
         const largeSpaceSize = this._largeSpaceSize;
         const smallSpaceSize = (this._size - this._largeSpaceSize * 2) / (spacesPerSide - 1);
 
-        const position = space % spacesPerSide;
-        const side = sideIndexToSide[Math.floor(space / spacesPerSide)];
+        const position = index % spacesPerSide;
+        const side = sideIndexToSide[Math.floor(index / spacesPerSide)];
         const direction = sideToDirection[side];
         const smallestSpaceSize = position === 0 ? largeSpaceSize : smallSpaceSize;
 
@@ -270,8 +291,11 @@ export class MapRenderer {
     drawSpace(
         context: canvas.CanvasRenderingContext2D,
         space: Space,
+        ownedSpace: OwnedSpace | undefined,
+        owner: Player | undefined,
         options: {
             direction: Direction,
+            side: Side,
             x: number,
             y: number,
             width: number,
@@ -282,18 +306,125 @@ export class MapRenderer {
 
         const label = (space.attributes?.name ?? typeToName[space.type]);
         const additionalInfo: string[] = [];
+
         if (space.attributes?.price) {
             additionalInfo.push('$' + space.attributes.price);
         }
 
-        if (space.attributes?.color) {
-            context.fillStyle = streetColorToSpaceColor[space.attributes?.color];
-        } else {
-            context.fillStyle = 'white';
+        const colorSize = 0.15;
+        context.lineWidth = 3;
+
+        if (owner && ownedSpace) {
+            context.fillStyle = this.getPlayerColor(owner.index, 0.7);
+
+            if (options.side === Side.TOP) {
+                context.fillRect(
+                    options.x, options.y,
+                    options.width, options.height * colorSize
+                );
+            } else if (options.side === Side.RIGHT) {
+                context.fillRect(
+                    options.x + options.width * (1 - colorSize), options.y,
+                    options.width * colorSize, options.height
+                );
+            } else if (options.side === Side.BOTTOM) {
+                context.fillRect(
+                    options.x, options.y + options.height * (1 - colorSize),
+                    options.width, options.height * colorSize
+                );
+            } else {
+                context.fillRect(
+                    options.x, options.y,
+                    options.width * colorSize, options.height
+                );
+            }
+
+            if (ownedSpace.hotel) {
+                additionalInfo.push('+ hotel');
+
+                const offset = 15;
+
+                let x: number, y: number;
+                if (options.side === Side.TOP) {
+                    x = options.x + options.width / 2;
+                    y = options.y + offset;
+                } else if (options.side === Side.RIGHT) {
+                    x = options.x + options.width - offset;
+                    y = options.y + options.height / 2;
+                } else if (options.side === Side.BOTTOM) {
+                    x = options.x + options.width / 2;
+                    y = options.y + options.height - offset;
+                } else {
+                    x = options.x + offset;
+                    y = options.y + options.height / 2;
+                }
+
+                context.beginPath();
+                context.fillStyle = 'white';
+                context.arc(x, y, 10, 0, Math.PI * 2);
+                context.fill();
+            } else if (ownedSpace.houses > 0) {
+                additionalInfo.push('+ ' + ownedSpace.houses + (ownedSpace.houses > 1 ? ' houses' : ' house'));
+
+                const size = 8;
+                const mapOffset = 10;
+                const offset = 5;
+                const length = ownedSpace.houses * (size + offset) - offset;
+
+                let x: number, y: number;
+                let xOffset = 0;
+                let yOffset = 0;
+                if (options.side === Side.TOP) {
+                    x = options.x + (options.width - length) / 2;
+                    y = options.y + mapOffset;
+                    xOffset = size + offset;
+                } else if (options.side === Side.RIGHT) {
+                    x = options.x + options.width - size - mapOffset;
+                    y = options.y + (options.height - length) / 2;
+                    yOffset = size + offset;
+                } else if (options.side === Side.BOTTOM) {
+                    x = options.x + (options.width - length) / 2;
+                    y = options.y + options.height - size - mapOffset;
+                    xOffset = size + offset;
+                } else {
+                    x = options.x + mapOffset;
+                    y = options.y + (options.height - length) / 2;
+                    yOffset = size + offset;
+                }
+
+                for (let house = 0; house < ownedSpace.houses; house++) {
+                    context.fillStyle = 'white';
+                    context.fillRect(x + xOffset * house, y + yOffset * house, size, size);
+                }
+            }
         }
 
-        context.lineWidth = 3;
-        context.fillRect(options.x, options.y, options.width, options.height);
+        if (space.attributes?.color) {
+            context.fillStyle = streetColorToSpaceColor[space.attributes?.color];
+
+            if (options.side === Side.TOP) {
+                context.fillRect(
+                    options.x, options.y + options.height * (1 - colorSize),
+                    options.width, options.height * colorSize
+                );
+            } else if (options.side === Side.RIGHT) {
+                context.fillRect(
+                    options.x, options.y,
+                    options.width * colorSize, options.height
+                );
+            } else if (options.side === Side.BOTTOM) {
+                context.fillRect(
+                    options.x, options.y,
+                    options.width, options.height * colorSize
+                );
+            } else {
+                context.fillRect(
+                    options.x + options.width * (1 - colorSize), options.y,
+                    options.width * colorSize, options.height
+                );
+            }
+        }
+
         context.strokeStyle = 'black';
         context.strokeRect(options.x, options.y, options.width, options.height);
 
@@ -312,6 +443,11 @@ export class MapRenderer {
         }
 
         context.restore();
+    }
+
+    getPlayerColor(index: number, opacity = 1): string {
+        const [r, g, b] = playerColors[index % playerColors.length];
+        return `rgba(${r}, ${g}, ${b}, ${opacity})`;
     }
 
     getTextBoundaries(

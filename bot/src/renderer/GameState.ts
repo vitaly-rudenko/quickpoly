@@ -1,10 +1,16 @@
+import { Player } from './Player';
+
 export interface GameState {
     move: {
         playerId: string,
     },
-    players: {
-        id: string,
-        name: string,
-        space: number,
-    }[]
+    spaces: OwnedSpace[],
+    players: Player[]
+}
+
+export interface OwnedSpace {
+    index: number,
+    ownerId: string,
+    houses: number,
+    hotel: boolean,
 }
