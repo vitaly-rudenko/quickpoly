@@ -16,6 +16,7 @@
     "author": "Vitaly Rudenko",
     "license": "ISC",
     "dependencies": {
+        "canvas": "^2.7.0",
         "chai": "^4.3.4",
         "mocha": "^8.3.2",
         "sinon": "^10.0.0",
