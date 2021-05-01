@@ -126,3 +126,4 @@ temp/
 
 # TypeScript
 build/
+credentials.json
