@@ -67,6 +67,8 @@ const playerColors = [
     [0, 140, 126], // teal
 ];
 
+const int = Math.trunc;
+
 export class MapRenderer {
     private _spaces: Space[];
     private _largeSpaceSize: number;
@@ -76,18 +78,13 @@ export class MapRenderer {
 
     constructor(
         spaces: Space[],
-        options: {
-            size: number,
-            largeSpaceSize: number,
-            fontFamily: string,
-            fontSize: number
-        }
+        options: { fontFamily: string }
     ) {
         this._spaces = spaces;
-        this._size = options.size;
-        this._largeSpaceSize = options.largeSpaceSize;
+        this._size = 2048;
+        this._largeSpaceSize = 436;
+        this._fontSize = 34;
         this._fontFamily = options.fontFamily;
-        this._fontSize = options.fontSize;
     }
 
     render(gameState: GameState): Buffer {
@@ -110,10 +107,10 @@ export class MapRenderer {
             });
         }
 
-        context.lineWidth = 3;
+        context.lineWidth = 4;
         context.strokeRect(
             this._largeSpaceSize, this._largeSpaceSize,
-            this._size - this._largeSpaceSize * 2, this._size - this._largeSpaceSize * 2
+            int(this._size - this._largeSpaceSize * 2), int(this._size - this._largeSpaceSize * 2)
         );
 
         this.drawPlayers(context, gameState.players);
@@ -142,27 +139,32 @@ export class MapRenderer {
             const playerName = player.name.length > 10
                 ? (player.name.slice(0, 10) + '...')
                 : player.name;
-            const textBoundaries = this.getTextBoundaries(context, playerName);
+            const textBoundaries = this.getTextBoundaries(context, ' ↑ ' + playerName);
             const offset = 2;
-            const centerOffset = 13;
+            const centerOffset = 26;
+            const spaceOffset = 25;
+            const iconRadius = 14;
+            const iconOffset = iconRadius * 2 + 5;
 
             const nameColor = this.getPlayerColor(player.index, 0.7);
             const iconColor = this.getPlayerColor(player.index);
 
             if (side === Side.TOP) {
-                const playerWidth = textBoundaries.width + 40;
-                const playerHeight = 30;
-                const playerX = x + width / 2 - centerOffset;
-                const playerY = y + height + offset + spacePosition * playerHeight;
+                const playerWidth = int(textBoundaries.width + 20);
+                const playerHeight = int(this._fontSize + 20);
+                const playerX = int(x + width / 2 - centerOffset);
+                const playerY = int(y + height + offset + spacePosition * playerHeight);
 
                 context.fillStyle = nameColor;
                 context.fillRect(playerX, playerY, playerWidth, playerHeight);
 
                 context.beginPath();
-                context.lineWidth = 2;
                 context.strokeStyle = 'white';
                 context.fillStyle = iconColor;
-                context.arc(x + width - 15, y + height - 15 - 20 * spacePosition, 8, 0, Math.PI * 2);
+                context.arc(
+                    x + width - spaceOffset, y + height - spaceOffset - iconOffset * spacePosition,
+                    iconRadius, 0, Math.PI * 2
+                );
                 context.fill();
 
                 context.fillStyle = 'white';
@@ -170,41 +172,45 @@ export class MapRenderer {
                 context.textBaseline = 'top';
                 context.fillText(' ↑ ' + playerName, playerX, playerY);
             } else if (side === Side.RIGHT) {
-                const playerWidth = 30;
-                const playerHeight = textBoundaries.width + 40;
-                const playerX = x - playerWidth - offset - spacePosition * playerWidth;
-                const playerY = y + height / 2 - centerOffset;
+                const playerWidth = int(this._fontSize + 20);
+                const playerHeight = int(textBoundaries.width + 20);
+                const playerX = int(x - playerWidth - offset - spacePosition * playerWidth);
+                const playerY = int(y + height / 2 - centerOffset);
 
                 context.fillStyle = nameColor;
                 context.fillRect(playerX, playerY, playerWidth, playerHeight);
 
                 context.beginPath();
-                context.lineWidth = 2;
                 context.strokeStyle = 'white';
                 context.fillStyle = iconColor;
-                context.arc(x + 15 + 20 * spacePosition, y + height - 15, 8, 0, Math.PI * 2);
+                context.arc(
+                    x + spaceOffset + iconOffset * spacePosition, y + height - spaceOffset,
+                    iconRadius, 0, Math.PI * 2
+                );
                 context.fill();
 
                 context.fillStyle = 'white';
                 context.textAlign = 'right';
-                context.textBaseline = 'bottom';
-                context.translate(playerX + playerWidth, playerY);
+                context.textBaseline = 'top';
+                context.translate(playerX, playerY);
                 context.rotate(-Math.PI / 2);
                 context.fillText(playerName + ' ↓ ', 0, 0);
             } else if (side === Side.BOTTOM) {
-                const playerWidth = textBoundaries.width + 40;
-                const playerHeight = 30;
-                const playerX = x - playerWidth + width / 2 + centerOffset;
-                const playerY = y - playerHeight - offset - spacePosition * playerHeight;
+                const playerWidth = int(textBoundaries.width + 30);
+                const playerHeight = int(this._fontSize + 20);
+                const playerX = int(x - playerWidth + width / 2 + centerOffset);
+                const playerY = int(y - playerHeight - offset - spacePosition * playerHeight);
 
                 context.fillStyle = nameColor;
                 context.fillRect(playerX, playerY, playerWidth, playerHeight);
 
                 context.beginPath();
-                context.lineWidth = 2;
                 context.strokeStyle = 'white';
                 context.fillStyle = iconColor;
-                context.arc(x + 15, y + 15 + 20 * spacePosition, 8, 0, Math.PI * 2);
+                context.arc(
+                    x + spaceOffset, y + spaceOffset + iconOffset * spacePosition,
+                    iconRadius, 0, Math.PI * 2
+                );
                 context.fill();
 
                 context.fillStyle = 'white';
@@ -212,19 +218,21 @@ export class MapRenderer {
                 context.textBaseline = 'top';
                 context.fillText(playerName + ' ↓ ', playerX + playerWidth, playerY);
             } else {
-                const playerWidth = 30;
-                const playerHeight = textBoundaries.width + 40;
-                const playerX = width + offset + spacePosition * playerWidth;
-                const playerY = y + height - playerHeight - centerOffset;
+                const playerWidth = int(this._fontSize + 20);
+                const playerHeight = int(textBoundaries.width + 30);
+                const playerX = int(width + offset + spacePosition * playerWidth);
+                const playerY = int(y + height - playerHeight - centerOffset);
 
                 context.fillStyle = nameColor;
                 context.fillRect(playerX, playerY, playerWidth, playerHeight);
 
                 context.beginPath();
-                context.lineWidth = 2;
                 context.strokeStyle = 'white';
                 context.fillStyle = iconColor;
-                context.arc(x + width - 15 - 20 * spacePosition, y + height - 15, 8, 0, Math.PI * 2);
+                context.arc(
+                    x + width - spaceOffset - iconOffset * spacePosition, y + height - spaceOffset,
+                    iconRadius, 0, Math.PI * 2
+                );
                 context.fill();
 
                 context.fillStyle = 'white';
@@ -249,7 +257,7 @@ export class MapRenderer {
     } {
         const spacesPerSide = this._spaces.length / 4;
         const largeSpaceSize = this._largeSpaceSize;
-        const smallSpaceSize = (this._size - this._largeSpaceSize * 2) / (spacesPerSide - 1);
+        const smallSpaceSize = int((this._size - this._largeSpaceSize * 2) / (spacesPerSide - 1));
 
         const position = index % spacesPerSide;
         const side = sideIndexToSide[Math.floor(index / spacesPerSide)];
@@ -311,8 +319,8 @@ export class MapRenderer {
             additionalInfo.push('$' + space.attributes.price);
         }
 
-        const colorSize = 0.15;
-        context.lineWidth = 3;
+        const colorSize = 40;
+        context.lineWidth = 4;
 
         if (owner && ownedSpace) {
             context.fillStyle = this.getPlayerColor(owner.index, 0.7);
@@ -320,29 +328,29 @@ export class MapRenderer {
             if (options.side === Side.TOP) {
                 context.fillRect(
                     options.x, options.y,
-                    options.width, options.height * colorSize
+                    options.width, colorSize
                 );
             } else if (options.side === Side.RIGHT) {
                 context.fillRect(
-                    options.x + options.width * (1 - colorSize), options.y,
-                    options.width * colorSize, options.height
+                    options.x + (options.width - colorSize), options.y,
+                    colorSize, options.height
                 );
             } else if (options.side === Side.BOTTOM) {
                 context.fillRect(
-                    options.x, options.y + options.height * (1 - colorSize),
-                    options.width, options.height * colorSize
+                    options.x, options.y + (options.height - colorSize),
+                    options.width, colorSize
                 );
             } else {
                 context.fillRect(
                     options.x, options.y,
-                    options.width * colorSize, options.height
+                    colorSize, options.height
                 );
             }
 
             if (ownedSpace.hotel) {
                 additionalInfo.push('+ hotel');
 
-                const offset = 15;
+                const offset = 20;
 
                 let x: number, y: number;
                 if (options.side === Side.TOP) {
@@ -361,14 +369,14 @@ export class MapRenderer {
 
                 context.beginPath();
                 context.fillStyle = 'white';
-                context.arc(x, y, 10, 0, Math.PI * 2);
+                context.arc(int(x), int(y), 12, 0, Math.PI * 2);
                 context.fill();
             } else if (ownedSpace.houses > 0) {
                 additionalInfo.push('+ ' + ownedSpace.houses + (ownedSpace.houses > 1 ? ' houses' : ' house'));
 
-                const size = 8;
-                const mapOffset = 10;
-                const offset = 5;
+                const size = 12;
+                const mapOffset = 14;
+                const offset = 8;
                 const length = ownedSpace.houses * (size + offset) - offset;
 
                 let x: number, y: number;
@@ -394,7 +402,7 @@ export class MapRenderer {
 
                 for (let house = 0; house < ownedSpace.houses; house++) {
                     context.fillStyle = 'white';
-                    context.fillRect(x + xOffset * house, y + yOffset * house, size, size);
+                    context.fillRect(int(x + xOffset * house), int(y + yOffset * house), size, size);
                 }
             }
         }
@@ -404,23 +412,23 @@ export class MapRenderer {
 
             if (options.side === Side.TOP) {
                 context.fillRect(
-                    options.x, options.y + options.height * (1 - colorSize),
-                    options.width, options.height * colorSize
+                    options.x, options.y + (options.height - colorSize),
+                    options.width, colorSize
                 );
             } else if (options.side === Side.RIGHT) {
                 context.fillRect(
                     options.x, options.y,
-                    options.width * colorSize, options.height
+                    colorSize, options.height
                 );
             } else if (options.side === Side.BOTTOM) {
                 context.fillRect(
                     options.x, options.y,
-                    options.width, options.height * colorSize
+                    options.width, colorSize
                 );
             } else {
                 context.fillRect(
-                    options.x + options.width * (1 - colorSize), options.y,
-                    options.width * colorSize, options.height
+                    options.x + (options.width - colorSize), options.y,
+                    colorSize, options.height
                 );
             }
         }
@@ -432,14 +440,14 @@ export class MapRenderer {
         context.font = `${this._fontSize}px "${this._fontFamily}"`;
         context.textAlign = 'center';
         context.textBaseline = 'middle';
-        context.translate(options.x + options.width / 2, options.y + options.height / 2);
+        context.translate(int(options.x + options.width / 2), int(options.y + options.height / 2));
         context.rotate(directionToAngle[options.direction]);
-        context.fillText(label, 0, additionalInfo.length > 0 ? -this._fontSize / 2 : 0);
+        context.fillText(label, 0, additionalInfo.length > 0 ? int(-this._fontSize / 2 - 4) : 0);
 
         if (additionalInfo.length > 0) {
-            context.font = `${Math.floor(this._fontSize * 0.8)}px "${this._fontFamily}"`;
+            context.font = `${int(this._fontSize * 0.8)}px "${this._fontFamily}"`;
             context.fillStyle = 'rgba(0, 0, 0, 0.8)';
-            context.fillText(additionalInfo.join(' '), 0, this._fontSize / 2);
+            context.fillText(additionalInfo.join(' '), 0, int(this._fontSize / 2 + 4));
         }
 
         context.restore();

@@ -21,12 +21,7 @@ async function start() {
         { family: 'Roboto' }
     );
 
-    const mapRenderer = new MapRenderer(spaces, {
-        size: 1108,
-        largeSpaceSize: 200,
-        fontSize: 18,
-        fontFamily: 'Roboto',
-    });
+    const mapRenderer = new MapRenderer(spaces, { fontFamily: 'Roboto' });
 
     const telegramBotToken = await loadTelegramBotToken();
 
