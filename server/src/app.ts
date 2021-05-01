@@ -14,6 +14,7 @@ import { JailSpace } from './app/entities/spaces/JailSpace';
 import { GoToJailSpace } from './app/entities/spaces/GoToJailSpace';
 import { BirthdayGiftSpace } from './app/entities/spaces/BirthdayGiftSpace';
 import { LuxuryTaxSpace } from './app/entities/spaces/LuxuryTaxSpace';
+import { Serializable } from './app/entities/Serializable';
 
 const communityChestSpace = new CommunityChestSpace({
     cards: [
@@ -157,7 +158,7 @@ const chanceSpace = new ChanceSpace({
     ],
 });
 
-const spaces = [
+const spaces: Serializable[] = [
     new GoSpace({ salary: 200 }),
     new StreetSpace({
         name: 'Mediterranean Avenue',
@@ -586,3 +587,5 @@ const spaces = [
         }),
     }),
 ];
+
+console.log(JSON.stringify(spaces.map(space => space.serialize()), null, 4));
