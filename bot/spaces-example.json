@@ -6,7 +6,7 @@
         }
     },
     {
-        "type": "utility",
+        "type": "street",
         "attributes": {
             "name": "Mediterranean Avenue",
             "price": 60,
@@ -30,7 +30,7 @@
         "type": "communityChest"
     },
     {
-        "type": "utility",
+        "type": "street",
         "attributes": {
             "name": "Baltic Avenue",
             "price": 60,
@@ -51,7 +51,7 @@
         }
     },
     {
-        "type": "utility",
+        "type": "street",
         "attributes": {
             "name": "Arctic Avenue",
             "price": 80,
@@ -79,14 +79,14 @@
         }
     },
     {
-        "type": "railroadSpace",
+        "type": "railroad",
         "attributes": {
             "name": "Reading Railroad",
             "price": 200
         }
     },
     {
-        "type": "utility",
+        "type": "street",
         "attributes": {
             "name": "Massachusetts Avenue",
             "price": 100,
@@ -107,7 +107,7 @@
         }
     },
     {
-        "type": "utility",
+        "type": "street",
         "attributes": {
             "name": "Oriental Avenue",
             "price": 100,
@@ -138,7 +138,7 @@
         }
     },
     {
-        "type": "utility",
+        "type": "street",
         "attributes": {
             "name": "Vermont Avenue",
             "price": 100,
@@ -159,13 +159,34 @@
         }
     },
     {
+        "type": "street",
+        "attributes": {
+            "name": "Connecticut Avenue",
+            "price": 120,
+            "color": "lightBlue",
+            "titleDeed": {
+                "baseRent": 8,
+                "perHouseRents": [
+                    40,
+                    100,
+                    300,
+                    450
+                ],
+                "hotelRent": 600,
+                "mortgageValue": 60,
+                "housePrice": 50,
+                "hotelBasePrice": 50
+            }
+        }
+    },
+    {
         "type": "jail"
     },
     {
         "type": "auction"
     },
     {
-        "type": "utility",
+        "type": "street",
         "attributes": {
             "name": "Maryland Avenue",
             "price": 140,
@@ -186,7 +207,7 @@
         }
     },
     {
-        "type": "utility",
+        "type": "street",
         "attributes": {
             "name": "St. Charles Place",
             "price": 140,
@@ -214,7 +235,7 @@
         }
     },
     {
-        "type": "utility",
+        "type": "street",
         "attributes": {
             "name": "States Avenue",
             "price": 140,
@@ -235,7 +256,7 @@
         }
     },
     {
-        "type": "utility",
+        "type": "street",
         "attributes": {
             "name": "Virginia Avenue",
             "price": 160,
@@ -256,14 +277,14 @@
         }
     },
     {
-        "type": "railroadSpace",
+        "type": "railroad",
         "attributes": {
             "name": "Pennsylvania Railroad",
             "price": 200
         }
     },
     {
-        "type": "utility",
+        "type": "street",
         "attributes": {
             "name": "St. James Place",
             "price": 180,
@@ -287,7 +308,7 @@
         "type": "communityChest"
     },
     {
-        "type": "utility",
+        "type": "street",
         "attributes": {
             "name": "Tennessee Avenue",
             "price": 180,
@@ -308,7 +329,7 @@
         }
     },
     {
-        "type": "utility",
+        "type": "street",
         "attributes": {
             "name": "New York Avenue",
             "price": 200,
@@ -329,7 +350,7 @@
         }
     },
     {
-        "type": "utility",
+        "type": "street",
         "attributes": {
             "name": "New Jersey Avenue",
             "price": 200,
@@ -353,7 +374,7 @@
         "type": "freeParking"
     },
     {
-        "type": "utility",
+        "type": "street",
         "attributes": {
             "name": "Kentucky Avenue",
             "price": 220,
@@ -377,7 +398,7 @@
         "type": "chance"
     },
     {
-        "type": "utility",
+        "type": "street",
         "attributes": {
             "name": "Indiana Avenue",
             "price": 220,
@@ -398,7 +419,7 @@
         }
     },
     {
-        "type": "utility",
+        "type": "street",
         "attributes": {
             "name": "Illinois Avenue",
             "price": 240,
@@ -419,7 +440,7 @@
         }
     },
     {
-        "type": "utility",
+        "type": "street",
         "attributes": {
             "name": "Michigan Avenue",
             "price": 240,
@@ -443,14 +464,14 @@
         "type": "busTicket"
     },
     {
-        "type": "railroadSpace",
+        "type": "railroad",
         "attributes": {
             "name": "B. & O. Railroad",
             "price": 200
         }
     },
     {
-        "type": "utility",
+        "type": "street",
         "attributes": {
             "name": "Atlantic Avenue",
             "price": 260,
@@ -471,7 +492,7 @@
         }
     },
     {
-        "type": "utility",
+        "type": "street",
         "attributes": {
             "name": "Ventnor Avenue",
             "price": 260,
@@ -499,7 +520,7 @@
         }
     },
     {
-        "type": "utility",
+        "type": "street",
         "attributes": {
             "name": "Marvin Gardens",
             "price": 280,
@@ -520,7 +541,7 @@
         }
     },
     {
-        "type": "utility",
+        "type": "street",
         "attributes": {
             "name": "California Avenue",
             "price": 280,
@@ -544,7 +565,7 @@
         "type": "goToJail"
     },
     {
-        "type": "utility",
+        "type": "street",
         "attributes": {
             "name": "Pacific Avenue",
             "price": 300,
@@ -565,7 +586,7 @@
         }
     },
     {
-        "type": "utility",
+        "type": "street",
         "attributes": {
             "name": "South Carolina Avenue",
             "price": 300,
@@ -586,7 +607,7 @@
         }
     },
     {
-        "type": "utility",
+        "type": "street",
         "attributes": {
             "name": "North Carolina Avenue",
             "price": 300,
@@ -610,7 +631,7 @@
         "type": "communityChest"
     },
     {
-        "type": "utility",
+        "type": "street",
         "attributes": {
             "name": "Pennsylvania Avenue",
             "price": 320,
@@ -631,7 +652,7 @@
         }
     },
     {
-        "type": "railroadSpace",
+        "type": "railroad",
         "attributes": {
             "name": "Short Line",
             "price": 200
@@ -647,7 +668,7 @@
         }
     },
     {
-        "type": "utility",
+        "type": "street",
         "attributes": {
             "name": "Florida Avenue",
             "price": 350,
@@ -668,7 +689,7 @@
         }
     },
     {
-        "type": "utility",
+        "type": "street",
         "attributes": {
             "name": "Park Place",
             "price": 350,
@@ -692,7 +713,7 @@
         "type": "luxuryTax"
     },
     {
-        "type": "utility",
+        "type": "street",
         "attributes": {
             "name": "Boardwalk",
             "price": 400,
