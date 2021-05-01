@@ -58,7 +58,7 @@ async function start() {
         }, {
             id: 'player-6',
             name: 'Player 6',
-            space: 34,
+            space: 32,
         }, {
             id: 'player-7',
             name: 'Player 7',
@@ -75,6 +75,22 @@ async function start() {
             id: 'player-10',
             name: 'Player 10',
             space: 46,
+        }, {
+            id: 'player-11',
+            name: 'Player 11',
+            space: 0,
+        }, {
+            id: 'player-12',
+            name: 'Player 12',
+            space: 0,
+        }, {
+            id: 'player-13',
+            name: 'Player 13',
+            space: 0,
+        }, {
+            id: 'player-14',
+            name: 'Player 14',
+            space: 13,
         }],
     });
 
