@@ -281,6 +281,10 @@ export class MapRenderer {
         context.save();
 
         const label = (space.attributes?.name ?? typeToName[space.type]);
+        const additionalInfo: string[] = [];
+        if (space.attributes?.price) {
+            additionalInfo.push('$' + space.attributes.price);
+        }
 
         if (space.attributes?.color) {
             context.fillStyle = streetColorToSpaceColor[space.attributes?.color];
@@ -299,7 +303,13 @@ export class MapRenderer {
         context.textBaseline = 'middle';
         context.translate(options.x + options.width / 2, options.y + options.height / 2);
         context.rotate(directionToAngle[options.direction]);
-        context.fillText(label, 0, 0);
+        context.fillText(label, 0, additionalInfo.length > 0 ? -this._fontSize / 2 : 0);
+
+        if (additionalInfo.length > 0) {
+            context.font = `${Math.floor(this._fontSize * 0.8)}px "${this._fontFamily}"`;
+            context.fillStyle = 'rgba(0, 0, 0, 0.8)';
+            context.fillText(additionalInfo.join(' '), 0, this._fontSize / 2);
+        }
 
         context.restore();
     }
