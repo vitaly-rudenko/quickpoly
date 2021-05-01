@@ -3,4 +3,5 @@ export interface Player {
     index: number,
     name: string,
     space: number,
+    money: number,
 }

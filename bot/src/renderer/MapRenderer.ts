@@ -113,12 +113,13 @@ export class MapRenderer {
             int(this._size - this._largeSpaceSize * 2), int(this._size - this._largeSpaceSize * 2)
         );
 
-        this.drawPlayers(context, gameState.players);
+        this.drawPlayerNamesAndIcons(context, gameState.players);
+        this.drawPlayerStats(context, gameState.players);
 
         return mapCanvas.toBuffer();
     }
 
-    drawPlayers(
+    drawPlayerNamesAndIcons(
         context: canvas.CanvasRenderingContext2D,
         players: Player[]
     ): void {
@@ -136,9 +137,7 @@ export class MapRenderer {
             context.save();
             context.font = `${this._fontSize}px "${this._fontFamily}"`;
 
-            const playerName = player.name.length > 10
-                ? (player.name.slice(0, 10) + '...')
-                : player.name;
+            const playerName = this.ellipsis(player.name, 13);
             const textBoundaries = this.getTextBoundaries(context, ' ↑ ' + playerName);
             const offset = 2;
             const centerOffset = 26;
@@ -245,6 +244,50 @@ export class MapRenderer {
 
             context.restore();
         }
+    }
+
+    drawPlayerStats(
+        context: canvas.CanvasRenderingContext2D,
+        players: Player[]
+    ): void {
+        const offset = 5;
+        const outerOffset = 10;
+        const playerHeight = int(this._fontSize + 20);
+
+        context.save();
+        context.font = `${this._fontSize}px "${this._fontFamily}"`;
+
+        const x = this._size / 2;
+        const y = this._size / 2 - ((playerHeight + offset) * players.length - offset) / 2;
+
+        for (let i = 0; i < players.length; i++) {
+            const player = players[i];
+            const stats = this.ellipsis(player.name, 20);
+            const color = this.getPlayerColor(player.index, 0.7);
+            const textBoundaries = this.getTextBoundaries(context, stats);
+            const playerWidth = Math.max(500, textBoundaries.width + 20);
+            const playerX = x - playerWidth / 2;
+            const playerY = y + i * (playerHeight + offset) - offset;
+
+            context.fillStyle = color;
+            context.fillRect(playerX, playerY, playerWidth, playerHeight);
+
+            context.fillStyle = 'white';
+            context.textAlign = 'left';
+            context.textBaseline = 'middle';
+            context.fillText(stats, int(playerX + outerOffset), int(playerY + playerHeight / 2));
+
+            context.fillStyle = 'white';
+            context.textAlign = 'right';
+            context.textBaseline = 'middle';
+            context.fillText(
+                '$' + player.money,
+                int(playerX + playerWidth - outerOffset),
+                int(playerY + playerHeight / 2)
+            );
+        }
+
+        context.restore();
     }
 
     getSpaceBoundaries(index: number): {
@@ -467,5 +510,9 @@ export class MapRenderer {
             width: metrics.width,
             height: metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent,
         };
+    }
+
+    ellipsis(input: string, maxLength: number): string {
+        return input.length > maxLength ? (input.slice(0, maxLength) + '...') : input;
     }
 }

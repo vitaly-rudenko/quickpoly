@@ -120,71 +120,79 @@ async function start() {
             index: 0,
             name: 'Vladimir',
             space: 3,
+            money: 150,
         }, {
             id: 'player-2',
             index: 1,
             name: 'Anton',
             space: 14,
+            money: 2500,
         }, {
             id: 'player-3',
             index: 2,
             name: 'George',
             space: 14,
+            money: 1570,
         }, {
             id: 'player-4',
             index: 3,
             name: 'Mikhail',
             space: 25,
+            money: 870,
         }, {
             id: 'player-5',
             index: 4,
             name: 'Jon Snow',
             space: 3,
+            money: 450,
         }, {
             id: 'player-6',
             index: 5,
             name: 'Nikita',
             space: 32,
+            money: 300,
         }, {
             id: 'player-7',
             index: 6,
             name: 'Vladislav',
             space: 35,
+            money: 448,
         }, {
             id: 'player-8',
             index: 7,
             name: 'Lofi hip hop radio - beast to relax/study to',
             space: 35,
-        }, {
-            id: 'player-9',
-            index: 8,
-            name: 'Eugene',
-            space: 46,
-        }, {
-            id: 'player-10',
-            index: 9,
-            name: '1234567890123456',
-            space: 46,
-        }, {
-            id: 'player-11',
-            index: 10,
-            name: 'Kyle',
-            space: 0,
-        }, {
-            id: 'player-12',
-            index: 11,
-            name: 'Monopoly Freak',
-            space: 0,
-        }, {
-            id: 'player-13',
-            index: 12,
-            name: 'Player 13',
-            space: 0,
-        }, {
-            id: 'player-14',
-            index: 13,
-            name: 'Horny ♥️',
-            space: 13,
+            money: 980,
+        // }, {
+        //     id: 'player-9',
+        //     index: 8,
+        //     name: 'Eugene',
+        //     space: 46,
+        // }, {
+        //     id: 'player-10',
+        //     index: 9,
+        //     name: '1234567890123456',
+        //     space: 46,
+        // }, {
+        //     id: 'player-11',
+        //     index: 10,
+        //     name: 'Kyle',
+        //     space: 0,
+        // }, {
+        //     id: 'player-12',
+        //     index: 11,
+        //     name: 'Monopoly Freak',
+        //     space: 0,
+        // }, {
+        //     id: 'player-13',
+        //     index: 12,
+        //     name: 'Player 13',
+        //     space: 0,
+        // }, {
+        //     id: 'player-14',
+        //     index: 13,
+        //     name: 'Horny ♥️',
+        //     space: 13,
         }],
     });
 
