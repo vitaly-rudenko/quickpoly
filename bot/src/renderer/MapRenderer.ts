@@ -56,14 +56,14 @@ const streetColorToSpaceColor: Record<string, string> = {
 };
 
 const playerColors = [
-    'rgba(220, 17, 0, 0.8)',
-    'rgba(220, 80, 30, 0.8)',
-    'rgba(180, 180, 0, 0.8)',
-    'rgba(0, 137, 36, 0.8)',
-    'rgba(0, 112, 137, 0.8)',
-    'rgba(21, 0, 137, 0.8)',
-    'rgba(137, 0, 114, 0.8)',
-    'rgba(0, 0, 0, 0.8)',
+    'rgba(220, 17, 0, 0.5)',
+    'rgba(220, 80, 30, 0.5)',
+    'rgba(180, 180, 0, 0.5)',
+    'rgba(0, 137, 36, 0.5)',
+    'rgba(0, 112, 137, 0.5)',
+    'rgba(21, 0, 137, 0.5)',
+    'rgba(137, 0, 114, 0.5)',
+    'rgba(0, 0, 0, 0.5)',
 ];
 
 export class MapRenderer {
@@ -135,66 +135,83 @@ export class MapRenderer {
             context.font = `${this._fontSize}px "${this._fontFamily}"`;
 
             const textBoundaries = this.getTextBoundaries(context, player.name);
-            const offset = 5;
+            const offset = 2;
+            const centerOffset = 13;
 
             const color = playerColors[i % playerColors.length];
 
             if (side === Side.TOP) {
                 const playerWidth = textBoundaries.width + 40;
                 const playerHeight = 30;
-                const playerX = x + width / 2;
-                const playerY = y + playerHeight / 2 + offset + spacePosition * (playerHeight + offset);
+                const playerX = x + width / 2 - centerOffset;
+                const playerY = y + height + offset + spacePosition * playerHeight;
 
                 context.fillStyle = color;
-                context.fillRect(playerX - playerWidth / 2, playerY - playerHeight / 2, playerWidth, playerHeight);
+                context.fillRect(playerX, playerY, playerWidth, playerHeight);
+
+                context.beginPath();
+                context.arc(x + 15 + 15 * spacePosition, y + 15, 5, 0, Math.PI * 2);
+                context.fill();
 
                 context.fillStyle = 'white';
-                context.textAlign = 'center';
-                context.textBaseline = 'middle';
-                context.fillText('↑ ' + player.name, playerX, playerY);
+                context.textAlign = 'left';
+                context.textBaseline = 'top';
+                context.fillText(' ↑ ' + player.name, playerX, playerY);
             } else if (side === Side.RIGHT) {
                 const playerWidth = 30;
                 const playerHeight = textBoundaries.width + 40;
-                const playerX = x + width - playerWidth / 2 - offset - spacePosition * (playerWidth + offset);
-                const playerY = y + height / 2;
+                const playerX = x - playerWidth - offset - spacePosition * playerWidth;
+                const playerY = y + height / 2 - centerOffset;
 
                 context.fillStyle = color;
-                context.fillRect(playerX - playerWidth / 2, playerY - playerHeight / 2, playerWidth, playerHeight);
+                context.fillRect(playerX, playerY, playerWidth, playerHeight);
+
+                context.beginPath();
+                context.arc(x + 15 + 15 * spacePosition, y + 15, 5, 0, Math.PI * 2);
+                context.fill();
 
                 context.fillStyle = 'white';
-                context.textAlign = 'center';
-                context.textBaseline = 'middle';
-                context.translate(playerX, playerY);
+                context.textAlign = 'right';
+                context.textBaseline = 'bottom';
+                context.translate(playerX + playerWidth, playerY);
                 context.rotate(-Math.PI / 2);
-                context.fillText('↓ ' + player.name, 0, 0);
+                context.fillText(player.name + ' ↓ ', 0, 0);
             } else if (side === Side.BOTTOM) {
                 const playerWidth = textBoundaries.width + 40;
                 const playerHeight = 30;
-                const playerX = x + width / 2;
-                const playerY = y + height - playerHeight / 2 - offset - spacePosition * (playerHeight + offset);
+                const playerX = x - playerWidth + width / 2 + centerOffset;
+                const playerY = y - playerHeight - offset - spacePosition * playerHeight;
 
                 context.fillStyle = color;
-                context.fillRect(playerX - playerWidth / 2, playerY - playerHeight / 2, playerWidth, playerHeight);
+                context.fillRect(playerX, playerY, playerWidth, playerHeight);
+
+                context.beginPath();
+                context.arc(x + 15 + 15 * spacePosition, y + 15, 5, 0, Math.PI * 2);
+                context.fill();
 
                 context.fillStyle = 'white';
-                context.textAlign = 'center';
-                context.textBaseline = 'middle';
-                context.fillText('↓ ' + player.name, playerX, playerY);
+                context.textAlign = 'right';
+                context.textBaseline = 'top';
+                context.fillText(player.name + ' ↓ ', playerX + playerWidth, playerY);
             } else {
                 const playerWidth = 30;
                 const playerHeight = textBoundaries.width + 40;
-                const playerX = playerWidth / 2 + offset + spacePosition * (playerWidth + offset);
-                const playerY = y + height / 2;
+                const playerX = width + offset + spacePosition * playerWidth;
+                const playerY = y + height - playerHeight - centerOffset;
 
                 context.fillStyle = color;
-                context.fillRect(playerX - playerWidth / 2, playerY - playerHeight / 2, playerWidth, playerHeight);
+                context.fillRect(playerX, playerY, playerWidth, playerHeight);
+
+                context.beginPath();
+                context.arc(x + 15 + 15 * spacePosition, y + 15, 5, 0, Math.PI * 2);
+                context.fill();
 
                 context.fillStyle = 'white';
-                context.textAlign = 'center';
-                context.textBaseline = 'middle';
-                context.translate(playerX, playerY);
+                context.textAlign = 'left';
+                context.textBaseline = 'top';
+                context.translate(playerX, playerY + playerHeight);
                 context.rotate(-Math.PI / 2);
-                context.fillText('↑ ' + player.name, 0, 0);
+                context.fillText(' ↑ ' + player.name, 0, 0);
             }
 
             context.restore();

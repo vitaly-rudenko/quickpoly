@@ -36,51 +36,51 @@ async function start() {
         },
         players: [{
             id: 'player-1',
-            name: 'Player 1',
+            name: 'Vladimir',
             space: 3,
         }, {
             id: 'player-2',
-            name: 'Player 2',
+            name: 'Anton',
             space: 14,
         }, {
             id: 'player-3',
-            name: 'Player 3',
+            name: 'George',
             space: 14,
         }, {
             id: 'player-4',
-            name: 'Player 4',
+            name: 'Mikhail',
             space: 25,
         }, {
             id: 'player-5',
-            name: 'Player 5',
+            name: 'Jon Snow',
             space: 3,
         }, {
             id: 'player-6',
-            name: 'Player 6',
+            name: 'Nikita',
             space: 32,
         }, {
             id: 'player-7',
-            name: 'Player 7',
+            name: 'Vladislav',
             space: 35,
         }, {
             id: 'player-8',
-            name: 'Player 8',
+            name: 'Lofi hip hop radio - beast to relax/study to',
             space: 35,
         }, {
             id: 'player-9',
-            name: 'Player 9',
+            name: 'Eugene',
             space: 46,
         }, {
             id: 'player-10',
-            name: 'Player 10',
+            name: 'Bogdan',
             space: 46,
         }, {
             id: 'player-11',
-            name: 'Player 11',
+            name: 'Kyle',
             space: 0,
         }, {
             id: 'player-12',
-            name: 'Player 12',
+            name: 'Monopoly Freak',
             space: 0,
         }, {
             id: 'player-13',
@@ -88,7 +88,7 @@ async function start() {
             space: 0,
         }, {
             id: 'player-14',
-            name: 'Player 14',
+            name: 'Horny ♥️',
             space: 13,
         }],
     });
