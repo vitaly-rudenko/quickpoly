@@ -163,43 +163,30 @@ async function start() {
             name: 'Lofi hip hop radio - beast to relax/study to',
             space: 35,
             money: 980,
-        // }, {
-        //     id: 'player-9',
-        //     index: 8,
-        //     name: 'Eugene',
-        //     space: 46,
-        // }, {
-        //     id: 'player-10',
-        //     index: 9,
-        //     name: '1234567890123456',
-        //     space: 46,
-        // }, {
-        //     id: 'player-11',
-        //     index: 10,
-        //     name: 'Kyle',
-        //     space: 0,
-        // }, {
-        //     id: 'player-12',
-        //     index: 11,
-        //     name: 'Monopoly Freak',
-        //     space: 0,
-        // }, {
-        //     id: 'player-13',
-        //     index: 12,
-        //     name: 'Player 13',
-        //     space: 0,
-        // }, {
-        //     id: 'player-14',
-        //     index: 13,
-        //     name: 'Horny ♥️',
-        //     space: 13,
         }],
     });
 
     const bot = new Telegraf(telegramBotToken);
     bot.hears('ping', ctx => ctx.reply('pong 🏓'));
-    bot.telegram.sendPhoto('-516338149', { source: image });
     bot.launch();
+
+    let messageId = null;
+    try {
+        messageId = await fs.readFile('./message_id', { encoding: 'utf-8' });
+    } catch (err) {
+        // ignore
+    }
+
+    if (!messageId) {
+        const message = await bot.telegram.sendPhoto('-516338149', { source: image });
+        messageId = message.message_id;
+        fs.writeFile('./message_id', String(messageId), { encoding: 'utf-8' });
+    } else {
+        bot.telegram.editMessageMedia('-516338149', Number(messageId), undefined,
+            { type: 'photo', media: { source: image } });
+    }
+
+    console.log('messageId:', messageId);
 }
 
 async function loadTelegramBotToken() {

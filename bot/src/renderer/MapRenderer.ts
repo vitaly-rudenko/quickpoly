@@ -83,13 +83,15 @@ export class MapRenderer {
         this._spaces = spaces;
         this._size = 2048;
         this._largeSpaceSize = 436;
-        this._fontSize = 34;
+        this._fontSize = 32;
         this._fontFamily = options.fontFamily;
     }
 
     render(gameState: GameState): Buffer {
         const mapCanvas = canvas.createCanvas(this._size, this._size);
         const context = mapCanvas.getContext('2d');
+
+        this.drawPlayerStats(context, gameState.players);
 
         for (let index = 0; index < this._spaces.length; index++) {
             const { x, y, width, height, side, direction } = this.getSpaceBoundaries(index);
@@ -114,7 +116,6 @@ export class MapRenderer {
         );
 
         this.drawPlayerNamesAndIcons(context, gameState.players);
-        this.drawPlayerStats(context, gameState.players);
 
         return mapCanvas.toBuffer();
     }
@@ -135,14 +136,15 @@ export class MapRenderer {
 
             const { x, y, width, height, side } = this.getSpaceBoundaries(player.space);
             context.save();
-            context.font = `${this._fontSize}px "${this._fontFamily}"`;
+            const fontSize = this._fontSize * 1.5;
+            context.font = `${fontSize}px "${this._fontFamily}"`;
 
             const playerName = this.ellipsis(player.name, 13);
             const textBoundaries = this.getTextBoundaries(context, ' ↑ ' + playerName);
             const offset = 2;
             const centerOffset = 26;
-            const spaceOffset = 25;
-            const iconRadius = 14;
+            const spaceOffset = 30;
+            const iconRadius = 20;
             const iconOffset = iconRadius * 2 + 5;
 
             const nameColor = this.getPlayerColor(player.index, 0.7);
@@ -150,7 +152,7 @@ export class MapRenderer {
 
             if (side === Side.TOP) {
                 const playerWidth = int(textBoundaries.width + 20);
-                const playerHeight = int(this._fontSize + 20);
+                const playerHeight = int(fontSize + 30);
                 const playerX = int(x + width / 2 - centerOffset);
                 const playerY = int(y + height + offset + spacePosition * playerHeight);
 
@@ -171,7 +173,7 @@ export class MapRenderer {
                 context.textBaseline = 'top';
                 context.fillText(' ↑ ' + playerName, playerX, playerY);
             } else if (side === Side.RIGHT) {
-                const playerWidth = int(this._fontSize + 20);
+                const playerWidth = int(fontSize + 30);
                 const playerHeight = int(textBoundaries.width + 20);
                 const playerX = int(x - playerWidth - offset - spacePosition * playerWidth);
                 const playerY = int(y + height / 2 - centerOffset);
@@ -196,7 +198,7 @@ export class MapRenderer {
                 context.fillText(playerName + ' ↓ ', 0, 0);
             } else if (side === Side.BOTTOM) {
                 const playerWidth = int(textBoundaries.width + 30);
-                const playerHeight = int(this._fontSize + 20);
+                const playerHeight = int(fontSize + 30);
                 const playerX = int(x - playerWidth + width / 2 + centerOffset);
                 const playerY = int(y - playerHeight - offset - spacePosition * playerHeight);
 
@@ -217,7 +219,7 @@ export class MapRenderer {
                 context.textBaseline = 'top';
                 context.fillText(playerName + ' ↓ ', playerX + playerWidth, playerY);
             } else {
-                const playerWidth = int(this._fontSize + 20);
+                const playerWidth = int(fontSize + 30);
                 const playerHeight = int(textBoundaries.width + 30);
                 const playerX = int(width + offset + spacePosition * playerWidth);
                 const playerY = int(y + height - playerHeight - centerOffset);
@@ -252,20 +254,20 @@ export class MapRenderer {
     ): void {
         const offset = 5;
         const outerOffset = 10;
-        const playerHeight = int(this._fontSize + 20);
+        const playerHeight = int(this._fontSize + 30);
 
         context.save();
-        context.font = `${this._fontSize}px "${this._fontFamily}"`;
+        context.font = `${int(this._fontSize * 1.5)}px "${this._fontFamily}"`;
 
         const x = this._size / 2;
         const y = this._size / 2 - ((playerHeight + offset) * players.length - offset) / 2;
 
         for (let i = 0; i < players.length; i++) {
             const player = players[i];
-            const stats = this.ellipsis(player.name, 20);
+            const stats = this.ellipsis(player.name, 13);
             const color = this.getPlayerColor(player.index, 0.7);
             const textBoundaries = this.getTextBoundaries(context, stats);
-            const playerWidth = Math.max(500, textBoundaries.width + 20);
+            const playerWidth = Math.max(500, textBoundaries.width + 40);
             const playerX = x - playerWidth / 2;
             const playerY = y + i * (playerHeight + offset) - offset;
 
@@ -362,7 +364,7 @@ export class MapRenderer {
             additionalInfo.push('$' + space.attributes.price);
         }
 
-        const colorSize = 40;
+        const colorSize = 50;
         context.lineWidth = 4;
 
         if (owner && ownedSpace) {
@@ -393,7 +395,7 @@ export class MapRenderer {
             if (ownedSpace.hotel) {
                 additionalInfo.push('+ hotel');
 
-                const offset = 20;
+                const offset = 25;
 
                 let x: number, y: number;
                 if (options.side === Side.TOP) {
@@ -412,14 +414,14 @@ export class MapRenderer {
 
                 context.beginPath();
                 context.fillStyle = 'white';
-                context.arc(int(x), int(y), 12, 0, Math.PI * 2);
+                context.arc(int(x), int(y), 18, 0, Math.PI * 2);
                 context.fill();
             } else if (ownedSpace.houses > 0) {
                 additionalInfo.push('+ ' + ownedSpace.houses + (ownedSpace.houses > 1 ? ' houses' : ' house'));
 
-                const size = 12;
-                const mapOffset = 14;
-                const offset = 8;
+                const size = 16;
+                const mapOffset = 18;
+                const offset = 6;
                 const length = ownedSpace.houses * (size + offset) - offset;
 
                 let x: number, y: number;
