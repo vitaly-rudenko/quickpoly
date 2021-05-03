@@ -11,6 +11,19 @@ import { MapRenderer } from './renderer/MapRenderer';
 const loggerProvider = new WinstonLoggerProvider({ logLevel: LogLevel.TRACE });
 const logger = loggerProvider.create('app');
 
+const caption = `
+⏳ *23 seconds left*
+👤 *Vladislav*
+📍 *Atlantic Avenue ↓*
+
+⤵️ *Latest moves*
+_Mikhail paid $350 for the rent_
+_Anton purchased Atlantic Avenue_
+_Mikhail paid $350 for the rent_
+_Anton purchased Atlantic Avenue_
+*Mikhail paid $350 for the rent*
+`;
+
 async function start() {
     logger.info('Starting the application');
 
@@ -178,15 +191,18 @@ async function start() {
     }
 
     if (!messageId) {
-        const message = await bot.telegram.sendPhoto('-516338149', { source: image });
+        const message = await bot.telegram.sendPhoto('-516338149', { source: image },
+            { caption, parse_mode: 'MarkdownV2' });
         messageId = message.message_id;
         fs.writeFile('./message_id', String(messageId), { encoding: 'utf-8' });
     } else {
-        bot.telegram.editMessageMedia('-516338149', Number(messageId), undefined,
-            { type: 'photo', media: { source: image } });
+        try {
+            await bot.telegram.editMessageMedia('-516338149', Number(messageId), undefined,
+                { type: 'photo', media: { source: image }, caption, parse_mode: 'MarkdownV2' });
+        } catch (err) {
+            // ignore
+        }
     }
-
-    console.log('messageId:', messageId);
 }
 
 async function loadTelegramBotToken() {

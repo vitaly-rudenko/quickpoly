@@ -139,7 +139,7 @@ export class MapRenderer {
             const fontSize = this._fontSize * 1.5;
             context.font = `${fontSize}px "${this._fontFamily}"`;
 
-            const playerName = this.ellipsis(player.name, 13);
+            const playerName = this.ellipsis(player.name, 10);
             const textBoundaries = this.getTextBoundaries(context, ' ↑ ' + playerName);
             const offset = 2;
             const centerOffset = 26;
@@ -267,7 +267,7 @@ export class MapRenderer {
             const stats = this.ellipsis(player.name, 13);
             const color = this.getPlayerColor(player.index, 0.7);
             const textBoundaries = this.getTextBoundaries(context, stats);
-            const playerWidth = Math.max(500, textBoundaries.width + 40);
+            const playerWidth = Math.max(450, textBoundaries.width + 40);
             const playerX = x - playerWidth / 2;
             const playerY = y + i * (playerHeight + offset) - offset;
 
