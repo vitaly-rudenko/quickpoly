@@ -60,10 +60,10 @@ const playerColors = [
     [220, 17, 0], // red
     [21, 0, 137], // blue
     [0, 137, 36], // green
-    [180, 180, 0], // yellow
+    [163, 163, 0], // yellow
     [0, 112, 137], // light blue
     [137, 0, 114], // purple
-    [220, 80, 30], // orange
+    [184, 99, 15], // orange
     [0, 140, 126], // teal
 ];
 
@@ -73,18 +73,20 @@ export class MapRenderer {
     private _spaces: Space[];
     private _largeSpaceSize: number;
     private _fontFamily: string;
+    private _fontFamilyBold: string;
     private _fontSize: number;
     private _size: number;
 
     constructor(
         spaces: Space[],
-        options: { fontFamily: string }
+        options: { fontFamily: string, fontFamilyBold: string }
     ) {
         this._spaces = spaces;
         this._size = 2048;
         this._largeSpaceSize = 436;
-        this._fontSize = 32;
+        this._fontSize = 40;
         this._fontFamily = options.fontFamily;
+        this._fontFamilyBold = options.fontFamilyBold;
     }
 
     render(gameState: GameState): Buffer {
@@ -136,8 +138,8 @@ export class MapRenderer {
 
             const { x, y, width, height, side } = this.getSpaceBoundaries(player.space);
             context.save();
-            const fontSize = this._fontSize * 1.5;
-            context.font = `${fontSize}px "${this._fontFamily}"`;
+            const fontSize = this._fontSize * 1.2;
+            context.font = `${fontSize}px "${this._fontFamilyBold}"`;
 
             const playerName = this.ellipsis(player.name, 10);
             const textBoundaries = this.getTextBoundaries(context, ' ↑ ' + playerName);
@@ -152,7 +154,7 @@ export class MapRenderer {
 
             if (side === Side.TOP) {
                 const playerWidth = int(textBoundaries.width + 20);
-                const playerHeight = int(fontSize + 30);
+                const playerHeight = int(fontSize + 25);
                 const playerX = int(x + width / 2 - centerOffset);
                 const playerY = int(y + height + offset + spacePosition * playerHeight);
 
@@ -173,7 +175,7 @@ export class MapRenderer {
                 context.textBaseline = 'top';
                 context.fillText(' ↑ ' + playerName, playerX, playerY);
             } else if (side === Side.RIGHT) {
-                const playerWidth = int(fontSize + 30);
+                const playerWidth = int(fontSize + 25);
                 const playerHeight = int(textBoundaries.width + 20);
                 const playerX = int(x - playerWidth - offset - spacePosition * playerWidth);
                 const playerY = int(y + height / 2 - centerOffset);
@@ -198,7 +200,7 @@ export class MapRenderer {
                 context.fillText(playerName + ' ↓ ', 0, 0);
             } else if (side === Side.BOTTOM) {
                 const playerWidth = int(textBoundaries.width + 30);
-                const playerHeight = int(fontSize + 30);
+                const playerHeight = int(fontSize + 25);
                 const playerX = int(x - playerWidth + width / 2 + centerOffset);
                 const playerY = int(y - playerHeight - offset - spacePosition * playerHeight);
 
@@ -219,7 +221,7 @@ export class MapRenderer {
                 context.textBaseline = 'top';
                 context.fillText(playerName + ' ↓ ', playerX + playerWidth, playerY);
             } else {
-                const playerWidth = int(fontSize + 30);
+                const playerWidth = int(fontSize + 25);
                 const playerHeight = int(textBoundaries.width + 30);
                 const playerX = int(width + offset + spacePosition * playerWidth);
                 const playerY = int(y + height - playerHeight - centerOffset);
@@ -252,28 +254,27 @@ export class MapRenderer {
         context: canvas.CanvasRenderingContext2D,
         players: Player[]
     ): void {
-        const offset = 5;
+        const offset = 0;
         const outerOffset = 10;
         const playerHeight = int(this._fontSize + 30);
-
-        context.save();
-        context.font = `${int(this._fontSize * 1.5)}px "${this._fontFamily}"`;
 
         const x = this._size / 2;
         const y = this._size / 2 - ((playerHeight + offset) * players.length - offset) / 2;
 
         for (let i = 0; i < players.length; i++) {
+            context.save();
+
             const player = players[i];
             const stats = this.ellipsis(player.name, 13);
             const color = this.getPlayerColor(player.index, 0.7);
-            const textBoundaries = this.getTextBoundaries(context, stats);
-            const playerWidth = Math.max(450, textBoundaries.width + 40);
+            const playerWidth = 600;
             const playerX = x - playerWidth / 2;
             const playerY = y + i * (playerHeight + offset) - offset;
 
             context.fillStyle = color;
-            context.fillRect(playerX, playerY, playerWidth, playerHeight);
+            context.fillRect(playerX - 10, playerY, playerWidth + 20, playerHeight);
 
+            context.font = `${int(this._fontSize * 1.3)}px "${this._fontFamilyBold}"`;
             context.fillStyle = 'white';
             context.textAlign = 'left';
             context.textBaseline = 'middle';
@@ -287,9 +288,9 @@ export class MapRenderer {
                 int(playerX + playerWidth - outerOffset),
                 int(playerY + playerHeight / 2)
             );
-        }
 
-        context.restore();
+            context.restore();
+        }
     }
 
     getSpaceBoundaries(index: number): {
@@ -393,8 +394,6 @@ export class MapRenderer {
             }
 
             if (ownedSpace.hotel) {
-                additionalInfo.push('+ hotel');
-
                 const offset = 25;
 
                 let x: number, y: number;
@@ -417,8 +416,6 @@ export class MapRenderer {
                 context.arc(int(x), int(y), 18, 0, Math.PI * 2);
                 context.fill();
             } else if (ownedSpace.houses > 0) {
-                additionalInfo.push('+ ' + ownedSpace.houses + (ownedSpace.houses > 1 ? ' houses' : ' house'));
-
                 const size = 16;
                 const mapOffset = 18;
                 const offset = 6;
@@ -487,12 +484,12 @@ export class MapRenderer {
         context.textBaseline = 'middle';
         context.translate(int(options.x + options.width / 2), int(options.y + options.height / 2));
         context.rotate(directionToAngle[options.direction]);
-        context.fillText(label, 0, additionalInfo.length > 0 ? int(-this._fontSize / 2 - 4) : 0);
+        context.fillText(label, 0, additionalInfo.length > 0 ? int(-this._fontSize / 2 - 2) : 0);
 
         if (additionalInfo.length > 0) {
-            context.font = `${int(this._fontSize * 0.8)}px "${this._fontFamily}"`;
-            context.fillStyle = 'rgba(0, 0, 0, 0.8)';
-            context.fillText(additionalInfo.join(' '), 0, int(this._fontSize / 2 + 4));
+            context.font = `${this._fontSize}px "${this._fontFamilyBold}"`;
+            context.fillStyle = 'rgba(0, 32, 128, 0.85)';
+            context.fillText(additionalInfo.join(' '), 0, int(this._fontSize / 2 + 2));
         }
 
         context.restore();
