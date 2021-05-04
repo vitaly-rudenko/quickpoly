@@ -8,7 +8,7 @@
     {
         "type": "street",
         "attributes": {
-            "name": "Mediterranean Avenue",
+            "name": "Mediterranean",
             "price": 60,
             "color": "brown",
             "titleDeed": {
@@ -32,7 +32,7 @@
     {
         "type": "street",
         "attributes": {
-            "name": "Baltic Avenue",
+            "name": "Baltic",
             "price": 60,
             "color": "brown",
             "titleDeed": {
@@ -53,7 +53,7 @@
     {
         "type": "street",
         "attributes": {
-            "name": "Arctic Avenue",
+            "name": "Arctic",
             "price": 80,
             "color": "brown",
             "titleDeed": {
@@ -88,7 +88,7 @@
     {
         "type": "street",
         "attributes": {
-            "name": "Massachusetts Avenue",
+            "name": "Massachusetts",
             "price": 100,
             "color": "lightBlue",
             "titleDeed": {
@@ -109,7 +109,7 @@
     {
         "type": "street",
         "attributes": {
-            "name": "Oriental Avenue",
+            "name": "Oriental",
             "price": 100,
             "color": "lightBlue",
             "titleDeed": {
@@ -140,7 +140,7 @@
     {
         "type": "street",
         "attributes": {
-            "name": "Vermont Avenue",
+            "name": "Vermont",
             "price": 100,
             "color": "lightBlue",
             "titleDeed": {
@@ -161,7 +161,7 @@
     {
         "type": "street",
         "attributes": {
-            "name": "Connecticut Avenue",
+            "name": "Connecticut",
             "price": 120,
             "color": "lightBlue",
             "titleDeed": {
@@ -188,7 +188,7 @@
     {
         "type": "street",
         "attributes": {
-            "name": "Maryland Avenue",
+            "name": "Maryland",
             "price": 140,
             "color": "pink",
             "titleDeed": {
@@ -237,7 +237,7 @@
     {
         "type": "street",
         "attributes": {
-            "name": "States Avenue",
+            "name": "States",
             "price": 140,
             "color": "pink",
             "titleDeed": {
@@ -258,7 +258,7 @@
     {
         "type": "street",
         "attributes": {
-            "name": "Virginia Avenue",
+            "name": "Virginia",
             "price": 160,
             "color": "pink",
             "titleDeed": {
@@ -310,7 +310,7 @@
     {
         "type": "street",
         "attributes": {
-            "name": "Tennessee Avenue",
+            "name": "Tennessee",
             "price": 180,
             "color": "orange",
             "titleDeed": {
@@ -331,7 +331,7 @@
     {
         "type": "street",
         "attributes": {
-            "name": "New York Avenue",
+            "name": "New York",
             "price": 200,
             "color": "orange",
             "titleDeed": {
@@ -352,7 +352,7 @@
     {
         "type": "street",
         "attributes": {
-            "name": "New Jersey Avenue",
+            "name": "New Jersey",
             "price": 200,
             "color": "orange",
             "titleDeed": {
@@ -376,7 +376,7 @@
     {
         "type": "street",
         "attributes": {
-            "name": "Kentucky Avenue",
+            "name": "Kentucky",
             "price": 220,
             "color": "red",
             "titleDeed": {
@@ -400,7 +400,7 @@
     {
         "type": "street",
         "attributes": {
-            "name": "Indiana Avenue",
+            "name": "Indiana",
             "price": 220,
             "color": "red",
             "titleDeed": {
@@ -421,7 +421,7 @@
     {
         "type": "street",
         "attributes": {
-            "name": "Illinois Avenue",
+            "name": "Illinois",
             "price": 240,
             "color": "red",
             "titleDeed": {
@@ -442,7 +442,7 @@
     {
         "type": "street",
         "attributes": {
-            "name": "Michigan Avenue",
+            "name": "Michigan",
             "price": 240,
             "color": "red",
             "titleDeed": {
@@ -473,7 +473,7 @@
     {
         "type": "street",
         "attributes": {
-            "name": "Atlantic Avenue",
+            "name": "Atlantic",
             "price": 260,
             "color": "yellow",
             "titleDeed": {
@@ -494,7 +494,7 @@
     {
         "type": "street",
         "attributes": {
-            "name": "Ventnor Avenue",
+            "name": "Ventnor",
             "price": 260,
             "color": "yellow",
             "titleDeed": {
@@ -543,7 +543,7 @@
     {
         "type": "street",
         "attributes": {
-            "name": "California Avenue",
+            "name": "California",
             "price": 280,
             "color": "yellow",
             "titleDeed": {
@@ -567,7 +567,7 @@
     {
         "type": "street",
         "attributes": {
-            "name": "Pacific Avenue",
+            "name": "Pacific",
             "price": 300,
             "color": "green",
             "titleDeed": {
@@ -588,7 +588,7 @@
     {
         "type": "street",
         "attributes": {
-            "name": "South Carolina Avenue",
+            "name": "South Carolina",
             "price": 300,
             "color": "green",
             "titleDeed": {
@@ -609,7 +609,7 @@
     {
         "type": "street",
         "attributes": {
-            "name": "North Carolina Avenue",
+            "name": "North Carolina",
             "price": 300,
             "color": "green",
             "titleDeed": {
@@ -633,7 +633,7 @@
     {
         "type": "street",
         "attributes": {
-            "name": "Pennsylvania Avenue",
+            "name": "Pennsylvania",
             "price": 320,
             "color": "green",
             "titleDeed": {
@@ -670,7 +670,7 @@
     {
         "type": "street",
         "attributes": {
-            "name": "Florida Avenue",
+            "name": "Florida",
             "price": 350,
             "color": "blue",
             "titleDeed": {

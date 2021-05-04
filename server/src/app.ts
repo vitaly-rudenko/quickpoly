@@ -161,7 +161,7 @@ const chanceSpace = new ChanceSpace({
 const spaces: Serializable[] = [
     new GoSpace({ salary: 200 }),
     new StreetSpace({
-        name: 'Mediterranean Avenue',
+        name: 'Mediterranean',
         price: 60,
         color: StreetColor.BROWN,
         titleDeed: new StreetTitleDeed({
@@ -175,7 +175,7 @@ const spaces: Serializable[] = [
     }),
     communityChestSpace,
     new StreetSpace({
-        name: 'Baltic Avenue',
+        name: 'Baltic',
         price: 60,
         color: StreetColor.BROWN,
         titleDeed: new StreetTitleDeed({
@@ -188,7 +188,7 @@ const spaces: Serializable[] = [
         }),
     }),
     new StreetSpace({
-        name: 'Arctic Avenue',
+        name: 'Arctic',
         price: 80,
         color: StreetColor.BROWN,
         titleDeed: new StreetTitleDeed({
@@ -209,7 +209,7 @@ const spaces: Serializable[] = [
         price: 200,
     }),
     new StreetSpace({
-        name: 'Massachusetts Avenue',
+        name: 'Massachusetts',
         price: 100,
         color: StreetColor.LIGHT_BLUE,
         titleDeed: new StreetTitleDeed({
@@ -222,7 +222,7 @@ const spaces: Serializable[] = [
         }),
     }),
     new StreetSpace({
-        name: 'Oriental Avenue',
+        name: 'Oriental',
         price: 100,
         color: StreetColor.LIGHT_BLUE,
         titleDeed: new StreetTitleDeed({
@@ -240,7 +240,7 @@ const spaces: Serializable[] = [
         price: 150,
     }),
     new StreetSpace({
-        name: 'Vermont Avenue',
+        name: 'Vermont',
         price: 100,
         color: StreetColor.LIGHT_BLUE,
         titleDeed: new StreetTitleDeed({
@@ -253,7 +253,7 @@ const spaces: Serializable[] = [
         }),
     }),
     new StreetSpace({
-        name: 'Connecticut Avenue',
+        name: 'Connecticut',
         price: 120,
         color: StreetColor.LIGHT_BLUE,
         titleDeed: new StreetTitleDeed({
@@ -268,7 +268,7 @@ const spaces: Serializable[] = [
     new JailSpace(),
     new AuctionSpace(),
     new StreetSpace({
-        name: 'Maryland Avenue',
+        name: 'Maryland',
         price: 140,
         color: StreetColor.PINK,
         titleDeed: new StreetTitleDeed({
@@ -298,7 +298,7 @@ const spaces: Serializable[] = [
         price: 150,
     }),
     new StreetSpace({
-        name: 'States Avenue',
+        name: 'States',
         price: 140,
         color: StreetColor.PINK,
         titleDeed: new StreetTitleDeed({
@@ -311,7 +311,7 @@ const spaces: Serializable[] = [
         }),
     }),
     new StreetSpace({
-        name: 'Virginia Avenue',
+        name: 'Virginia',
         price: 160,
         color: StreetColor.PINK,
         titleDeed: new StreetTitleDeed({
@@ -342,7 +342,7 @@ const spaces: Serializable[] = [
     }),
     communityChestSpace,
     new StreetSpace({
-        name: 'Tennessee Avenue',
+        name: 'Tennessee',
         price: 180,
         color: StreetColor.ORANGE,
         titleDeed: new StreetTitleDeed({
@@ -355,7 +355,7 @@ const spaces: Serializable[] = [
         }),
     }),
     new StreetSpace({
-        name: 'New York Avenue',
+        name: 'New York',
         price: 200,
         color: StreetColor.ORANGE,
         titleDeed: new StreetTitleDeed({
@@ -368,7 +368,7 @@ const spaces: Serializable[] = [
         }),
     }),
     new StreetSpace({
-        name: 'New Jersey Avenue',
+        name: 'New Jersey',
         price: 200,
         color: StreetColor.ORANGE,
         titleDeed: new StreetTitleDeed({
@@ -382,7 +382,7 @@ const spaces: Serializable[] = [
     }),
     new FreeParkingSpace(),
     new StreetSpace({
-        name: 'Kentucky Avenue',
+        name: 'Kentucky',
         price: 220,
         color: StreetColor.RED,
         titleDeed: new StreetTitleDeed({
@@ -396,7 +396,7 @@ const spaces: Serializable[] = [
     }),
     chanceSpace,
     new StreetSpace({
-        name: 'Indiana Avenue',
+        name: 'Indiana',
         price: 220,
         color: StreetColor.RED,
         titleDeed: new StreetTitleDeed({
@@ -409,7 +409,7 @@ const spaces: Serializable[] = [
         }),
     }),
     new StreetSpace({
-        name: 'Illinois Avenue',
+        name: 'Illinois',
         price: 240,
         color: StreetColor.RED,
         titleDeed: new StreetTitleDeed({
@@ -422,7 +422,7 @@ const spaces: Serializable[] = [
         }),
     }),
     new StreetSpace({
-        name: 'Michigan Avenue',
+        name: 'Michigan',
         price: 240,
         color: StreetColor.RED,
         titleDeed: new StreetTitleDeed({
@@ -440,7 +440,7 @@ const spaces: Serializable[] = [
         price: 200,
     }),
     new StreetSpace({
-        name: 'Atlantic Avenue',
+        name: 'Atlantic',
         price: 260,
         color: StreetColor.YELLOW,
         titleDeed: new StreetTitleDeed({
@@ -453,7 +453,7 @@ const spaces: Serializable[] = [
         }),
     }),
     new StreetSpace({
-        name: 'Ventnor Avenue',
+        name: 'Ventnor',
         price: 260,
         color: StreetColor.YELLOW,
         titleDeed: new StreetTitleDeed({
@@ -483,7 +483,7 @@ const spaces: Serializable[] = [
         }),
     }),
     new StreetSpace({
-        name: 'California Avenue',
+        name: 'California',
         price: 280,
         color: StreetColor.YELLOW,
         titleDeed: new StreetTitleDeed({
@@ -497,7 +497,7 @@ const spaces: Serializable[] = [
     }),
     new GoToJailSpace(),
     new StreetSpace({
-        name: 'Pacific Avenue',
+        name: 'Pacific',
         price: 300,
         color: StreetColor.GREEN,
         titleDeed: new StreetTitleDeed({
@@ -510,7 +510,7 @@ const spaces: Serializable[] = [
         }),
     }),
     new StreetSpace({
-        name: 'South Carolina Avenue',
+        name: 'South Carolina',
         price: 300,
         color: StreetColor.GREEN,
         titleDeed: new StreetTitleDeed({
@@ -523,7 +523,7 @@ const spaces: Serializable[] = [
         }),
     }),
     new StreetSpace({
-        name: 'North Carolina Avenue',
+        name: 'North Carolina',
         price: 300,
         color: StreetColor.GREEN,
         titleDeed: new StreetTitleDeed({
@@ -537,7 +537,7 @@ const spaces: Serializable[] = [
     }),
     communityChestSpace,
     new StreetSpace({
-        name: 'Pennsylvania Avenue',
+        name: 'Pennsylvania',
         price: 320,
         color: StreetColor.GREEN,
         titleDeed: new StreetTitleDeed({
@@ -558,7 +558,7 @@ const spaces: Serializable[] = [
         amount: 100,
     }),
     new StreetSpace({
-        name: 'Florida Avenue',
+        name: 'Florida',
         price: 350,
         color: StreetColor.BLUE,
         titleDeed: new StreetTitleDeed({
