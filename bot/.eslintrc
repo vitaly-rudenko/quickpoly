@@ -45,6 +45,8 @@
         "no-unused-vars": "off",
         "object-curly-newline": "off",
         "no-restricted-syntax": "off",
-        "prefer-template": "off"
+        "prefer-template": "off",
+        "quote-props": "off",
+        "dot-notation": "off"
     }
 }
