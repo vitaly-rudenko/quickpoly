@@ -15,9 +15,11 @@
     "author": "Vitaly Rudenko",
     "license": "ISC",
     "dependencies": {
+        "@types/common-tags": "^1.8.0",
         "@types/sinon": "^10.0.0",
         "canvas": "^2.7.0",
         "chai": "^4.3.4",
+        "common-tags": "^1.8.0",
         "mocha": "^8.3.2",
         "sinon": "^10.0.0",
         "telegraf": "^4.3.0",
