@@ -7,21 +7,23 @@ import canvas from 'canvas';
 import { LogLevel } from './logging/LoggerProvider';
 import { WinstonLoggerProvider } from './logging/WinstonLoggerProvider';
 import { MapRenderer } from './renderer/MapRenderer';
+import { Game } from './game/Game';
 
 const loggerProvider = new WinstonLoggerProvider({ logLevel: LogLevel.TRACE });
 const logger = loggerProvider.create('app');
 
+const chatId = '-516338149';
 const caption = `
 ⏳ *23 seconds left*
 👤 *Vladislav*
 📍 *Atlantic Avenue ↓*
 
 ⤵️ *Latest moves*
-_Mikhail paid $350 for the rent_
-_Anton purchased Atlantic Avenue_
-_Mikhail paid $350 for the rent_
-_Anton purchased Atlantic Avenue_
-*Mikhail paid $350 for the rent*
+19:13 Mikhail paid $350 for the rent
+19:14 Anton purchased Atlantic Avenue
+19:15 Mikhail paid $350 for the rent
+19:17 Anton purchased Atlantic Avenue
+*19:17 Mikhail paid $350 for the rent*
 `;
 
 async function start() {
@@ -34,7 +36,12 @@ async function start() {
         { family: 'Roboto' }
     );
 
-    const mapRenderer = new MapRenderer(spaces, { fontFamily: 'Roboto' });
+    canvas.registerFont(
+        path.join(process.cwd(), 'assets', 'Roboto-Bold.ttf'),
+        { family: 'Roboto Bold' }
+    );
+
+    const mapRenderer = new MapRenderer(spaces, { fontFamily: 'Roboto', fontFamilyBold: 'Roboto Bold' });
 
     const telegramBotToken = await loadTelegramBotToken();
 
@@ -132,7 +139,7 @@ async function start() {
             id: 'player-1',
             index: 0,
             name: 'Vladimir',
-            space: 3,
+            space: 0,
             money: 150,
         }, {
             id: 'player-2',
@@ -174,14 +181,25 @@ async function start() {
             id: 'player-8',
             index: 7,
             name: 'Lofi hip hop radio - beast to relax/study to',
-            space: 35,
+            space: 45,
             money: 980,
         }],
     });
 
     const bot = new Telegraf(telegramBotToken);
     bot.hears('ping', ctx => ctx.reply('pong 🏓'));
-    bot.launch();
+    bot.launch({
+        allowedUpdates: ['callback_query'],
+        dropPendingUpdates: true,
+    });
+
+    // bot.command('start', () => {
+    new Game({
+        chatId,
+    }, {
+        bot,
+    }).start();
+    // });
 
     let messageId = null;
     try {
@@ -191,13 +209,24 @@ async function start() {
     }
 
     if (!messageId) {
-        const message = await bot.telegram.sendPhoto('-516338149', { source: image },
-            { caption, parse_mode: 'MarkdownV2' });
+        const message = await bot.telegram.sendPhoto(chatId, { source: image },
+            { caption, parse_mode: 'MarkdownV2', disable_notification: true });
         messageId = message.message_id;
         fs.writeFile('./message_id', String(messageId), { encoding: 'utf-8' });
+
+        setTimeout(async () => {
+            const diceMessage1 = await bot.telegram.sendDice(chatId, { disable_notification: true });
+            const diceMessage2 = await bot.telegram.sendDice(chatId, { disable_notification: true });
+            console.log(diceMessage1.dice.value, diceMessage2.dice.value);
+
+            setTimeout(async () => {
+                await bot.telegram.deleteMessage(chatId, diceMessage1.message_id);
+                await bot.telegram.deleteMessage(chatId, diceMessage2.message_id);
+            }, 7000);
+        }, 2000);
     } else {
         try {
-            await bot.telegram.editMessageMedia('-516338149', Number(messageId), undefined,
+            await bot.telegram.editMessageMedia(chatId, Number(messageId), undefined,
                 { type: 'photo', media: { source: image }, caption, parse_mode: 'MarkdownV2' });
         } catch (err) {
             // ignore
