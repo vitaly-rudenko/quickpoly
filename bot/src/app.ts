@@ -6,7 +6,7 @@ import canvas from 'canvas';
 
 import { LogLevel } from './logging/LoggerProvider';
 import { WinstonLoggerProvider } from './logging/WinstonLoggerProvider';
-import { MapRenderer } from './renderer/MapRenderer';
+import { MapRenderer } from './rendering/MapRenderer';
 import { TelegramBot } from './game/TelegramBot';
 import { Game } from './game/Game';
 import { Player } from './game/Player';
