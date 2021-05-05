@@ -7,12 +7,10 @@ export class Game {
     private _gameContext: GameContext;
     private _bot: TelegramBot;
 
-    constructor(options: {
-        chatId: number,
-        author: Player,
-    }, dependencies: {
-        bot: TelegramBot
-    }) {
+    constructor(
+        options: { chatId: number, author: Player },
+        dependencies: { bot: TelegramBot }
+    ) {
         this._gameContext = new GameContext({
             chatId: options.chatId,
             author: options.author,

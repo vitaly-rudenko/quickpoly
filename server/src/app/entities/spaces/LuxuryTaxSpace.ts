@@ -11,6 +11,11 @@ export class LuxuryTaxSpace implements LandableSpace, Serializable {
     land(): void {}
 
     serialize(): SerializableObject {
-        return { type: 'luxuryTax' };
+        return {
+            type: 'luxuryTax',
+            attributes: {
+                amount: this._amount,
+            },
+        };
     }
 }

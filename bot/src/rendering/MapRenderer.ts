@@ -1,6 +1,6 @@
 import canvas from 'canvas';
-import { GameState, OwnedSpace } from './GameState';
-import { Player } from './Player';
+import { ServerGameState, ServerOwnedSpace } from '../server/ServerGameState';
+import { ServerPlayer } from '../server/ServerPlayer';
 import { Space } from './Space';
 
 enum Side {
@@ -89,7 +89,7 @@ export class MapRenderer {
         this._fontFamilyBold = options.fontFamilyBold;
     }
 
-    render(gameState: GameState): Buffer {
+    render(gameState: ServerGameState): Buffer {
         const mapCanvas = canvas.createCanvas(this._size, this._size);
         const context = mapCanvas.getContext('2d');
 
@@ -124,7 +124,7 @@ export class MapRenderer {
 
     drawPlayerNamesAndIcons(
         context: canvas.CanvasRenderingContext2D,
-        players: Player[]
+        players: ServerPlayer[]
     ): void {
         const perSpaceCount = new Map();
 
@@ -252,7 +252,7 @@ export class MapRenderer {
 
     drawPlayerStats(
         context: canvas.CanvasRenderingContext2D,
-        players: Player[]
+        players: ServerPlayer[]
     ): void {
         const offset = 0;
         const outerOffset = 10;
@@ -345,8 +345,8 @@ export class MapRenderer {
     drawSpace(
         context: canvas.CanvasRenderingContext2D,
         space: Space,
-        ownedSpace: OwnedSpace | undefined,
-        owner: Player | undefined,
+        ownedSpace: ServerOwnedSpace | undefined,
+        owner: ServerPlayer | undefined,
         options: {
             direction: Direction,
             side: Side,

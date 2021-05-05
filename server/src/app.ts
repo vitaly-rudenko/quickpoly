@@ -1,3 +1,5 @@
+import WebSocket from 'ws';
+
 import { CommunityChestSpace } from './app/entities/spaces/community-chest/CommunityChestSpace';
 import { GoSpace } from './app/entities/spaces/GoSpace';
 import { StreetSpace } from './app/entities/spaces/properties/StreetSpace';
@@ -601,4 +603,26 @@ const spaces: Serializable[] = [
     }),
 ];
 
-console.log(JSON.stringify(spaces.map(space => space.serialize()), null, 4));
+const server = new WebSocket.Server({
+    host: 'localhost',
+    port: 3000,
+});
+
+server.on('listening', () => {
+    server.on('connection', (client) => {
+        client.on('message', (message) => {
+            const command = JSON.parse(message.toString('utf-8'));
+
+            if (command.command === 'getData') {
+                const gameData = spaces.map(s => s.serialize());
+                client.send(Buffer.from(JSON.stringify({
+                    commandId: command.commandId,
+                    data: gameData,
+                }), 'utf-8'));
+            }
+        });
+    });
+
+    console.log('Server started');
+});
+

@@ -10,6 +10,7 @@ import { MapRenderer } from './rendering/MapRenderer';
 import { TelegramBot } from './game/TelegramBot';
 import { Game } from './game/Game';
 import { Player } from './game/Player';
+import { ServerSocket } from './server/ServerSocket';
 
 const loggerProvider = new WinstonLoggerProvider({ logLevel: LogLevel.TRACE });
 const logger = loggerProvider.create('app');
@@ -187,6 +188,12 @@ async function start() {
             money: 980,
         }],
     });
+
+    const serverSocket = new ServerSocket({
+        loggerProvider,
+    });
+
+    await serverSocket.connect();
 
     const bot = new TelegramBot(new Telegraf(telegramBotToken));
     await bot.start();

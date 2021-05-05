@@ -12,12 +12,12 @@
 #### Command message format
 
 ```
-{ gameId?, playerId?, command, data? }
+{ commandId, connectionId, gameId?, playerId?, command, data? }
 ```
 
 #### Command response message format
 ```
-{ data } or { error }
+{ commandId, connectionId, data } or { commandId, connectionId, error }
 ```
 
 ### `getData` command

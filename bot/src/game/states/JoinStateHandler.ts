@@ -6,10 +6,12 @@ import { GameContext } from '../GameContext';
 import { Player } from '../Player';
 import { TelegramBot } from '../TelegramBot';
 import { CancelledStateHandler } from './CancelledStateHandler';
+import { GameStateHandler } from './GameStateHandler';
 import { StateHandler } from './StateHandler';
 
 enum Action {
     TOGGLE_PARTICIPATION = 'toggleParticipation',
+    START = 'start',
 }
 
 export class JoinStateHandler implements StateHandler {
@@ -24,11 +26,17 @@ export class JoinStateHandler implements StateHandler {
     }
 
     async enter(): Promise<void> {
-        this._players = [this._gameContext.author];
+        this._players = [this._gameContext.author, new Player({ id: 1, name: 'fake' })];
         this._bot.addActionHandler(
             this._gameContext.chatId,
             Action.TOGGLE_PARTICIPATION,
             this._handleToggleParticipationAction
+        );
+
+        this._bot.addActionHandler(
+            this._gameContext.chatId,
+            Action.START,
+            this._handleStartAction
         );
 
         await this._updateMessage();
@@ -39,6 +47,12 @@ export class JoinStateHandler implements StateHandler {
             this._gameContext.chatId,
             Action.TOGGLE_PARTICIPATION,
             this._handleToggleParticipationAction
+        );
+
+        this._bot.removeActionHandler(
+            this._gameContext.chatId,
+            Action.START,
+            this._handleStartAction
         );
 
         if (this._messageId) {
@@ -73,9 +87,12 @@ export class JoinStateHandler implements StateHandler {
             'disable_notification': true,
             ...Markup.inlineKeyboard([
                 Markup.button.callback(
-                    `Join / ${this._players.length > 1 ? 'Leave' : 'Cancel'}`,
+                    `Join / ${this._players.length >= 2 ? 'Leave' : 'Cancel'}`,
                     Action.TOGGLE_PARTICIPATION
                 ),
+                ...this._players.length >= 2
+                    ? [Markup.button.callback('Start!', Action.START)]
+                    : [],
             ]),
         }];
     }
@@ -109,5 +126,17 @@ export class JoinStateHandler implements StateHandler {
             await telegrafContext.answerCbQuery('You have joined the game');
             await this._updateMessage();
         }
+    }
+
+    @Bound
+    private async _handleStartAction(): Promise<void> {
+        await this._gameContext.next(
+            new GameStateHandler({
+                players: this._players,
+            }, {
+                gameContext: this._gameContext,
+                bot: this._bot,
+            })
+        );
     }
 }

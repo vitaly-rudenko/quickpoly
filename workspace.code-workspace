@@ -1,13 +1,16 @@
 {
 	"folders": [
 		{
+			"name": "bot",
 			"path": "bot"
 		},
 		{
-			"path": "helpers"
+			"name": "server",
+			"path": "server"
 		},
 		{
-			"path": "server"
+			"name": "helpers",
+			"path": "helpers"
 		}
 	],
 	"settings": {},
