@@ -7,12 +7,14 @@ import canvas from 'canvas';
 import { LogLevel } from './logging/LoggerProvider';
 import { WinstonLoggerProvider } from './logging/WinstonLoggerProvider';
 import { MapRenderer } from './renderer/MapRenderer';
+import { TelegramBot } from './game/TelegramBot';
 import { Game } from './game/Game';
+import { Player } from './game/Player';
 
 const loggerProvider = new WinstonLoggerProvider({ logLevel: LogLevel.TRACE });
 const logger = loggerProvider.create('app');
 
-const chatId = '-516338149';
+const chatId = -516338149;
 const caption = `
 ⏳ *23 seconds left*
 👤 *Vladislav*
@@ -186,52 +188,58 @@ async function start() {
         }],
     });
 
-    const bot = new Telegraf(telegramBotToken);
-    bot.hears('ping', ctx => ctx.reply('pong 🏓'));
-    bot.launch({
-        allowedUpdates: ['callback_query'],
-        dropPendingUpdates: true,
-    });
+    const bot = new TelegramBot(new Telegraf(telegramBotToken));
+    await bot.start();
 
-    // bot.command('start', () => {
-    new Game({
+    const game = new Game({
         chatId,
+        author: new Player({
+            id: 56681133,
+            name: 'Vitaly',
+        }),
     }, {
         bot,
-    }).start();
-    // });
+    });
 
-    let messageId = null;
-    try {
-        messageId = await fs.readFile('./message_id', { encoding: 'utf-8' });
-    } catch (err) {
-        // ignore
-    }
+    await game.start();
 
-    if (!messageId) {
-        const message = await bot.telegram.sendPhoto(chatId, { source: image },
-            { caption, parse_mode: 'MarkdownV2', disable_notification: true });
-        messageId = message.message_id;
-        fs.writeFile('./message_id', String(messageId), { encoding: 'utf-8' });
+    // new Game({
+    //     chatId,
+    // }, {
+    //     bot,
+    // }).start();
 
-        setTimeout(async () => {
-            const diceMessage1 = await bot.telegram.sendDice(chatId, { disable_notification: true });
-            const diceMessage2 = await bot.telegram.sendDice(chatId, { disable_notification: true });
-            console.log(diceMessage1.dice.value, diceMessage2.dice.value);
+    // let messageId = null;
+    // try {
+    //     messageId = await fs.readFile('./message_id', { encoding: 'utf-8' });
+    // } catch (err) {
+    //     // ignore
+    // }
 
-            setTimeout(async () => {
-                await bot.telegram.deleteMessage(chatId, diceMessage1.message_id);
-                await bot.telegram.deleteMessage(chatId, diceMessage2.message_id);
-            }, 7000);
-        }, 2000);
-    } else {
-        try {
-            await bot.telegram.editMessageMedia(chatId, Number(messageId), undefined,
-                { type: 'photo', media: { source: image }, caption, parse_mode: 'MarkdownV2' });
-        } catch (err) {
-            // ignore
-        }
-    }
+    // if (!messageId) {
+    //     const message = await bot.api.sendPhoto(chatId, { source: image },
+    //         { caption, parse_mode: 'MarkdownV2', disable_notification: true });
+    //     messageId = message.message_id;
+    //     fs.writeFile('./message_id', String(messageId), { encoding: 'utf-8' });
+
+    //     setTimeout(async () => {
+    //         const diceMessage1 = await bot.api.sendDice(chatId, { disable_notification: true });
+    //         const diceMessage2 = await bot.api.sendDice(chatId, { disable_notification: true });
+    //         console.log(diceMessage1.dice.value, diceMessage2.dice.value);
+
+    //         setTimeout(async () => {
+    //             await bot.api.deleteMessage(chatId, diceMessage1.message_id);
+    //             await bot.api.deleteMessage(chatId, diceMessage2.message_id);
+    //         }, 7000);
+    //     }, 2000);
+    // } else {
+    //     try {
+    //         await bot.api.editMessageMedia(chatId, Number(messageId), undefined,
+    //             { type: 'photo', media: { source: image }, caption, parse_mode: 'MarkdownV2' });
+    //     } catch (err) {
+    //         // ignore
+    //     }
+    // }
 }
 
 async function loadTelegramBotToken() {
