@@ -1,6 +1,6 @@
 import { StreetTitleDeed } from './StreetTitleDeed';
 import { PropertySpace } from './PropertySpace';
-import { Serializable, SerializableObject } from '../../Serializable';
+import { Serializable, SerializableObject } from '../../utils/Serializable';
 import { StreetColor } from './StreetColor';
 
 export class StreetSpace extends PropertySpace implements Serializable {

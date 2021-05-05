@@ -1,10 +1,10 @@
-import { Serializable, SerializableObject } from '../../Serializable';
+import { Serializable, SerializableObject } from '../../utils/Serializable';
 import { PropertySpace } from './PropertySpace';
 
-export class UtilitySpace extends PropertySpace implements Serializable {
+export class RailroadSpace extends PropertySpace implements Serializable {
     serialize(): SerializableObject {
         return {
-            type: 'utility',
+            type: 'railroad',
             attributes: {
                 name: this._name,
                 price: this._price,

@@ -13,7 +13,11 @@
 			"path": "helpers"
 		}
 	],
-	"settings": {},
+	"settings": {
+		"files.trimFinalNewlines": true,
+		"files.trimTrailingWhitespace": true,
+		"files.insertFinalNewline": true
+	},
 	"launch": {
 		"configurations": [{
             "name": "Attach (bot)",

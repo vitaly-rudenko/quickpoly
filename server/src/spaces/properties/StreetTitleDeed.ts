@@ -1,4 +1,4 @@
-import { Serializable, SerializableObject } from '../../Serializable';
+import { Serializable, SerializableObject } from '../../utils/Serializable';
 
 export class StreetTitleDeed implements Serializable {
     private _baseRent: number;

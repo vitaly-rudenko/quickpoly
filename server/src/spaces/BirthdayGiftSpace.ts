@@ -1,7 +1,7 @@
-import { Serializable, SerializableObject } from '../Serializable';
+import { Serializable, SerializableObject } from '../utils/Serializable';
 import { LandableSpace } from './LandableSpace';
 
-export class LuxuryTaxSpace implements LandableSpace, Serializable {
+export class BirthdayGiftSpace implements LandableSpace, Serializable {
     private _amount: number;
 
     constructor(attributes: { amount: number }) {
@@ -12,7 +12,7 @@ export class LuxuryTaxSpace implements LandableSpace, Serializable {
 
     serialize(): SerializableObject {
         return {
-            type: 'luxuryTax',
+            type: 'birthdayGift',
             attributes: {
                 amount: this._amount,
             },

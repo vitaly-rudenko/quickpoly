@@ -1,4 +1,4 @@
-import { Serializable, SerializableObject } from '../../Serializable';
+import { Serializable, SerializableObject } from '../../utils/Serializable';
 import { LandableSpace } from '../LandableSpace';
 import { ChanceCard } from './ChanceCard';
 

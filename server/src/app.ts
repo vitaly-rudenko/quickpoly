@@ -1,22 +1,21 @@
-import WebSocket from 'ws';
-
-import { CommunityChestSpace } from './app/entities/spaces/community-chest/CommunityChestSpace';
-import { GoSpace } from './app/entities/spaces/GoSpace';
-import { StreetSpace } from './app/entities/spaces/properties/StreetSpace';
-import { StreetColor } from './app/entities/spaces/properties/StreetColor';
-import { StreetTitleDeed } from './app/entities/spaces/properties/StreetTitleDeed';
-import { IncomeTaxSpace } from './app/entities/spaces/IncomeTaxSpace';
-import { RailroadSpace } from './app/entities/spaces/properties/RailroadSpace';
-import { UtilitySpace } from './app/entities/spaces/properties/UtilitySpace';
-import { AuctionSpace } from './app/entities/spaces/AuctionSpace';
-import { FreeParkingSpace } from './app/entities/spaces/FreeParkingSpace';
-import { ChanceSpace } from './app/entities/spaces/chance/ChanceSpace';
-import { BusTicketSpace } from './app/entities/spaces/BusTicketSpace';
-import { JailSpace } from './app/entities/spaces/JailSpace';
-import { GoToJailSpace } from './app/entities/spaces/GoToJailSpace';
-import { BirthdayGiftSpace } from './app/entities/spaces/BirthdayGiftSpace';
-import { LuxuryTaxSpace } from './app/entities/spaces/LuxuryTaxSpace';
-import { Serializable } from './app/entities/Serializable';
+import { CommunityChestSpace } from './spaces/community-chest/CommunityChestSpace';
+import { GoSpace } from './spaces/GoSpace';
+import { StreetSpace } from './spaces/properties/StreetSpace';
+import { StreetColor } from './spaces/properties/StreetColor';
+import { StreetTitleDeed } from './spaces/properties/StreetTitleDeed';
+import { IncomeTaxSpace } from './spaces/IncomeTaxSpace';
+import { RailroadSpace } from './spaces/properties/RailroadSpace';
+import { UtilitySpace } from './spaces/properties/UtilitySpace';
+import { AuctionSpace } from './spaces/AuctionSpace';
+import { FreeParkingSpace } from './spaces/FreeParkingSpace';
+import { ChanceSpace } from './spaces/chance/ChanceSpace';
+import { BusTicketSpace } from './spaces/BusTicketSpace';
+import { JailSpace } from './spaces/JailSpace';
+import { GoToJailSpace } from './spaces/GoToJailSpace';
+import { BirthdayGiftSpace } from './spaces/BirthdayGiftSpace';
+import { LuxuryTaxSpace } from './spaces/LuxuryTaxSpace';
+import { Serializable } from './utils/Serializable';
+import { Server } from './Server';
 
 const communityChestSpace = new CommunityChestSpace({
     cards: [
@@ -603,26 +602,12 @@ const spaces: Serializable[] = [
     }),
 ];
 
-const server = new WebSocket.Server({
-    host: 'localhost',
-    port: 3000,
-});
+async function start() {
+    const server = new Server();
 
-server.on('listening', () => {
-    server.on('connection', (client) => {
-        client.on('message', (message) => {
-            const command = JSON.parse(message.toString('utf-8'));
+    server.setCommandHandler('getData', () => spaces.map(s => s.serialize()));
 
-            if (command.command === 'getData') {
-                const gameData = spaces.map(s => s.serialize());
-                client.send(Buffer.from(JSON.stringify({
-                    commandId: command.commandId,
-                    data: gameData,
-                }), 'utf-8'));
-            }
-        });
-    });
+    await server.start();
+}
 
-    console.log('Server started');
-});
-
+start();

@@ -11,13 +11,20 @@
 
 #### Command message format
 
-```
-{ commandId, connectionId, gameId?, playerId?, command, data? }
+```ts
+interface Command {
+    correlationId: string,
+    command: string,
+    data?: any
+}
 ```
 
 #### Command response message format
-```
-{ commandId, connectionId, data } or { commandId, connectionId, error }
+```ts
+interface CommandResponse {
+    correlationId: string,
+    result?: any
+}
 ```
 
 ### `getData` command

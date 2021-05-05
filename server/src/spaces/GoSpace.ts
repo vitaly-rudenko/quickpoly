@@ -1,6 +1,6 @@
 import { LandableSpace } from './LandableSpace';
 import { PassableSpace } from '../PassableSpace';
-import { Serializable, SerializableObject } from '../Serializable';
+import { Serializable, SerializableObject } from '../utils/Serializable';
 
 export class GoSpace implements LandableSpace, PassableSpace, Serializable {
     private _salary: number;
