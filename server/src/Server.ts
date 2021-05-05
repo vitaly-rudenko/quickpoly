@@ -4,7 +4,6 @@ import { CommandMessage, CommandHandler } from './CommandHandler';
 export class Server {
     private _commandHandlers = new Map<string, VersatileCommandHandler>();
 
-
     async start(): Promise<void> {
         const server = new WebSocket.Server({
             host: 'localhost',
@@ -17,6 +16,8 @@ export class Server {
                     await this._handleMessage(client, JSON.parse(message.toString('utf-8')));
                 });
             });
+
+            console.log('Server is listening');
         });
     }
 
@@ -53,4 +54,4 @@ export class Server {
     }
 }
 
-type VersatileCommandHandler = CommandHandler | ((input: unknown) => (Promise<unknown> | unknown));
+type VersatileCommandHandler<T = any> = CommandHandler<T> | ((input: T) => (Promise<T> | T));

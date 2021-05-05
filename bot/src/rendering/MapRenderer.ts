@@ -1,7 +1,7 @@
 import canvas from 'canvas';
+import { ServerGameData, Space, StreetColor } from '../server/ServerGameData';
 import { ServerGameState, ServerOwnedSpace } from '../server/ServerGameState';
 import { ServerPlayer } from '../server/ServerPlayer';
-import { Space } from './Space';
 
 enum Side {
     TOP = 'top',
@@ -70,23 +70,25 @@ const playerColors = [
 const int = Math.trunc;
 
 export class MapRenderer {
-    private _spaces: Space[];
+    private _gameData: ServerGameData;
     private _largeSpaceSize: number;
     private _fontFamily: string;
     private _fontFamilyBold: string;
     private _fontSize: number;
     private _size: number;
 
-    constructor(
-        spaces: Space[],
-        options: { fontFamily: string, fontFamilyBold: string }
-    ) {
-        this._spaces = spaces;
+    constructor(attributes: {
+        gameData: ServerGameData,
+        fontFamily: string,
+        fontFamilyBold: string
+    }) {
+        this._gameData = attributes.gameData;
+        this._fontFamily = attributes.fontFamily;
+        this._fontFamilyBold = attributes.fontFamilyBold;
+
         this._size = 2048;
         this._largeSpaceSize = 436;
         this._fontSize = 40;
-        this._fontFamily = options.fontFamily;
-        this._fontFamilyBold = options.fontFamilyBold;
     }
 
     render(gameState: ServerGameState): Buffer {
@@ -95,13 +97,13 @@ export class MapRenderer {
 
         this.drawPlayerStats(context, gameState.players);
 
-        for (let index = 0; index < this._spaces.length; index++) {
+        for (let index = 0; index < this._gameData.spaces.length; index++) {
             const { x, y, width, height, side, direction } = this.getSpaceBoundaries(index);
 
             const ownedSpace = gameState.spaces.find(space => space.index === index);
             const player = ownedSpace && gameState.players.find(p => p.id === ownedSpace.ownerId);
 
-            this.drawSpace(context, this._spaces[index], ownedSpace, player, {
+            this.drawSpace(context, this._gameData.spaces[index], ownedSpace, player, {
                 x,
                 y,
                 width,
@@ -301,7 +303,7 @@ export class MapRenderer {
         side: Side,
         direction: Direction
     } {
-        const spacesPerSide = this._spaces.length / 4;
+        const spacesPerSide = this._gameData.spaces.length / 4;
         const largeSpaceSize = this._largeSpaceSize;
         const smallSpaceSize = int((this._size - this._largeSpaceSize * 2) / (spacesPerSide - 1));
 
@@ -347,7 +349,7 @@ export class MapRenderer {
         space: Space,
         ownedSpace: ServerOwnedSpace | undefined,
         owner: ServerPlayer | undefined,
-        options: {
+        attributes: {
             direction: Direction,
             side: Side,
             x: number,
@@ -358,11 +360,23 @@ export class MapRenderer {
     ): void {
         context.save();
 
-        const label = (space.attributes?.name ?? typeToName[space.type]);
+        let label = typeToName[space.type];
+        let color: StreetColor | undefined;
+
         const additionalInfo: string[] = [];
 
-        if (space.attributes?.price) {
-            additionalInfo.push('$' + space.attributes.price);
+        if ('attributes' in space) {
+            if ('name' in space.attributes) {
+                label = space.attributes.name;
+            }
+
+            if ('price' in space.attributes) {
+                additionalInfo.push('$' + space.attributes.price);
+            }
+
+            if ('color' in space.attributes) {
+                color = space.attributes.color;
+            }
         }
 
         const colorSize = 50;
@@ -371,25 +385,25 @@ export class MapRenderer {
         if (owner && ownedSpace) {
             context.fillStyle = this.getPlayerColor(owner.index, 0.7);
 
-            if (options.side === Side.TOP) {
+            if (attributes.side === Side.TOP) {
                 context.fillRect(
-                    options.x, options.y,
-                    options.width, colorSize
+                    attributes.x, attributes.y,
+                    attributes.width, colorSize
                 );
-            } else if (options.side === Side.RIGHT) {
+            } else if (attributes.side === Side.RIGHT) {
                 context.fillRect(
-                    options.x + (options.width - colorSize), options.y,
-                    colorSize, options.height
+                    attributes.x + (attributes.width - colorSize), attributes.y,
+                    colorSize, attributes.height
                 );
-            } else if (options.side === Side.BOTTOM) {
+            } else if (attributes.side === Side.BOTTOM) {
                 context.fillRect(
-                    options.x, options.y + (options.height - colorSize),
-                    options.width, colorSize
+                    attributes.x, attributes.y + (attributes.height - colorSize),
+                    attributes.width, colorSize
                 );
             } else {
                 context.fillRect(
-                    options.x, options.y,
-                    colorSize, options.height
+                    attributes.x, attributes.y,
+                    colorSize, attributes.height
                 );
             }
 
@@ -397,18 +411,18 @@ export class MapRenderer {
                 const offset = 25;
 
                 let x: number, y: number;
-                if (options.side === Side.TOP) {
-                    x = options.x + options.width / 2;
-                    y = options.y + offset;
-                } else if (options.side === Side.RIGHT) {
-                    x = options.x + options.width - offset;
-                    y = options.y + options.height / 2;
-                } else if (options.side === Side.BOTTOM) {
-                    x = options.x + options.width / 2;
-                    y = options.y + options.height - offset;
+                if (attributes.side === Side.TOP) {
+                    x = attributes.x + attributes.width / 2;
+                    y = attributes.y + offset;
+                } else if (attributes.side === Side.RIGHT) {
+                    x = attributes.x + attributes.width - offset;
+                    y = attributes.y + attributes.height / 2;
+                } else if (attributes.side === Side.BOTTOM) {
+                    x = attributes.x + attributes.width / 2;
+                    y = attributes.y + attributes.height - offset;
                 } else {
-                    x = options.x + offset;
-                    y = options.y + options.height / 2;
+                    x = attributes.x + offset;
+                    y = attributes.y + attributes.height / 2;
                 }
 
                 context.beginPath();
@@ -424,21 +438,21 @@ export class MapRenderer {
                 let x: number, y: number;
                 let xOffset = 0;
                 let yOffset = 0;
-                if (options.side === Side.TOP) {
-                    x = options.x + (options.width - length) / 2;
-                    y = options.y + mapOffset;
+                if (attributes.side === Side.TOP) {
+                    x = attributes.x + (attributes.width - length) / 2;
+                    y = attributes.y + mapOffset;
                     xOffset = size + offset;
-                } else if (options.side === Side.RIGHT) {
-                    x = options.x + options.width - size - mapOffset;
-                    y = options.y + (options.height - length) / 2;
+                } else if (attributes.side === Side.RIGHT) {
+                    x = attributes.x + attributes.width - size - mapOffset;
+                    y = attributes.y + (attributes.height - length) / 2;
                     yOffset = size + offset;
-                } else if (options.side === Side.BOTTOM) {
-                    x = options.x + (options.width - length) / 2;
-                    y = options.y + options.height - size - mapOffset;
+                } else if (attributes.side === Side.BOTTOM) {
+                    x = attributes.x + (attributes.width - length) / 2;
+                    y = attributes.y + attributes.height - size - mapOffset;
                     xOffset = size + offset;
                 } else {
-                    x = options.x + mapOffset;
-                    y = options.y + (options.height - length) / 2;
+                    x = attributes.x + mapOffset;
+                    y = attributes.y + (attributes.height - length) / 2;
                     yOffset = size + offset;
                 }
 
@@ -449,41 +463,41 @@ export class MapRenderer {
             }
         }
 
-        if (space.attributes?.color) {
-            context.fillStyle = streetColorToSpaceColor[space.attributes?.color];
+        if (color) {
+            context.fillStyle = streetColorToSpaceColor[color];
 
-            if (options.side === Side.TOP) {
+            if (attributes.side === Side.TOP) {
                 context.fillRect(
-                    options.x, options.y + (options.height - colorSize),
-                    options.width, colorSize
+                    attributes.x, attributes.y + (attributes.height - colorSize),
+                    attributes.width, colorSize
                 );
-            } else if (options.side === Side.RIGHT) {
+            } else if (attributes.side === Side.RIGHT) {
                 context.fillRect(
-                    options.x, options.y,
-                    colorSize, options.height
+                    attributes.x, attributes.y,
+                    colorSize, attributes.height
                 );
-            } else if (options.side === Side.BOTTOM) {
+            } else if (attributes.side === Side.BOTTOM) {
                 context.fillRect(
-                    options.x, options.y,
-                    options.width, colorSize
+                    attributes.x, attributes.y,
+                    attributes.width, colorSize
                 );
             } else {
                 context.fillRect(
-                    options.x + (options.width - colorSize), options.y,
-                    colorSize, options.height
+                    attributes.x + (attributes.width - colorSize), attributes.y,
+                    colorSize, attributes.height
                 );
             }
         }
 
         context.strokeStyle = 'black';
-        context.strokeRect(options.x, options.y, options.width, options.height);
+        context.strokeRect(attributes.x, attributes.y, attributes.width, attributes.height);
 
         context.fillStyle = 'black';
         context.font = `${this._fontSize}px "${this._fontFamily}"`;
         context.textAlign = 'center';
         context.textBaseline = 'middle';
-        context.translate(int(options.x + options.width / 2), int(options.y + options.height / 2));
-        context.rotate(directionToAngle[options.direction]);
+        context.translate(int(attributes.x + attributes.width / 2), int(attributes.y + attributes.height / 2));
+        context.rotate(directionToAngle[attributes.direction]);
         context.fillText(label, 0, additionalInfo.length > 0 ? int(-this._fontSize / 2 - 2) : 0);
 
         if (additionalInfo.length > 0) {

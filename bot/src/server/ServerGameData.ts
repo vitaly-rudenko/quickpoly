@@ -1,21 +1,23 @@
 export interface ServerGameData {
-    spaces: (
-        AuctionSpace |
-        BirthdayGiftSpace |
-        BusTicketSpace |
-        FreeParkingSpace |
-        GoSpace |
-        GoToJailSpace |
-        IncomeTaxSpace |
-        JailSpace |
-        LuxuryTaxSpace |
-        ChanceSpace |
-        CommunityChestSpace |
-        RailroadSpace |
-        StreetSpace |
-        UtilitySpace
-    )[]
+    spaces: Space[]
 }
+
+export type Space = (
+    AuctionSpace |
+    BirthdayGiftSpace |
+    BusTicketSpace |
+    FreeParkingSpace |
+    GoSpace |
+    GoToJailSpace |
+    IncomeTaxSpace |
+    JailSpace |
+    LuxuryTaxSpace |
+    ChanceSpace |
+    CommunityChestSpace |
+    RailroadSpace |
+    StreetSpace |
+    UtilitySpace
+);
 
 export interface AuctionSpace {
     type: 'auction';

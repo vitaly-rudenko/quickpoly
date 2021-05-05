@@ -16,6 +16,7 @@ import { BirthdayGiftSpace } from './spaces/BirthdayGiftSpace';
 import { LuxuryTaxSpace } from './spaces/LuxuryTaxSpace';
 import { Serializable } from './utils/Serializable';
 import { Server } from './Server';
+import { Game } from './Game';
 
 const communityChestSpace = new CommunityChestSpace({
     cards: [
@@ -604,8 +605,42 @@ const spaces: Serializable[] = [
 
 async function start() {
     const server = new Server();
+    let latestGameId = 0n;
 
-    server.setCommandHandler('getData', () => spaces.map(s => s.serialize()));
+    const games = new Map<string, Game>();
+
+    server.setCommandHandler('getData', () => ({
+        spaces: spaces.map(s => s.serialize()),
+    }));
+
+    server.setCommandHandler('createGame', (data: {
+        players: {
+            id: number,
+            name: string
+        }[]
+    }) => {
+        latestGameId += 1n;
+        const gameId = latestGameId.toString();
+
+        games.set(gameId, new Game({
+            players: data.players.map((player, i) => ({
+                id: player.id,
+                name: player.name,
+                index: i,
+                space: 0,
+                money: 1500,
+            })),
+        }));
+
+        return gameId;
+    });
+
+    server.setCommandHandler('getGameState', (gameId: string) => {
+        const game = games.get(gameId);
+        if (!game) return null;
+
+        return game.serialize();
+    });
 
     await server.start();
 }

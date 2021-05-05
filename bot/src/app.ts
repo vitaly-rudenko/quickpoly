@@ -10,7 +10,7 @@ import { MapRenderer } from './rendering/MapRenderer';
 import { TelegramBot } from './game/TelegramBot';
 import { Game } from './game/Game';
 import { Player } from './game/Player';
-import { ServerSocket } from './server/ServerSocket';
+import { GameServer } from './server/GameServer';
 
 const loggerProvider = new WinstonLoggerProvider({ logLevel: LogLevel.TRACE });
 const logger = loggerProvider.create('app');
@@ -44,156 +44,10 @@ async function start() {
         { family: 'Roboto Bold' }
     );
 
-    const mapRenderer = new MapRenderer(spaces, { fontFamily: 'Roboto', fontFamilyBold: 'Roboto Bold' });
-
     const telegramBotToken = await loadTelegramBotToken();
 
-    const image = mapRenderer.render({
-        move: {
-            playerId: 3,
-        },
-        spaces: [{
-            index: 1,
-            ownerId: 2,
-            houses: 0,
-            hotel: true,
-        }, {
-            index: 3,
-            ownerId: 2,
-            houses: 3,
-            hotel: false,
-        }, {
-            index: 4,
-            ownerId: 2,
-            houses: 0,
-            hotel: false,
-        }, {
-            index: 15,
-            ownerId: 3,
-            houses: 2,
-            hotel: false,
-        }, {
-            index: 16,
-            ownerId: 3,
-            houses: 1,
-            hotel: false,
-        }, {
-            index: 17,
-            ownerId: 4,
-            houses: 0,
-            hotel: false,
-        }, {
-            index: 18,
-            ownerId: 3,
-            houses: 3,
-            hotel: false,
-        }, {
-            index: 19,
-            ownerId: 3,
-            houses: 0,
-            hotel: true,
-        }, {
-            index: 27,
-            ownerId: 6,
-            houses: 0,
-            hotel: false,
-        }, {
-            index: 29,
-            ownerId: 6,
-            houses: 3,
-            hotel: false,
-        }, {
-            index: 30,
-            ownerId: 6,
-            houses: 2,
-            hotel: false,
-        }, {
-            index: 31,
-            ownerId: 6,
-            houses: 0,
-            hotel: true,
-        }, {
-            index: 34,
-            ownerId: 8,
-            houses: 0,
-            hotel: false,
-        }, {
-            index: 40,
-            ownerId: 8,
-            houses: 2,
-            hotel: false,
-        }, {
-            index: 41,
-            ownerId: 8,
-            houses: 2,
-            hotel: false,
-        }, {
-            index: 42,
-            ownerId: 8,
-            houses: 1,
-            hotel: false,
-        }, {
-            index: 44,
-            ownerId: 8,
-            houses: 4,
-            hotel: false,
-        }],
-        players: [{
-            id: 1,
-            index: 0,
-            name: 'Vladimir',
-            space: 0,
-            money: 150,
-        }, {
-            id: 2,
-            index: 1,
-            name: 'Anton',
-            space: 14,
-            money: 2500,
-        }, {
-            id: 3,
-            index: 2,
-            name: 'George',
-            space: 14,
-            money: 1570,
-        }, {
-            id: 4,
-            index: 3,
-            name: 'Mikhail',
-            space: 25,
-            money: 870,
-        }, {
-            id: 5,
-            index: 4,
-            name: 'Jon Snow',
-            space: 3,
-            money: 450,
-        }, {
-            id: 6,
-            index: 5,
-            name: 'Nikita',
-            space: 32,
-            money: 300,
-        }, {
-            id: 7,
-            index: 6,
-            name: 'Vladislav',
-            space: 35,
-            money: 448,
-        }, {
-            id: 8,
-            index: 7,
-            name: 'Lofi hip hop radio - beast to relax/study to',
-            space: 45,
-            money: 980,
-        }],
-    });
-
-    const serverSocket = new ServerSocket({
-        loggerProvider,
-    });
-
-    await serverSocket.connect();
+    const gameServer = new GameServer({ loggerProvider });
+    await gameServer.connect();
 
     const bot = new TelegramBot(new Telegraf(telegramBotToken));
     await bot.start();
@@ -206,15 +60,149 @@ async function start() {
         }),
     }, {
         bot,
+        gameServer,
     });
 
     await game.start();
 
-    // new Game({
-    //     chatId,
-    // }, {
-    //     bot,
-    // }).start();
+    // const mapRenderer = new MapRenderer({ spaces, fontFamily: 'Roboto', fontFamilyBold: 'Roboto Bold' });
+    // const image = mapRenderer.render({
+    //     spaces: [{
+    //         index: 1,
+    //         ownerId: 2,
+    //         houses: 0,
+    //         hotel: true,
+    //     }, {
+    //         index: 3,
+    //         ownerId: 2,
+    //         houses: 3,
+    //         hotel: false,
+    //     }, {
+    //         index: 4,
+    //         ownerId: 2,
+    //         houses: 0,
+    //         hotel: false,
+    //     }, {
+    //         index: 15,
+    //         ownerId: 3,
+    //         houses: 2,
+    //         hotel: false,
+    //     }, {
+    //         index: 16,
+    //         ownerId: 3,
+    //         houses: 1,
+    //         hotel: false,
+    //     }, {
+    //         index: 17,
+    //         ownerId: 4,
+    //         houses: 0,
+    //         hotel: false,
+    //     }, {
+    //         index: 18,
+    //         ownerId: 3,
+    //         houses: 3,
+    //         hotel: false,
+    //     }, {
+    //         index: 19,
+    //         ownerId: 3,
+    //         houses: 0,
+    //         hotel: true,
+    //     }, {
+    //         index: 27,
+    //         ownerId: 6,
+    //         houses: 0,
+    //         hotel: false,
+    //     }, {
+    //         index: 29,
+    //         ownerId: 6,
+    //         houses: 3,
+    //         hotel: false,
+    //     }, {
+    //         index: 30,
+    //         ownerId: 6,
+    //         houses: 2,
+    //         hotel: false,
+    //     }, {
+    //         index: 31,
+    //         ownerId: 6,
+    //         houses: 0,
+    //         hotel: true,
+    //     }, {
+    //         index: 34,
+    //         ownerId: 8,
+    //         houses: 0,
+    //         hotel: false,
+    //     }, {
+    //         index: 40,
+    //         ownerId: 8,
+    //         houses: 2,
+    //         hotel: false,
+    //     }, {
+    //         index: 41,
+    //         ownerId: 8,
+    //         houses: 2,
+    //         hotel: false,
+    //     }, {
+    //         index: 42,
+    //         ownerId: 8,
+    //         houses: 1,
+    //         hotel: false,
+    //     }, {
+    //         index: 44,
+    //         ownerId: 8,
+    //         houses: 4,
+    //         hotel: false,
+    //     }],
+    //     players: [{
+    //         id: 1,
+    //         index: 0,
+    //         name: 'Vladimir',
+    //         space: 0,
+    //         money: 150,
+    //     }, {
+    //         id: 2,
+    //         index: 1,
+    //         name: 'Anton',
+    //         space: 14,
+    //         money: 2500,
+    //     }, {
+    //         id: 3,
+    //         index: 2,
+    //         name: 'George',
+    //         space: 14,
+    //         money: 1570,
+    //     }, {
+    //         id: 4,
+    //         index: 3,
+    //         name: 'Mikhail',
+    //         space: 25,
+    //         money: 870,
+    //     }, {
+    //         id: 5,
+    //         index: 4,
+    //         name: 'Jon Snow',
+    //         space: 3,
+    //         money: 450,
+    //     }, {
+    //         id: 6,
+    //         index: 5,
+    //         name: 'Nikita',
+    //         space: 32,
+    //         money: 300,
+    //     }, {
+    //         id: 7,
+    //         index: 6,
+    //         name: 'Vladislav',
+    //         space: 35,
+    //         money: 448,
+    //     }, {
+    //         id: 8,
+    //         index: 7,
+    //         name: 'Lofi hip hop radio - beast to relax/study to',
+    //         space: 45,
+    //         money: 980,
+    //     }],
+    // });
 
     // let messageId = null;
     // try {

@@ -13,8 +13,8 @@ const winstonLogLevelMapping: Record<LogLevel, string> = {
 export class WinstonLoggerProvider implements LoggerProvider {
     private _logLevel: LogLevel;
 
-    constructor(options: { logLevel: LogLevel }) {
-        this._logLevel = options.logLevel;
+    constructor(attributes: { logLevel: LogLevel }) {
+        this._logLevel = attributes.logLevel;
     }
 
     create(label: string): Logger {

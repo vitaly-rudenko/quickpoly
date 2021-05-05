@@ -1,6 +1,7 @@
 import { stripIndents } from 'common-tags';
 import { Context as TelegrafContext, Markup } from 'telegraf';
 import { ExtraEditMessageText, ExtraReplyMessage } from 'telegraf/typings/telegram-types';
+import { GameServer } from '../../server/GameServer';
 import { Bound } from '../../utils/Bound';
 import { GameContext } from '../GameContext';
 import { Player } from '../Player';
@@ -19,10 +20,12 @@ export class JoinStateHandler implements StateHandler {
     private _bot: TelegramBot;
     private _messageId: number | undefined;
     private _players: Player[] = [];
+    private _gameServer: GameServer;
 
-    constructor(dependencies: { gameContext: GameContext, bot: TelegramBot }) {
+    constructor(dependencies: { gameContext: GameContext, bot: TelegramBot, gameServer: GameServer }) {
         this._gameContext = dependencies.gameContext;
         this._bot = dependencies.bot;
+        this._gameServer = dependencies.gameServer;
     }
 
     async enter(): Promise<void> {
@@ -87,11 +90,11 @@ export class JoinStateHandler implements StateHandler {
             'disable_notification': true,
             ...Markup.inlineKeyboard([
                 Markup.button.callback(
-                    `Join / ${this._players.length >= 2 ? 'Leave' : 'Cancel'}`,
+                    '✋ Join | Leave',
                     Action.TOGGLE_PARTICIPATION
                 ),
                 ...this._players.length >= 2
-                    ? [Markup.button.callback('Start!', Action.START)]
+                    ? [Markup.button.callback('🎉 Start!', Action.START)]
                     : [],
             ]),
         }];
@@ -136,6 +139,7 @@ export class JoinStateHandler implements StateHandler {
             }, {
                 gameContext: this._gameContext,
                 bot: this._bot,
+                gameServer: this._gameServer,
             })
         );
     }
