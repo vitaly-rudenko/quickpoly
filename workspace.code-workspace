@@ -1,0 +1,29 @@
+{
+	"folders": [
+		{
+			"path": "bot"
+		},
+		{
+			"path": "helpers"
+		},
+		{
+			"path": "server"
+		}
+	],
+	"settings": {},
+	"launch": {
+		"configurations": [{
+            "name": "Attach (bot)",
+            "port": 9229,
+            "request": "attach",
+            "timeout": 100000000,
+            "restart": true,
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "sourceMaps": true,
+            "type": "node"
+        }],
+		"compounds": []
+	}
+}

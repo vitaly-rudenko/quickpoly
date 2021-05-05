@@ -1,9 +1,9 @@
-type SerializableValue = string | number | boolean | null;
+export interface Serializable {
+    serialize(): SerializableObject;
+}
 
 export interface SerializableObject {
     [key: string]: SerializableValue | SerializableValue[] | SerializableObject | SerializableObject[]
 }
 
-export interface Serializable {
-    serialize(): SerializableObject;
-}
+type SerializableValue = string | number | boolean | null;
