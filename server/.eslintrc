@@ -51,6 +51,7 @@
         "operator-linebreak": "off",
         "@typescript-eslint/ban-types": "off",
         "function-paren-newline": "off",
-        "no-unused-expressions": "off"
+        "no-unused-expressions": "off",
+        "no-nested-ternary": "off"
     }
 }

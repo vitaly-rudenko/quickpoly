@@ -1,7 +1,7 @@
 import { Action } from '../../actions/Action';
 import { PurchasePropertyAction } from '../../actions/PurchasePropertyAction';
-import { PutPropertyUpForAuction } from '../../actions/PutPropertyUpForAuction';
 import { Context } from '../../Context';
+import { Player } from '../../Player';
 import { PropertySpace } from './PropertySpace';
 
 export class StreetSpace extends PropertySpace {
@@ -9,6 +9,7 @@ export class StreetSpace extends PropertySpace {
     private _titleDeed: StreetTitleDeed;
 
     constructor(attributes: {
+        owner: Player | null,
         name: string,
         price: number,
         color: StreetColor,
@@ -16,6 +17,7 @@ export class StreetSpace extends PropertySpace {
     }) {
         super({
             type: 'streetSpace',
+            owner: attributes.owner,
             name: attributes.name,
             price: attributes.price,
         });
@@ -24,11 +26,8 @@ export class StreetSpace extends PropertySpace {
         this._titleDeed = attributes.titleDeed;
     }
 
-    getActions(context: Context): Action[] {
-        return [
-            new PurchasePropertyAction(this),
-            new PutPropertyUpForAuction(this),
-        ];
+    calculateRent(): number {
+        return this._titleDeed.baseRent;
     }
 }
 
@@ -54,6 +53,30 @@ export class StreetTitleDeed {
         this._mortgageValue = attributes.mortgageValue;
         this._housePrice = attributes.housePrice;
         this._hotelBasePrice = attributes.hotelBasePrice;
+    }
+
+    get baseRent(): number {
+        return this._baseRent;
+    }
+
+    get perHouseRents(): number[] {
+        return this._perHouseRents;
+    }
+
+    get hotelRent(): number {
+        return this._hotelRent;
+    }
+
+    get mortgageValue(): number {
+        return this._mortgageValue;
+    }
+
+    get housePrice(): number {
+        return this._housePrice;
+    }
+
+    get hotelBasePrice(): number {
+        return this._hotelBasePrice;
     }
 }
 

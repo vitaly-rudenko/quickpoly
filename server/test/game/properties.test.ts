@@ -4,10 +4,10 @@ import { GoSpace } from '../../src/game/map/GoSpace';
 import { StreetColor, StreetSpace, StreetTitleDeed } from '../../src/game/map/properties/StreetSpace';
 import { Player } from '../../src/game/Player';
 import { Mocker } from '../helpers/Mocker';
-import { GiveUpAction } from '../../src/game/actions/GiveUpAction';
-import { PutPropertyUpForAuction } from '../../src/game/actions/PutPropertyUpForAuction';
 import { PurchasePropertyAction } from '../../src/game/actions/PurchasePropertyAction';
 import { PropertyPurchasedLog } from '../../src/game/logs/PropertyPurchasedLog';
+import { PropertyRentPaidLog } from '../../src/game/logs/PropertyRentPaidLog';
+import { PayPropertyRentAction } from '../../src/game/actions/PayPropertyRentAction';
 
 describe('[properties]', () => {
     let mocker: Mocker;
@@ -17,7 +17,9 @@ describe('[properties]', () => {
 
         mocker.register(Game, (_, attributes) => new Game({
             move: {
-                player: attributes?.players?.[0] ?? mocker.create(Player),
+                player: attributes?.move?.player
+                    ?? attributes?.players?.[0]
+                    ?? mocker.create(Player),
             },
             players: attributes?.players ?? [mocker.reuse(Player)],
             map: attributes?.map ?? [],
@@ -30,42 +32,42 @@ describe('[properties]', () => {
         }));
 
         mocker.register(GoSpace, () => new GoSpace({ salary: 0 }));
-        mocker.register(StreetSpace, (_, attributes) => new StreetSpace({
-            name: 'My street',
-            color: StreetColor.LIGHT_BLUE,
+
+        mocker.register(StreetTitleDeed, (_, attributes) => new StreetTitleDeed({
+            baseRent: attributes?.baseRent ?? 0,
+            hotelBasePrice: 0,
+            hotelRent: 0,
+            housePrice: 0,
+            mortgageValue: 0,
+            perHouseRents: [0],
+        }));
+
+        mocker.register(StreetSpace, ({ index }, attributes) => new StreetSpace({
+            owner: attributes?.owner ?? null,
             price: attributes?.price ?? 0,
-            titleDeed: new StreetTitleDeed({
-                baseRent: 0,
-                hotelBasePrice: 0,
-                hotelRent: 0,
-                housePrice: 0,
-                mortgageValue: 0,
-                perHouseRents: [0],
-            }),
+            name: `Street #${index}`,
+            color: StreetColor.LIGHT_BLUE,
+            titleDeed: attributes?.titleDeed ?? mocker.create(StreetTitleDeed),
         }));
     });
 
-    it('should add purchase and auction actions for player', () => {
+    it('should give player an option to purchase the property', () => {
         const player = mocker.create(Player);
-        const street = mocker.create(StreetSpace);
+        const streetSpace = mocker.create(StreetSpace);
 
         const game = mocker.create(Game, {
             players: [player],
-            map: [street],
+            map: [streetSpace],
         });
 
         expect(game.getAvailableActions())
             .to.be.deep.eq([
-                new PurchasePropertyAction(street),
-                new PutPropertyUpForAuction(street),
-                new GiveUpAction(),
+                new PurchasePropertyAction(streetSpace),
             ]);
     });
 
-    it('should allow player to buy the property', () => {
-        const playerId = 'fake-player-id';
-
-        const player = mocker.create(Player, { id: playerId, money: 100 });
+    it('should allow player to purchase the property', () => {
+        const player = mocker.create(Player, { money: 100 });
         const streetSpace = mocker.create(StreetSpace, { price: 46 });
 
         const game = mocker.create(Game, {
@@ -74,16 +76,53 @@ describe('[properties]', () => {
         });
 
         expect(player.money).to.eq(100);
-        expect(streetSpace.ownerId).to.be.null;
+        expect(streetSpace.owner).to.be.null;
         expect(game.getLogs()).to.be.deep.eq([]);
 
-        game.performAction(PurchasePropertyAction);
+        game.start();
+        game.performAction('purchaseProperty');
 
         expect(player.money).to.eq(54);
-        expect(streetSpace.ownerId).to.eq(0);
+        expect(streetSpace.owner).to.eq(player);
         expect(game.getLogs())
             .to.be.deep.eq([
                 new PropertyPurchasedLog({ player, propertySpace: streetSpace }),
             ]);
+    });
+
+    it.only('should charge player for the rent', () => {
+        const player1 = mocker.create(Player);
+        const player2 = mocker.create(Player, { money: 200 });
+
+        const streetSpace = mocker.create(StreetSpace, {
+            owner: player1,
+            titleDeed: mocker.create(StreetTitleDeed, { baseRent: 154 }),
+        });
+
+        const game = mocker.create(Game, {
+            move: { player: player2 },
+            players: [player1, player2],
+            map: [streetSpace],
+        });
+
+        expect(player2.money).to.eq(200);
+        expect(game.getLogs()).to.be.deep.eq([]);
+        expect(game.getAvailableActions())
+            .to.be.deep.eq([
+                new PayPropertyRentAction(streetSpace),
+            ]);
+
+        game.start();
+
+        expect(player2.money).to.eq(46);
+        expect(game.getLogs()).to.be.deep.eq([
+            new PropertyRentPaidLog({
+                player: player2,
+                propertySpace: streetSpace,
+                amount: 154,
+            }),
+        ]);
+        expect(game.getAvailableActions())
+            .to.be.deep.eq([]);
     });
 });

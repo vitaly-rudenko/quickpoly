@@ -1,11 +1,13 @@
 import { Space } from './map/Space';
 import { Player } from './Player';
 import { Action } from './actions/Action';
-import { GiveUpAction } from './actions/GiveUpAction';
 import { Log } from './logs/Log';
+import { Context } from './Context';
 
 export class Game {
     private _movePlayer: Player;
+    private _performedMoveActions: Action[];
+
     private _players: Player[];
     private _map: Space[];
     private _logs: Log[] = [];
@@ -16,22 +18,48 @@ export class Game {
         map: Space[],
     }) {
         this._movePlayer = state.move.player;
+        this._performedMoveActions = [];
+
         this._players = state.players;
         this._map = state.map;
     }
 
+    start(): void {
+        this._performRequiredActions();
+    }
+
     getAvailableActions(): Action[] {
         return [
-            ...this._getMoveSpace().getActions({ player: this._movePlayer }),
-            new GiveUpAction(),
+            ...this._getMoveSpace().getActions(
+                new Context({
+                    player: this._movePlayer,
+                    performedMoveActions: this._performedMoveActions,
+                })
+            ),
         ];
     }
 
-    performAction<T extends Action>(type: { new(...args: any[]): T }): void {
-        const action = this.getAvailableActions().find(a => a instanceof type) as T | undefined;
+    _performRequiredActions(): void {
+        const actions = this.getAvailableActions().filter(a => a.required);
+
+        for (const action of actions) {
+            this.performAction(action.type);
+        }
+    }
+
+    performAction(type: string): void {
+        const action = this.getAvailableActions().find(a => a.type === type);
         if (!action) return;
 
-        this._logs.push(...action.perform({ player: this._movePlayer }));
+        const logs = action.perform(
+            new Context({
+                player: this._movePlayer,
+                performedMoveActions: this._performedMoveActions,
+            })
+        );
+
+        this._performedMoveActions.push(action);
+        this._logs.push(...logs);
     }
 
     getLogs(): Log[] {

@@ -34,6 +34,6 @@ type Factory<T extends ClassType> = (
 type ClassType = { new(...args: any[]): any };
 
 type PartialArguments<T extends Array<U>, U = unknown> = Array<PartialArgument<T[number]>>;
-type PartialArgument<T> = T extends Record<string, unknown>
+type PartialArgument<T> = (T extends Record<string, unknown>
     ? { [K in keyof T]?: PartialArgument<T[K]> }
-    : T;
+    : T) | undefined;
