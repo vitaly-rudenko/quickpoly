@@ -5,6 +5,9 @@ export class FreeParkingSpace implements LandableSpace, Serializable {
     land(): void {}
 
     serialize(): SerializableObject {
-        return { type: 'freeParking' };
+        return {
+            type: 'freeParking',
+            name: 'Free Parking',
+        };
     }
 }

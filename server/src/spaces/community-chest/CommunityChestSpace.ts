@@ -14,6 +14,9 @@ export class CommunityChestSpace implements LandableSpace, Serializable {
     land(): void {}
 
     serialize(): SerializableObject {
-        return { type: 'communityChest' };
+        return {
+            type: 'communityChest',
+            name: 'Community Chest',
+        };
     }
 }

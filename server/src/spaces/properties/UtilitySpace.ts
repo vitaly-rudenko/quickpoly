@@ -5,8 +5,8 @@ export class UtilitySpace extends PropertySpace implements Serializable {
     serialize(): SerializableObject {
         return {
             type: 'utility',
+            name: this._name,
             attributes: {
-                name: this._name,
                 price: this._price,
             },
         };

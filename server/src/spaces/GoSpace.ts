@@ -16,6 +16,7 @@ export class GoSpace implements LandableSpace, PassableSpace, Serializable {
     serialize(): SerializableObject {
         return {
             type: 'go',
+            name: 'Go',
             attributes: {
                 salary: this._salary,
             },

@@ -13,6 +13,7 @@ export class BirthdayGiftSpace implements LandableSpace, Serializable {
     serialize(): SerializableObject {
         return {
             type: 'birthdayGift',
+            name: 'Birthday Gift',
             attributes: {
                 amount: this._amount,
             },

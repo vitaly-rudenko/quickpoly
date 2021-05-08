@@ -1,48 +1,15 @@
 import canvas from 'canvas';
+import { MapSide } from '../map/MapSide';
+import { MapUtils } from '../map/MapUtils';
+import { SpaceDirection } from '../map/SpaceDirection';
 import { ServerGameData, Space, StreetColor } from '../server/ServerGameData';
 import { ServerGameState, ServerOwnedSpace } from '../server/ServerGameState';
 import { ServerPlayer } from '../server/ServerPlayer';
 
-enum Side {
-    TOP = 'top',
-    RIGHT = 'right',
-    BOTTOM = 'bottom',
-    LEFT = 'left',
-}
-
-enum Direction {
-    BOTTOM_TO_TOP = 'bottomToTop',
-    TOP_TO_BOTTOM = 'topToBottom',
-    LEFT_TO_RIGHT = 'leftToRight',
-}
-
-const sideIndexToSide = [Side.TOP, Side.RIGHT, Side.BOTTOM, Side.LEFT];
-
-const sideToDirection: Record<Side, Direction> = {
-    [Side.TOP]: Direction.BOTTOM_TO_TOP,
-    [Side.RIGHT]: Direction.LEFT_TO_RIGHT,
-    [Side.BOTTOM]: Direction.TOP_TO_BOTTOM,
-    [Side.LEFT]: Direction.LEFT_TO_RIGHT,
-};
-
-const directionToAngle: Record<Direction, number> = {
-    [Direction.LEFT_TO_RIGHT]: 0,
-    [Direction.BOTTOM_TO_TOP]: -Math.PI / 2,
-    [Direction.TOP_TO_BOTTOM]: Math.PI / 2,
-};
-
-const typeToName: Record<string, string> = {
-    go: 'GO',
-    jail: 'Jail',
-    goToJail: 'Go to Jail',
-    freeParking: 'Free Parking',
-    busTicket: 'Bus Ticket',
-    chance: 'Chance',
-    communityChest: 'Community Chest',
-    birthdayGift: 'Birthday Gift',
-    luxuryTax: 'Luxury Tax',
-    incomeTax: 'Income Tax',
-    auction: 'Auction',
+const spaceDirectionToAngle: Record<SpaceDirection, number> = {
+    [SpaceDirection.LEFT_TO_RIGHT]: 0,
+    [SpaceDirection.BOTTOM_TO_TOP]: -Math.PI / 2,
+    [SpaceDirection.TOP_TO_BOTTOM]: Math.PI / 2,
 };
 
 const streetColorToSpaceColor: Record<string, string> = {
@@ -70,21 +37,15 @@ const playerColors = [
 const int = Math.trunc;
 
 export class MapRenderer {
-    private _gameData: ServerGameData;
     private _largeSpaceSize: number;
     private _fontFamily: string;
     private _fontFamilyBold: string;
     private _fontSize: number;
     private _size: number;
 
-    constructor(attributes: {
-        gameData: ServerGameData,
-        fontFamily: string,
-        fontFamilyBold: string
-    }) {
-        this._gameData = attributes.gameData;
-        this._fontFamily = attributes.fontFamily;
-        this._fontFamilyBold = attributes.fontFamilyBold;
+    constructor() {
+        this._fontFamily = 'Roboto';
+        this._fontFamilyBold = 'Roboto Bold';
 
         this._size = 2048;
         this._largeSpaceSize = 436;
@@ -97,13 +58,13 @@ export class MapRenderer {
 
         this.drawPlayerStats(context, gameState.players);
 
-        for (let index = 0; index < this._gameData.spaces.length; index++) {
-            const { x, y, width, height, side, direction } = this.getSpaceBoundaries(index);
+        for (let index = 0; index < gameState.gameData.spaces.length; index++) {
+            const { x, y, width, height, side, direction } = this.getSpaceBoundaries(gameState.gameData, index);
 
             const ownedSpace = gameState.spaces.find(space => space.index === index);
             const player = ownedSpace && gameState.players.find(p => p.id === ownedSpace.ownerId);
 
-            this.drawSpace(context, this._gameData.spaces[index], ownedSpace, player, {
+            this.drawSpace(context, gameState.gameData.spaces[index], ownedSpace, player, {
                 x,
                 y,
                 width,
@@ -119,12 +80,13 @@ export class MapRenderer {
             int(this._size - this._largeSpaceSize * 2), int(this._size - this._largeSpaceSize * 2)
         );
 
-        this.drawPlayerNamesAndIcons(context, gameState.players);
+        this.drawPlayerNamesAndIcons(gameState.gameData, context, gameState.players);
 
         return mapCanvas.toBuffer();
     }
 
     drawPlayerNamesAndIcons(
+        gameData: ServerGameData,
         context: canvas.CanvasRenderingContext2D,
         players: ServerPlayer[]
     ): void {
@@ -138,7 +100,7 @@ export class MapRenderer {
             const spacePosition = perSpaceCount.get(player.space);
             perSpaceCount.set(player.space, spacePosition + 1);
 
-            const { x, y, width, height, side } = this.getSpaceBoundaries(player.space);
+            const { x, y, width, height, side } = this.getSpaceBoundaries(gameData, player.space);
             context.save();
             const fontSize = this._fontSize * 1.2;
             context.font = `${fontSize}px "${this._fontFamilyBold}"`;
@@ -154,7 +116,7 @@ export class MapRenderer {
             const nameColor = this.getPlayerColor(player.index, 0.7);
             const iconColor = this.getPlayerColor(player.index);
 
-            if (side === Side.TOP) {
+            if (side === MapSide.TOP) {
                 const playerWidth = int(textBoundaries.width + 20);
                 const playerHeight = int(fontSize + 25);
                 const playerX = int(x + width / 2 - centerOffset);
@@ -176,7 +138,7 @@ export class MapRenderer {
                 context.textAlign = 'left';
                 context.textBaseline = 'top';
                 context.fillText(' ↑ ' + playerName, playerX, playerY);
-            } else if (side === Side.RIGHT) {
+            } else if (side === MapSide.RIGHT) {
                 const playerWidth = int(fontSize + 25);
                 const playerHeight = int(textBoundaries.width + 20);
                 const playerX = int(x - playerWidth - offset - spacePosition * playerWidth);
@@ -200,7 +162,7 @@ export class MapRenderer {
                 context.translate(playerX, playerY);
                 context.rotate(-Math.PI / 2);
                 context.fillText(playerName + ' ↓ ', 0, 0);
-            } else if (side === Side.BOTTOM) {
+            } else if (side === MapSide.BOTTOM) {
                 const playerWidth = int(textBoundaries.width + 30);
                 const playerHeight = int(fontSize + 25);
                 const playerX = int(x - playerWidth + width / 2 + centerOffset);
@@ -295,31 +257,30 @@ export class MapRenderer {
         }
     }
 
-    getSpaceBoundaries(index: number): {
+    getSpaceBoundaries(gameData: ServerGameData, index: number): {
         x: number,
         y: number,
         width: number,
         height: number,
-        side: Side,
-        direction: Direction
+        side: MapSide,
+        direction: SpaceDirection
     } {
-        const spacesPerSide = this._gameData.spaces.length / 4;
+        const { position, side, direction } = MapUtils.getSpacePosition(gameData, index);
+
+        const spacesPerSide = gameData.spaces.length / 4;
         const largeSpaceSize = this._largeSpaceSize;
         const smallSpaceSize = int((this._size - this._largeSpaceSize * 2) / (spacesPerSide - 1));
 
-        const position = index % spacesPerSide;
-        const side = sideIndexToSide[Math.floor(index / spacesPerSide)];
-        const direction = sideToDirection[side];
         const smallestSpaceSize = position === 0 ? largeSpaceSize : smallSpaceSize;
 
         let x: number, y: number;
-        if (side === Side.TOP) {
+        if (side === MapSide.TOP) {
             x = Math.min(1, position) * largeSpaceSize + Math.max(0, position - 1) * smallSpaceSize;
             y = 0;
-        } else if (side === Side.RIGHT) {
+        } else if (side === MapSide.RIGHT) {
             x = this._size - largeSpaceSize;
             y = Math.min(1, position) * largeSpaceSize + Math.max(0, position - 1) * smallSpaceSize;
-        } else if (side === Side.BOTTOM) {
+        } else if (side === MapSide.BOTTOM) {
             x = this._size - largeSpaceSize - position * smallSpaceSize;
             y = this._size - largeSpaceSize;
         } else {
@@ -328,7 +289,7 @@ export class MapRenderer {
         }
 
         let width: number, height: number;
-        if (direction === Direction.BOTTOM_TO_TOP || direction === Direction.TOP_TO_BOTTOM) {
+        if (direction === SpaceDirection.BOTTOM_TO_TOP || direction === SpaceDirection.TOP_TO_BOTTOM) {
             [width, height] = [smallestSpaceSize, largeSpaceSize];
         } else {
             [width, height] = [largeSpaceSize, smallestSpaceSize];
@@ -350,8 +311,8 @@ export class MapRenderer {
         ownedSpace: ServerOwnedSpace | undefined,
         owner: ServerPlayer | undefined,
         attributes: {
-            direction: Direction,
-            side: Side,
+            direction: SpaceDirection,
+            side: MapSide,
             x: number,
             y: number,
             width: number,
@@ -360,16 +321,12 @@ export class MapRenderer {
     ): void {
         context.save();
 
-        let label = typeToName[space.type];
+        const label = space.name;
         let color: StreetColor | undefined;
 
         const additionalInfo: string[] = [];
 
         if ('attributes' in space) {
-            if ('name' in space.attributes) {
-                label = space.attributes.name;
-            }
-
             if ('price' in space.attributes) {
                 additionalInfo.push('$' + space.attributes.price);
             }
@@ -385,17 +342,17 @@ export class MapRenderer {
         if (owner && ownedSpace) {
             context.fillStyle = this.getPlayerColor(owner.index, 0.7);
 
-            if (attributes.side === Side.TOP) {
+            if (attributes.side === MapSide.TOP) {
                 context.fillRect(
                     attributes.x, attributes.y,
                     attributes.width, colorSize
                 );
-            } else if (attributes.side === Side.RIGHT) {
+            } else if (attributes.side === MapSide.RIGHT) {
                 context.fillRect(
                     attributes.x + (attributes.width - colorSize), attributes.y,
                     colorSize, attributes.height
                 );
-            } else if (attributes.side === Side.BOTTOM) {
+            } else if (attributes.side === MapSide.BOTTOM) {
                 context.fillRect(
                     attributes.x, attributes.y + (attributes.height - colorSize),
                     attributes.width, colorSize
@@ -411,13 +368,13 @@ export class MapRenderer {
                 const offset = 25;
 
                 let x: number, y: number;
-                if (attributes.side === Side.TOP) {
+                if (attributes.side === MapSide.TOP) {
                     x = attributes.x + attributes.width / 2;
                     y = attributes.y + offset;
-                } else if (attributes.side === Side.RIGHT) {
+                } else if (attributes.side === MapSide.RIGHT) {
                     x = attributes.x + attributes.width - offset;
                     y = attributes.y + attributes.height / 2;
-                } else if (attributes.side === Side.BOTTOM) {
+                } else if (attributes.side === MapSide.BOTTOM) {
                     x = attributes.x + attributes.width / 2;
                     y = attributes.y + attributes.height - offset;
                 } else {
@@ -438,15 +395,15 @@ export class MapRenderer {
                 let x: number, y: number;
                 let xOffset = 0;
                 let yOffset = 0;
-                if (attributes.side === Side.TOP) {
+                if (attributes.side === MapSide.TOP) {
                     x = attributes.x + (attributes.width - length) / 2;
                     y = attributes.y + mapOffset;
                     xOffset = size + offset;
-                } else if (attributes.side === Side.RIGHT) {
+                } else if (attributes.side === MapSide.RIGHT) {
                     x = attributes.x + attributes.width - size - mapOffset;
                     y = attributes.y + (attributes.height - length) / 2;
                     yOffset = size + offset;
-                } else if (attributes.side === Side.BOTTOM) {
+                } else if (attributes.side === MapSide.BOTTOM) {
                     x = attributes.x + (attributes.width - length) / 2;
                     y = attributes.y + attributes.height - size - mapOffset;
                     xOffset = size + offset;
@@ -466,17 +423,17 @@ export class MapRenderer {
         if (color) {
             context.fillStyle = streetColorToSpaceColor[color];
 
-            if (attributes.side === Side.TOP) {
+            if (attributes.side === MapSide.TOP) {
                 context.fillRect(
                     attributes.x, attributes.y + (attributes.height - colorSize),
                     attributes.width, colorSize
                 );
-            } else if (attributes.side === Side.RIGHT) {
+            } else if (attributes.side === MapSide.RIGHT) {
                 context.fillRect(
                     attributes.x, attributes.y,
                     colorSize, attributes.height
                 );
-            } else if (attributes.side === Side.BOTTOM) {
+            } else if (attributes.side === MapSide.BOTTOM) {
                 context.fillRect(
                     attributes.x, attributes.y,
                     attributes.width, colorSize
@@ -497,7 +454,7 @@ export class MapRenderer {
         context.textAlign = 'center';
         context.textBaseline = 'middle';
         context.translate(int(attributes.x + attributes.width / 2), int(attributes.y + attributes.height / 2));
-        context.rotate(directionToAngle[attributes.direction]);
+        context.rotate(spaceDirectionToAngle[attributes.direction]);
         context.fillText(label, 0, additionalInfo.length > 0 ? int(-this._fontSize / 2 - 2) : 0);
 
         if (additionalInfo.length > 0) {

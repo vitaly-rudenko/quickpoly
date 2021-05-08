@@ -1,8 +1,14 @@
+import { ServerGameData } from './ServerGameData';
 import { ServerPlayer } from './ServerPlayer';
 
 export interface ServerGameState {
+    move: {
+        playerId: number,
+        timesOutAt: number,
+    },
     spaces: ServerOwnedSpace[],
-    players: ServerPlayer[]
+    players: ServerPlayer[],
+    gameData: ServerGameData,
 }
 
 export interface ServerOwnedSpace {

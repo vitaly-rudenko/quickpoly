@@ -1,8 +1,10 @@
 import WebSocket from 'ws';
 import { CommandMessage, CommandHandler } from './CommandHandler';
+import { EventHandler, EventMessage } from './EventHandler';
 
 export class Server {
     private _commandHandlers = new Map<string, VersatileCommandHandler>();
+    private _eventHandlers = new Map<string, VersatileEventHandler>();
 
     async start(): Promise<void> {
         const server = new WebSocket.Server({
@@ -25,20 +27,37 @@ export class Server {
         this._commandHandlers.set(command, handler);
     }
 
-    private async _handleMessage(client: WebSocket, message: CommandMessage) {
-        const handler = this._commandHandlers.get(message.command);
-        if (!handler) {
-            throw new Error('Unknown command: ' + message.command);
-        }
+    setEventHandler(event: string, handler: VersatileEventHandler): void {
+        this._eventHandlers.set(event, handler);
+    }
 
-        let result;
-        if (typeof handler === 'function') {
-            result = await handler(message.data);
+    private async _handleMessage(client: WebSocket, message: CommandMessage | EventMessage) {
+        if ('command' in message) {
+            const handler = this._commandHandlers.get(message.command);
+            if (!handler) {
+                throw new Error('Unknown command: ' + message.command);
+            }
+
+            let result;
+            if (typeof handler === 'function') {
+                result = await handler(message.data);
+            } else {
+                result = await handler.handle(message.data);
+            }
+
+            await this._send(client, { correlationId: message.correlationId, result });
         } else {
-            result = await handler.handle(message.data);
-        }
+            const handler = this._eventHandlers.get(message.event);
+            if (!handler) {
+                throw new Error('Unknown event: ' + message.event);
+            }
 
-        await this._send(client, { correlationId: message.correlationId, result });
+            if (typeof handler === 'function') {
+                await handler(message.data);
+            } else {
+                await handler.handle(message.data);
+            }
+        }
     }
 
     private async _send(client: WebSocket, data: unknown): Promise<void> {
@@ -54,4 +73,5 @@ export class Server {
     }
 }
 
-type VersatileCommandHandler<T = any> = CommandHandler<T> | ((input: T) => (Promise<T> | T));
+type VersatileCommandHandler<T = any> = CommandHandler<T> | ((data: T) => (Promise<T> | T));
+type VersatileEventHandler<T = any> = EventHandler<T> | ((data: T) => (Promise<void> | void));

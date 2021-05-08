@@ -48,6 +48,9 @@
         "prefer-template": "off",
         "quote-props": "off",
         "dot-notation": "off",
-        "operator-linebreak": "off"
+        "operator-linebreak": "off",
+        "@typescript-eslint/ban-types": "off",
+        "function-paren-newline": "off",
+        "no-unused-expressions": "off"
     }
 }

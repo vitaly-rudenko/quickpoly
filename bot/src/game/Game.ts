@@ -1,4 +1,4 @@
-import { GameServer } from '../server/GameServer';
+import { Server } from '../server/Server';
 import { GameContext } from './GameContext';
 import { Player } from './Player';
 import { ReadyStateHandler } from './states/ReadyStateHandler';
@@ -7,11 +7,11 @@ import { TelegramBot } from './TelegramBot';
 export class Game {
     private _gameContext: GameContext;
     private _bot: TelegramBot;
-    private _gameServer: GameServer;
+    private _gameServer: Server;
 
     constructor(
         attributes: { chatId: number, author: Player },
-        dependencies: { bot: TelegramBot, gameServer: GameServer }
+        dependencies: { bot: TelegramBot, gameServer: Server }
     ) {
         this._gameContext = new GameContext({
             chatId: attributes.chatId,

@@ -10,7 +10,7 @@ import { MapRenderer } from './rendering/MapRenderer';
 import { TelegramBot } from './game/TelegramBot';
 import { Game } from './game/Game';
 import { Player } from './game/Player';
-import { GameServer } from './server/GameServer';
+import { Server } from './server/Server';
 
 const loggerProvider = new WinstonLoggerProvider({ logLevel: LogLevel.TRACE });
 const logger = loggerProvider.create('app');
@@ -32,8 +32,6 @@ const caption = `
 async function start() {
     logger.info('Starting the application');
 
-    const spaces = await loadSpaces();
-
     canvas.registerFont(
         path.join(process.cwd(), 'assets', 'Roboto-Regular.ttf'),
         { family: 'Roboto' }
@@ -46,7 +44,7 @@ async function start() {
 
     const telegramBotToken = await loadTelegramBotToken();
 
-    const gameServer = new GameServer({ loggerProvider });
+    const gameServer = new Server({ loggerProvider });
     await gameServer.connect();
 
     const bot = new TelegramBot(new Telegraf(telegramBotToken));
@@ -65,7 +63,8 @@ async function start() {
 
     await game.start();
 
-    // const mapRenderer = new MapRenderer({ spaces, fontFamily: 'Roboto', fontFamilyBold: 'Roboto Bold' });
+    // const mapRenderer = new MapRenderer();
+
     // const image = mapRenderer.render({
     //     spaces: [{
     //         index: 1,
@@ -246,15 +245,6 @@ async function loadTelegramBotToken() {
     );
 
     return credentials.telegramBotToken;
-}
-
-async function loadSpaces() {
-    return JSON.parse(
-        await fs.readFile(
-            path.join(process.cwd(), 'spaces-example.json'),
-            { encoding: 'utf-8' }
-        )
-    );
 }
 
 start()

@@ -5,6 +5,9 @@ export class AuctionSpace implements LandableSpace, Serializable {
     land(): void {}
 
     serialize(): SerializableObject {
-        return { type: 'auction' };
+        return {
+            type: 'auction',
+            name: 'Auction',
+        };
     }
 }

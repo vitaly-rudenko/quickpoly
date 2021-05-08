@@ -25,8 +25,8 @@ export class StreetSpace extends PropertySpace implements Serializable {
     serialize(): SerializableObject {
         return {
             type: 'street',
+            name: this._name,
             attributes: {
-                name: this._name,
                 price: this._price,
                 color: this._color,
                 titleDeed: this._titleDeed.serialize(),

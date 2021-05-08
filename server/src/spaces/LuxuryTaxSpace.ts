@@ -13,6 +13,7 @@ export class LuxuryTaxSpace implements LandableSpace, Serializable {
     serialize(): SerializableObject {
         return {
             type: 'luxuryTax',
+            name: 'Luxury Tax',
             attributes: {
                 amount: this._amount,
             },

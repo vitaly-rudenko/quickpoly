@@ -14,9 +14,9 @@ import { JailSpace } from './spaces/JailSpace';
 import { GoToJailSpace } from './spaces/GoToJailSpace';
 import { BirthdayGiftSpace } from './spaces/BirthdayGiftSpace';
 import { LuxuryTaxSpace } from './spaces/LuxuryTaxSpace';
-import { Serializable } from './utils/Serializable';
 import { Server } from './Server';
 import { Game } from './Game';
+import { Space } from './GameData';
 
 const communityChestSpace = new CommunityChestSpace({
     cards: [
@@ -160,7 +160,7 @@ const chanceSpace = new ChanceSpace({
     ],
 });
 
-const spaces: Serializable[] = [
+const spaces: Space[] = [
     new GoSpace({ salary: 200 }),
     new StreetSpace({
         name: 'Mediterranean',
@@ -609,10 +609,6 @@ async function start() {
 
     const games = new Map<string, Game>();
 
-    server.setCommandHandler('getData', () => ({
-        spaces: spaces.map(s => s.serialize()),
-    }));
-
     server.setCommandHandler('createGame', (data: {
         players: {
             id: number,
@@ -623,6 +619,8 @@ async function start() {
         const gameId = latestGameId.toString();
 
         games.set(gameId, new Game({
+            gameData: { spaces },
+            moveTimeoutMs: 90 * 1000,
             players: data.players.map((player, i) => ({
                 id: player.id,
                 name: player.name,
@@ -640,6 +638,15 @@ async function start() {
         if (!game) return null;
 
         return game.serialize();
+    });
+
+    server.setEventHandler('rollDice', (data: { gameId: string, dice: [number, number] }) => {
+        const game = games.get(data.gameId);
+        if (!game) {
+            throw new Error('Game not found: ' + data.gameId);
+        }
+
+        game.move(data.dice);
     });
 
     await server.start();

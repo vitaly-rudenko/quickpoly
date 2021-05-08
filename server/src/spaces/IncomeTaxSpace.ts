@@ -15,6 +15,7 @@ export class IncomeTaxSpace implements LandableSpace, Serializable {
     serialize(): SerializableObject {
         return {
             type: 'incomeTax',
+            name: 'Income Tax',
             attributes: {
                 amount: this._amount,
                 percent: this._percent,

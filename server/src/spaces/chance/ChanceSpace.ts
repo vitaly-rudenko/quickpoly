@@ -14,6 +14,9 @@ export class ChanceSpace implements LandableSpace, Serializable {
     land(): void {}
 
     serialize(): SerializableObject {
-        return { type: 'chance' };
+        return {
+            type: 'chance',
+            name: 'Chance',
+        };
     }
 }

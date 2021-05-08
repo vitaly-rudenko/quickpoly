@@ -1,7 +1,7 @@
 import { stripIndents } from 'common-tags';
 import { Context as TelegrafContext, Markup } from 'telegraf';
 import { ExtraEditMessageText, ExtraReplyMessage } from 'telegraf/typings/telegram-types';
-import { GameServer } from '../../server/GameServer';
+import { Server } from '../../server/Server';
 import { Bound } from '../../utils/Bound';
 import { GameContext } from '../GameContext';
 import { Player } from '../Player';
@@ -20,16 +20,16 @@ export class JoinStateHandler implements StateHandler {
     private _bot: TelegramBot;
     private _messageId: number | undefined;
     private _players: Player[] = [];
-    private _gameServer: GameServer;
+    private _gameServer: Server;
 
-    constructor(dependencies: { gameContext: GameContext, bot: TelegramBot, gameServer: GameServer }) {
+    constructor(dependencies: { gameContext: GameContext, bot: TelegramBot, gameServer: Server }) {
         this._gameContext = dependencies.gameContext;
         this._bot = dependencies.bot;
         this._gameServer = dependencies.gameServer;
     }
 
     async enter(): Promise<void> {
-        this._players = [this._gameContext.author, new Player({ id: 1, name: 'fake' })];
+        this._players = [this._gameContext.author, new Player({ id: 0, name: 'Jon Snow' })];
         this._bot.addActionHandler(
             this._gameContext.chatId,
             Action.TOGGLE_PARTICIPATION,
@@ -43,6 +43,9 @@ export class JoinStateHandler implements StateHandler {
         );
 
         await this._updateMessage();
+
+        // TODO: remove
+        await this._handleStartAction();
     }
 
     async exit(): Promise<void> {

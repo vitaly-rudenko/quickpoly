@@ -5,6 +5,9 @@ export class JailSpace implements LandableSpace, Serializable {
     land(): void {}
 
     serialize(): SerializableObject {
-        return { type: 'jail' };
+        return {
+            type: 'jail',
+            name: 'Jail',
+        };
     }
 }

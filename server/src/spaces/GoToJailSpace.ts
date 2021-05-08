@@ -5,6 +5,9 @@ export class GoToJailSpace implements LandableSpace, Serializable {
     land(): void {}
 
     serialize(): SerializableObject {
-        return { type: 'goToJail' };
+        return {
+            type: 'goToJail',
+            name: 'Go to Jail',
+        };
     }
 }

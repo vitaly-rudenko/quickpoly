@@ -5,6 +5,9 @@ export class BusTicketSpace implements LandableSpace, Serializable {
     land(): void {}
 
     serialize(): SerializableObject {
-        return { type: 'busTicket' };
+        return {
+            type: 'busTicket',
+            name: 'Bus Ticket',
+        };
     }
 }
