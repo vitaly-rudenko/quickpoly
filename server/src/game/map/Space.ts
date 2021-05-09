@@ -8,5 +8,5 @@ export abstract class Space {
         this._type = attributes.type;
     }
 
-    abstract getActions(context: Context): Action[];
+    abstract getLandActions(context: Context): Action[];
 }

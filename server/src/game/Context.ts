@@ -1,18 +1,17 @@
-import type { Action } from './actions/Action';
+import type { Action, ActionType } from './actions/Action';
 import type { Player } from './Player';
 
 export class Context {
     private _player: Player;
-    private _performedMoveActions: Action[];
+    private _performedActions: Action[];
 
-    constructor(attributes: { player: Player, performedMoveActions: Action[] }) {
+    constructor(attributes: { player: Player, performedActions: Action[] }) {
         this._player = attributes.player;
-        this._performedMoveActions = attributes.performedMoveActions;
+        this._performedActions = attributes.performedActions;
     }
 
-    hasBeenPerformed(actionClass: { new(...args: any[]): Action }): boolean {
-        return this._performedMoveActions
-            .some(action => action instanceof actionClass);
+    hasActionBeenPerformed(type: ActionType): boolean {
+        return this._performedActions.some(action => action.type === type);
     }
 
     get player(): Player {

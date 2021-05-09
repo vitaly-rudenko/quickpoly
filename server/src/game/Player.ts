@@ -17,6 +17,14 @@ export class Player {
         this._money -= amount;
     }
 
+    topUp(amount: number): void {
+        this._money += amount;
+    }
+
+    moveTo(position: number): void {
+        this._position = position;
+    }
+
     get id(): string {
         return this._id;
     }

@@ -1,4 +1,4 @@
-import { Action } from '../../actions/Action';
+import { Action, ActionType } from '../../actions/Action';
 import { PayPropertyRentAction } from '../../actions/PayPropertyRentAction';
 import { PurchasePropertyAction } from '../../actions/PurchasePropertyAction';
 import { Context } from '../../Context';
@@ -6,32 +6,32 @@ import { Player } from '../../Player';
 import { Space } from '../Space';
 
 export abstract class PropertySpace extends Space {
-    private _owner: Player | null;
+    private _landlord: Player | null;
     private _name: string;
     private _price: number;
 
     constructor(attributes: {
-        owner: Player | null,
+        landlord: Player | null,
         type: string,
         name: string,
         price: number,
     }) {
         super({ type: attributes.type });
 
-        this._owner = attributes.owner ?? null;
+        this._landlord = attributes.landlord ?? null;
         this._name = attributes.name;
         this._price = attributes.price;
     }
 
-    makeOwner(player: Player): void {
-        this._owner = player;
+    setLandlord(player: Player): void {
+        this._landlord = player;
     }
 
-    getActions(context: Context): Action[] {
-        return this._owner
-            ? this._owner === context.player
+    getLandActions(context: Context): Action[] {
+        return this._landlord
+            ? this._landlord === context.player
                 ? []
-                : context.hasBeenPerformed(PayPropertyRentAction)
+                : context.hasActionBeenPerformed(ActionType.PAY_PROPERTY_RENT)
                     ? []
                     : [new PayPropertyRentAction(this)]
             : [new PurchasePropertyAction(this)];
@@ -43,7 +43,7 @@ export abstract class PropertySpace extends Space {
         return this._price;
     }
 
-    get owner(): Player | null {
-        return this._owner;
+    get landlord(): Player | null {
+        return this._landlord;
     }
 }

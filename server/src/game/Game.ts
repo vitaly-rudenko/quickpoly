@@ -1,12 +1,13 @@
 import { Space } from './map/Space';
 import { Player } from './Player';
-import { Action } from './actions/Action';
+import { Action, ActionType } from './actions/Action';
 import { Log } from './logs/Log';
 import { Context } from './Context';
+import { DiceRolledLog } from './logs/DiceRolledLog';
 
 export class Game {
     private _movePlayer: Player;
-    private _performedMoveActions: Action[];
+    private _performedActions: Action[];
 
     private _players: Player[];
     private _map: Space[];
@@ -18,7 +19,7 @@ export class Game {
         map: Space[],
     }) {
         this._movePlayer = state.move.player;
-        this._performedMoveActions = [];
+        this._performedActions = [];
 
         this._players = state.players;
         this._map = state.map;
@@ -28,18 +29,33 @@ export class Game {
         this._performRequiredActions();
     }
 
+    rollDice(dice: [number, number]): void {
+        this._movePlayer.moveTo(
+            (this._movePlayer.position + dice[0] + dice[1]) % this._map.length
+        );
+
+        this._logs.push(
+            new DiceRolledLog({
+                player: this._movePlayer,
+                dice,
+            })
+        );
+
+        this._performRequiredActions();
+    }
+
     getAvailableActions(): Action[] {
         return [
-            ...this._getMoveSpace().getActions(
+            ...this._getMoveSpace().getLandActions(
                 new Context({
                     player: this._movePlayer,
-                    performedMoveActions: this._performedMoveActions,
+                    performedActions: this._performedActions,
                 })
             ),
         ];
     }
 
-    _performRequiredActions(): void {
+    private _performRequiredActions(): void {
         const actions = this.getAvailableActions().filter(a => a.required);
 
         for (const action of actions) {
@@ -47,23 +63,27 @@ export class Game {
         }
     }
 
-    performAction(type: string): void {
+    performAction(type: ActionType): void {
         const action = this.getAvailableActions().find(a => a.type === type);
         if (!action) return;
 
         const logs = action.perform(
             new Context({
                 player: this._movePlayer,
-                performedMoveActions: this._performedMoveActions,
+                performedActions: this._performedActions,
             })
         );
 
-        this._performedMoveActions.push(action);
+        this._performedActions.push(action);
         this._logs.push(...logs);
     }
 
     getLogs(): Log[] {
         return this._logs;
+    }
+
+    getPerformedActions(): Action[] {
+        return this._performedActions;
     }
 
     private _getMoveSpace(): Space {

@@ -2,24 +2,31 @@ import type { PropertySpace } from '../map/properties/PropertySpace';
 import { Context } from '../Context';
 import { Log } from '../logs/Log';
 import { PropertyRentPaidLog } from '../logs/PropertyRentPaidLog';
-import { Action } from './Action';
+import { Action, ActionType } from './Action';
 
 export class PayPropertyRentAction extends Action {
     private _propertySpace: PropertySpace;
 
     constructor(propertySpace: PropertySpace) {
-        super({ type: 'payPropertyRent', required: true });
+        super({ type: ActionType.PAY_PROPERTY_RENT, required: true });
 
         this._propertySpace = propertySpace;
     }
 
     perform(context: Context): Log[] {
+        const landlord = this._propertySpace.landlord;
+        if (landlord === null) {
+            throw new Error('Property is not owned by anybody');
+        }
+
         const amount = this._propertySpace.calculateRent();
         context.player.charge(amount);
+        landlord.topUp(amount);
 
         return [
             new PropertyRentPaidLog({
-                player: context.player,
+                landlord,
+                tenant: context.player,
                 propertySpace: this._propertySpace,
                 amount,
             }),

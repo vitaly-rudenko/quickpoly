@@ -1,6 +1,3 @@
-import { Action } from '../../actions/Action';
-import { PurchasePropertyAction } from '../../actions/PurchasePropertyAction';
-import { Context } from '../../Context';
 import { Player } from '../../Player';
 import { PropertySpace } from './PropertySpace';
 
@@ -9,7 +6,7 @@ export class StreetSpace extends PropertySpace {
     private _titleDeed: StreetTitleDeed;
 
     constructor(attributes: {
-        owner: Player | null,
+        landlord: Player | null,
         name: string,
         price: number,
         color: StreetColor,
@@ -17,7 +14,7 @@ export class StreetSpace extends PropertySpace {
     }) {
         super({
             type: 'streetSpace',
-            owner: attributes.owner,
+            landlord: attributes.landlord,
             name: attributes.name,
             price: attributes.price,
         });
