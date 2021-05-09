@@ -10,6 +10,9 @@ import { PropertyRentPaidLog } from '../../src/game/logs/PropertyRentPaidLog';
 import { PayPropertyRentAction } from '../../src/game/actions/PayPropertyRentAction';
 import { ActionType } from '../../src/game/actions/Action';
 import { DiceRolledLog } from '../../src/game/logs/DiceRolledLog';
+import { PutPropertyUpForAuctionAction } from '../../src/game/actions/PutPropertyUpForAuctionAction';
+import { PropertyPutUpForAuctionLog } from '../../src/game/logs/PropertyPutUpForAuctionLog';
+import { MovedToSpaceLog } from '../../src/game/logs/MovedToSpaceLog';
 
 describe('[basic property actions]', () => {
     let mocker: Mocker;
@@ -53,199 +56,271 @@ describe('[basic property actions]', () => {
         }));
     });
 
-    it('should give player an option to purchase the property', () => {
-        const player = mocker.create(Player);
-        const streetSpace = mocker.create(StreetSpace);
+    describe('[purchasing]', () => {
+        it('should give player an option to purchase the property', () => {
+            const player = mocker.create(Player);
+            const streetSpace = mocker.create(StreetSpace);
 
-        const game = mocker.create(Game, {
-            players: [player],
-            map: [streetSpace],
+            const game = mocker.create(Game, {
+                players: [player],
+                map: [streetSpace],
+            });
+
+            expect(game.getAvailableActions())
+                .to.be.deep.eq([
+                    new PurchasePropertyAction(streetSpace),
+                    new PutPropertyUpForAuctionAction(streetSpace),
+                ]);
         });
 
-        expect(game.getAvailableActions())
-            .to.be.deep.eq([
-                new PurchasePropertyAction(streetSpace),
-            ]);
+        it.only('should allow player to purchase the property', () => {
+            const player1 = mocker.create(Player, { money: 100 });
+            const player2 = mocker.create(Player);
+
+            const streetSpace = mocker.create(StreetSpace, { price: 46 });
+
+            const game = mocker.create(Game, {
+                players: [player1, player2],
+                map: [streetSpace],
+            });
+
+            expect(player1.money).to.eq(100);
+            expect(streetSpace.landlord).to.be.null;
+            expect(game.getLogs()).to.be.deep.eq([]);
+            expect(game.getAvailableActions())
+                .to.be.deep.eq([
+                    new PurchasePropertyAction(streetSpace),
+                    new PutPropertyUpForAuctionAction(streetSpace),
+                ]);
+
+            game.start();
+            game.performAction(ActionType.PURCHASE_PROPERTY);
+
+            expect(player1.money).to.eq(54);
+            expect(streetSpace.landlord).to.eq(player1);
+            expect(game.movePlayer).to.eq(player2);
+            expect(game.getLogs())
+                .to.be.deep.eq([
+                    new PropertyPurchasedLog({ player: player1, propertySpace: streetSpace }),
+                ]);
+        });
+
+        it('should not allow player to purchase the property when they don\'t have enough money', () => {
+            const player = mocker.create(Player, { money: 50 });
+            const streetSpace = mocker.create(StreetSpace, { price: 100 });
+
+            const game = mocker.create(Game, {
+                players: [player],
+                map: [streetSpace],
+            });
+
+            expect(player.money).to.eq(50);
+            expect(streetSpace.landlord).to.be.null;
+            expect(game.getLogs()).to.be.deep.eq([]);
+            expect(game.getAvailableActions())
+                .to.be.deep.eq([
+                    new PutPropertyUpForAuctionAction(streetSpace),
+                ]);
+
+            game.start();
+            game.performAction(ActionType.PURCHASE_PROPERTY);
+
+            expect(player.money).to.eq(50);
+            expect(streetSpace.landlord).to.be.null;
+            expect(game.getLogs()).to.be.deep.eq([]);
+            expect(game.getAvailableActions())
+                .to.be.deep.eq([
+                    new PutPropertyUpForAuctionAction(streetSpace),
+                ]);
+        });
     });
 
-    it('should allow player to purchase the property', () => {
-        const player = mocker.create(Player, { money: 100 });
-        const streetSpace = mocker.create(StreetSpace, { price: 46 });
+    describe('[renting]', () => {
+        it('should charge player for the rent immediately', () => {
+            const player1 = mocker.create(Player, { money: 100 });
+            const player2 = mocker.create(Player, { money: 200 });
 
-        const game = mocker.create(Game, {
-            players: [player],
-            map: [streetSpace],
-        });
-
-        expect(player.money).to.eq(100);
-        expect(streetSpace.landlord).to.be.null;
-        expect(game.getLogs()).to.be.deep.eq([]);
-        expect(game.getAvailableActions())
-            .to.be.deep.eq([
-                new PurchasePropertyAction(streetSpace),
-            ]);
-
-        game.start();
-        game.performAction(ActionType.PURCHASE_PROPERTY);
-
-        expect(player.money).to.eq(54);
-        expect(streetSpace.landlord).to.eq(player);
-        expect(game.getAvailableActions()).to.be.deep.eq([]);
-        expect(game.getLogs())
-            .to.be.deep.eq([
-                new PropertyPurchasedLog({ player, propertySpace: streetSpace }),
-            ]);
-    });
-
-    it('should not allow player to purchase the property when they don\'t have enough money', () => {
-        const player = mocker.create(Player, { money: 50 });
-        const streetSpace = mocker.create(StreetSpace, { price: 100 });
-
-        const game = mocker.create(Game, {
-            players: [player],
-            map: [streetSpace],
-        });
-
-        expect(player.money).to.eq(50);
-        expect(streetSpace.landlord).to.be.null;
-        expect(game.getLogs()).to.be.deep.eq([]);
-        expect(game.getAvailableActions()).to.be.deep.eq([]);
-
-        game.start();
-        game.performAction(ActionType.PURCHASE_PROPERTY);
-
-        expect(player.money).to.eq(50);
-        expect(streetSpace.landlord).to.be.null;
-        expect(game.getLogs()).to.be.deep.eq([]);
-        expect(game.getAvailableActions()).to.be.deep.eq([]);
-    });
-
-    it('should charge player for the rent immediately', () => {
-        const player1 = mocker.create(Player, { money: 100 });
-        const player2 = mocker.create(Player, { money: 200 });
-
-        const streetSpace = mocker.create(StreetSpace, {
-            landlord: player1,
-            titleDeed: mocker.create(StreetTitleDeed, { baseRent: 154 }),
-        });
-
-        const game = mocker.create(Game, {
-            move: { player: player2 },
-            players: [player1, player2],
-            map: [streetSpace],
-        });
-
-        expect(player1.money).to.eq(100);
-        expect(player2.money).to.eq(200);
-        expect(game.getLogs()).to.be.deep.eq([]);
-        expect(game.getPerformedActions()).to.deep.eq([]);
-        expect(game.getAvailableActions())
-            .to.be.deep.eq([
-                new PayPropertyRentAction(streetSpace),
-            ]);
-
-        game.start();
-
-        expect(player1.money).to.eq(254);
-        expect(player2.money).to.eq(46);
-        expect(game.getLogs()).to.be.deep.eq([
-            new PropertyRentPaidLog({
+            const streetSpace = mocker.create(StreetSpace, {
                 landlord: player1,
-                tenant: player2,
-                propertySpace: streetSpace,
-                amount: 154,
-            }),
-        ]);
-        expect(game.getAvailableActions()).to.be.deep.eq([]);
-        expect(game.getPerformedActions())
-            .to.deep.eq([
-                new PayPropertyRentAction(streetSpace),
+                titleDeed: mocker.create(StreetTitleDeed, { baseRent: 154 }),
+            });
+
+            const game = mocker.create(Game, {
+                move: { player: player2 },
+                players: [player1, player2],
+                map: [streetSpace],
+            });
+
+            expect(player1.money).to.eq(100);
+            expect(player2.money).to.eq(200);
+            expect(game.getLogs()).to.be.deep.eq([]);
+            expect(game.getPerformedActions()).to.deep.eq([]);
+            expect(game.getAvailableActions())
+                .to.be.deep.eq([
+                    new PayPropertyRentAction(streetSpace),
+                ]);
+
+            game.start();
+
+            expect(player1.money).to.eq(254);
+            expect(player2.money).to.eq(46);
+            expect(game.getLogs()).to.be.deep.eq([
+                new PropertyRentPaidLog({
+                    landlord: player1,
+                    tenant: player2,
+                    propertySpace: streetSpace,
+                    amount: 154,
+                }),
             ]);
-    });
-
-    it('should charge player for the rent when landed', () => {
-        const player1 = mocker.create(Player, { money: 100 });
-        const player2 = mocker.create(Player, { money: 200 });
-
-        const streetSpace = mocker.create(StreetSpace, {
-            landlord: player1,
-            titleDeed: mocker.create(StreetTitleDeed, { baseRent: 154 }),
+            expect(game.getAvailableActions()).to.be.deep.eq([]);
+            expect(game.getPerformedActions())
+                .to.deep.eq([
+                    new PayPropertyRentAction(streetSpace),
+                ]);
         });
 
-        const game = mocker.create(Game, {
-            move: { player: player2 },
-            players: [player1, player2],
-            map: [
-                mocker.create(GoSpace),
-                mocker.create(StreetSpace),
-                streetSpace,
-            ],
-        });
+        it('should charge player for the rent when landed', () => {
+            const player1 = mocker.create(Player, { money: 100 });
+            const player2 = mocker.create(Player, { money: 200 });
 
-        expect(player1.money).to.eq(100);
-        expect(player2.money).to.eq(200);
-        expect(game.getLogs()).to.be.deep.eq([]);
-        expect(game.getPerformedActions()).to.deep.eq([]);
-        expect(game.getAvailableActions()).to.be.deep.eq([]);
-
-        game.start();
-        game.rollDice([1, 1]);
-
-        expect(player1.money).to.eq(254);
-        expect(player2.money).to.eq(46);
-        expect(game.getLogs()).to.be.deep.eq([
-            new DiceRolledLog({
-                player: player2,
-                dice: [1, 1],
-            }),
-            new PropertyRentPaidLog({
+            const streetSpace = mocker.create(StreetSpace, {
                 landlord: player1,
-                tenant: player2,
-                propertySpace: streetSpace,
-                amount: 154,
-            }),
-        ]);
-        expect(game.getAvailableActions()).to.be.deep.eq([]);
-        expect(game.getPerformedActions())
-            .to.deep.eq([
-                new PayPropertyRentAction(streetSpace),
+                titleDeed: mocker.create(StreetTitleDeed, { baseRent: 154 }),
+            });
+
+            const game = mocker.create(Game, {
+                move: { player: player2 },
+                players: [player1, player2],
+                map: [
+                    mocker.create(GoSpace),
+                    mocker.create(StreetSpace),
+                    streetSpace,
+                ],
+            });
+
+            expect(player1.money).to.eq(100);
+            expect(player2.money).to.eq(200);
+            expect(game.getLogs()).to.be.deep.eq([]);
+            expect(game.getPerformedActions()).to.deep.eq([]);
+            expect(game.getAvailableActions()).to.be.deep.eq([]);
+
+            game.start();
+            game.rollDice([1, 1]);
+
+            expect(player1.money).to.eq(254);
+            expect(player2.money).to.eq(46);
+            expect(game.getLogs()).to.be.deep.eq([
+                new DiceRolledLog({
+                    player: player2,
+                    dice: [1, 1],
+                }),
+                new MovedToSpaceLog({
+                    player: player2,
+                    space: streetSpace,
+                }),
+                new PropertyRentPaidLog({
+                    landlord: player1,
+                    tenant: player2,
+                    propertySpace: streetSpace,
+                    amount: 154,
+                }),
             ]);
+            expect(game.getAvailableActions()).to.be.deep.eq([]);
+            expect(game.getPerformedActions())
+                .to.deep.eq([
+                    new PayPropertyRentAction(streetSpace),
+                ]);
+        });
+
+        it('should not charge the player when they don\'t have enough money', () => {
+            const player1 = mocker.create(Player, { money: 100 });
+            const player2 = mocker.create(Player, { money: 100 });
+
+            const streetSpace = mocker.create(StreetSpace, {
+                landlord: player1,
+                titleDeed: mocker.create(StreetTitleDeed, { baseRent: 154 }),
+            });
+
+            const game = mocker.create(Game, {
+                move: { player: player2 },
+                players: [player1, player2],
+                map: [streetSpace],
+            });
+
+            expect(player1.money).to.eq(100);
+            expect(player2.money).to.eq(100);
+            expect(game.getLogs()).to.be.deep.eq([]);
+            expect(game.getPerformedActions()).to.deep.eq([]);
+            expect(game.getAvailableActions())
+                .to.be.deep.eq([
+                    new PayPropertyRentAction(streetSpace),
+                ]);
+
+            game.start();
+            game.performAction(ActionType.PAY_PROPERTY_RENT);
+
+            expect(player1.money).to.eq(100);
+            expect(player2.money).to.eq(100);
+            expect(game.getLogs()).to.be.deep.eq([]);
+            expect(game.getPerformedActions()).to.deep.eq([]);
+            expect(game.getAvailableActions())
+                .to.be.deep.eq([
+                    new PayPropertyRentAction(streetSpace),
+                ]);
+        });
     });
 
-    it('should not charge the player when they don\'t have enough money', () => {
-        const player1 = mocker.create(Player, { money: 100 });
-        const player2 = mocker.create(Player, { money: 100 });
+    describe('[putting up for auction]', () => {
+        it.skip('should allow players to put property up for auction', () => {
+            const player1 = mocker.create(Player, { money: 200 });
+            const player2 = mocker.create(Player, { money: 200 });
 
-        const streetSpace = mocker.create(StreetSpace, {
-            landlord: player1,
-            titleDeed: mocker.create(StreetTitleDeed, { baseRent: 154 }),
+            const streetSpace = mocker.create(StreetSpace, { price: 100 });
+
+            const game = mocker.create(Game, {
+                players: [player1, player2],
+                map: [streetSpace],
+            });
+
+            game.start();
+
+            expect(game.getLogs()).to.deep.eq([]);
+            expect(game.getPerformedActions()).to.deep.eq([]);
+            expect(game.getAvailableActions())
+                .to.deep.eq([
+                    new PurchasePropertyAction(streetSpace),
+                    new PutPropertyUpForAuctionAction(streetSpace),
+                ]);
+
+            game.performAction(ActionType.PUT_PROPERTY_UP_FOR_AUCTION);
+
+            expect(game.getLogs())
+                .to.deep.eq([
+                    new PropertyPutUpForAuctionLog({ propertySpace: streetSpace }),
+                ]);
+            expect(game.getPerformedActions())
+                .to.deep.eq([
+                    new PutPropertyUpForAuctionAction(streetSpace),
+                ]);
+            expect(game.getAvailableActions())
+                .to.deep.eq([]);
         });
 
-        const game = mocker.create(Game, {
-            move: { player: player2 },
-            players: [player1, player2],
-            map: [streetSpace],
-        });
+        // it('should allow players to bid for the property', () => {
+        //     const player1 = mocker.create(Player, { money: 200 });
+        //     const player2 = mocker.create(Player, { money: 200 });
+        //     const player3 = mocker.create(Player, { money: 200 });
 
-        expect(player1.money).to.eq(100);
-        expect(player2.money).to.eq(100);
-        expect(game.getLogs()).to.be.deep.eq([]);
-        expect(game.getPerformedActions()).to.deep.eq([]);
-        expect(game.getAvailableActions())
-            .to.be.deep.eq([
-                new PayPropertyRentAction(streetSpace),
-            ]);
+        //     const streetSpace = mocker.create(StreetSpace, { price: 100 });
 
-        game.start();
-        game.performAction(ActionType.PAY_PROPERTY_RENT);
+        //     const game = mocker.create(Game, {
+        //         players: [player1, player2, player3],
+        //         map: [streetSpace],
+        //     });
 
-        expect(player1.money).to.eq(100);
-        expect(player2.money).to.eq(100);
-        expect(game.getLogs()).to.be.deep.eq([]);
-        expect(game.getPerformedActions()).to.deep.eq([]);
-        expect(game.getAvailableActions())
-            .to.be.deep.eq([
-                new PayPropertyRentAction(streetSpace),
-            ]);
+        //     game.start();
+
+        //     game.getAvailableActions()
+        // });
     });
 });

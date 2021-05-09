@@ -1,6 +1,6 @@
 import type { PropertySpace } from '../map/properties/PropertySpace';
-import { Context } from '../Context';
-import { Log } from '../logs/Log';
+import type { MoveContext } from '../MoveContext';
+import type { Log } from '../logs/Log';
 import { PropertyPurchasedLog } from '../logs/PropertyPurchasedLog';
 import { Action, ActionType } from './Action';
 
@@ -13,13 +13,13 @@ export class PurchasePropertyAction extends Action {
         this._propertySpace = propertySpace;
     }
 
-    perform(context: Context): Log[] {
-        context.player.charge(this._propertySpace.price);
-        this._propertySpace.setLandlord(context.player);
+    perform(context: MoveContext): Log[] {
+        context.movePlayer.charge(this._propertySpace.price);
+        this._propertySpace.setLandlord(context.movePlayer);
 
         return [
             new PropertyPurchasedLog({
-                player: context.player,
+                player: context.movePlayer,
                 propertySpace: this._propertySpace,
             }),
         ];

@@ -10,7 +10,7 @@ export class GoSpace extends Space {
         this._salary = attributes.salary;
     }
 
-    getLandActions(): Action[] {
+    getResidenceActions(): Action[] {
         return [];
     }
 }

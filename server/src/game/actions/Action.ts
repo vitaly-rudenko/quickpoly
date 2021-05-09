@@ -1,8 +1,10 @@
-import { Context } from '../Context';
-import { Log } from '../logs/Log';
+import type { MoveContext } from '../MoveContext';
+import type { Log } from '../logs/Log';
 
 export enum ActionType {
+    ROLL_DICE = 'rollDice',
     PURCHASE_PROPERTY = 'purchaseProperty',
+    PUT_PROPERTY_UP_FOR_AUCTION = 'putPropertyUpForAuction',
     PAY_PROPERTY_RENT = 'payPropertyRent',
 }
 
@@ -15,7 +17,7 @@ export abstract class Action {
         this._required = attributes.required;
     }
 
-    abstract perform(context: Context): Log[];
+    abstract perform(context: MoveContext): Log[];
 
     get type(): ActionType {
         return this._type;

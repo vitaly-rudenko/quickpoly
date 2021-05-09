@@ -1,9 +1,10 @@
+import type { MoveContext } from '../../MoveContext';
+import type { Player } from '../../Player';
 import { Action, ActionType } from '../../actions/Action';
+import { Space } from '../Space';
 import { PayPropertyRentAction } from '../../actions/PayPropertyRentAction';
 import { PurchasePropertyAction } from '../../actions/PurchasePropertyAction';
-import { Context } from '../../Context';
-import { Player } from '../../Player';
-import { Space } from '../Space';
+import { PutPropertyUpForAuctionAction } from '../../actions/PutPropertyUpForAuctionAction';
 
 export abstract class PropertySpace extends Space {
     private _landlord: Player | null;
@@ -27,16 +28,28 @@ export abstract class PropertySpace extends Space {
         this._landlord = player;
     }
 
-    getLandActions(context: Context): Action[] {
-        return this._landlord
-            ? this._landlord === context.player
-                ? []
-                : context.hasActionBeenPerformed(ActionType.PAY_PROPERTY_RENT)
-                    ? []
-                    : [new PayPropertyRentAction(this)]
-            : context.player.canPay(this._price)
-                ? [new PurchasePropertyAction(this)]
-                : [];
+    getResidenceActions(context: MoveContext): Action[] {
+        const actions: Action[] = [];
+
+        if (this._landlord) {
+            if (
+                this._landlord !== context.movePlayer &&
+                !context.hasActionBeenPerformed(ActionType.PAY_PROPERTY_RENT)
+            ) {
+                actions.push(new PayPropertyRentAction(this));
+            }
+        } else {
+            if (
+                context.movePlayer.canPay(this._price) &&
+                !context.hasActionBeenPerformed(ActionType.PURCHASE_PROPERTY)
+            ) {
+                actions.push(new PurchasePropertyAction(this));
+            }
+
+            actions.push(new PutPropertyUpForAuctionAction(this));
+        }
+
+        return actions;
     }
 
     abstract calculateRent(): number;

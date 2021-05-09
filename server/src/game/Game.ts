@@ -1,10 +1,11 @@
 import { Space } from './map/Space';
 import { Player } from './Player';
-import { Action, ActionType } from './actions/Action';
+import { Action, ActionTypeClass, ActionType } from './actions/Action';
 import { Log } from './logs/Log';
-import { Context } from './Context';
-import { DiceRolledLog } from './logs/DiceRolledLog';
+import { MoveContext } from './MoveContext';
 import { RequiredActionPostponedError } from './actions/RequiredActionPostponedError';
+import { Auction } from './Auction';
+import { RollDiceAction } from './actions/RollDiceAction';
 
 export class Game {
     private _movePlayer: Player;
@@ -13,6 +14,8 @@ export class Game {
     private _players: Player[];
     private _map: Space[];
     private _logs: Log[] = [];
+
+    private _auction: Auction | null = null;
 
     constructor(state: {
         move: { player: Player },
@@ -30,37 +33,16 @@ export class Game {
         this._performRequiredActions();
     }
 
-    rollDice(dice: [number, number]): void {
-        this._movePlayer.moveTo(
-            (this._movePlayer.position + dice[0] + dice[1]) % this._map.length
-        );
-
-        this._logs.push(
-            new DiceRolledLog({
-                player: this._movePlayer,
-                dice,
-            })
-        );
-
-        this._performRequiredActions();
-    }
-
-    getAvailableActions(): Action[] {
-        return [
-            ...this._getMoveSpace().getLandActions(
-                new Context({
-                    player: this._movePlayer,
-                    performedActions: this._performedActions,
-                })
-            ),
-        ];
-    }
-
     private _performRequiredActions(): void {
-        const actions = this.getAvailableActions().filter(a => a.required);
+        const movePlayer = this._movePlayer;
+        const actions = this._getRequiredActions();
 
         for (const action of actions) {
             this.performAction(action.type);
+
+            if (movePlayer !== this._movePlayer) { // move changed
+                break;
+            }
         }
     }
 
@@ -69,12 +51,7 @@ export class Game {
         if (!action) return;
 
         try {
-            const logs = action.perform(
-                new Context({
-                    player: this._movePlayer,
-                    performedActions: this._performedActions,
-                })
-            );
+            const logs = action.perform(this._createContext(), data);
 
             this._performedActions.push(action);
             this._logs.push(...logs);
@@ -83,6 +60,21 @@ export class Game {
                 throw error;
             }
         }
+
+        this._performRequiredActions();
+        this._nextMoveIfNecessary();
+    }
+
+
+    private _getRequiredActions(): Action[] {
+        return this.getAvailableActions().filter(a => a.required);
+    }
+
+    getAvailableActions(): Action[] {
+        return [
+            ...this._getMoveSpace().getResidenceActions(this._createContext()),
+            new RollDiceAction(),
+        ];
     }
 
     getLogs(): Log[] {
@@ -93,7 +85,35 @@ export class Game {
         return this._performedActions;
     }
 
+    private _nextMoveIfNecessary(): void {
+        if (this.getAvailableActions().length === 0) {
+            this._nextMove();
+        }
+    }
+
+    private _nextMove(): void {
+        const index = this._players.indexOf(this._movePlayer);
+        const nextIndex = (index + 1) % this._players.length;
+
+        this._movePlayer = this._players[nextIndex];
+        this._performedActions = [];
+
+        this._performRequiredActions();
+    }
+
+    private _createContext(): MoveContext {
+        return new MoveContext({
+            player: this._movePlayer,
+            performedActions: this._performedActions,
+            map: this._map,
+        });
+    }
+
     private _getMoveSpace(): Space {
         return this._map[this._movePlayer.position];
+    }
+
+    get movePlayer(): Player {
+        return this._movePlayer;
     }
 }
