@@ -13,6 +13,10 @@ export class Player {
         this._money = attributes.money;
     }
 
+    canPay(amount: number): boolean {
+        return this._money >= amount;
+    }
+
     charge(amount: number): void {
         this._money -= amount;
     }

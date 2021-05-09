@@ -3,6 +3,7 @@ import { Context } from '../Context';
 import { Log } from '../logs/Log';
 import { PropertyRentPaidLog } from '../logs/PropertyRentPaidLog';
 import { Action, ActionType } from './Action';
+import { RequiredActionPostponedError } from './RequiredActionPostponedError';
 
 export class PayPropertyRentAction extends Action {
     private _propertySpace: PropertySpace;
@@ -20,6 +21,11 @@ export class PayPropertyRentAction extends Action {
         }
 
         const amount = this._propertySpace.calculateRent();
+
+        if (!context.player.canPay(amount)) {
+            throw new RequiredActionPostponedError();
+        }
+
         context.player.charge(amount);
         landlord.topUp(amount);
 

@@ -4,6 +4,7 @@ import { Action, ActionType } from './actions/Action';
 import { Log } from './logs/Log';
 import { Context } from './Context';
 import { DiceRolledLog } from './logs/DiceRolledLog';
+import { RequiredActionPostponedError } from './actions/RequiredActionPostponedError';
 
 export class Game {
     private _movePlayer: Player;
@@ -67,15 +68,21 @@ export class Game {
         const action = this.getAvailableActions().find(a => a.type === type);
         if (!action) return;
 
-        const logs = action.perform(
-            new Context({
-                player: this._movePlayer,
-                performedActions: this._performedActions,
-            })
-        );
+        try {
+            const logs = action.perform(
+                new Context({
+                    player: this._movePlayer,
+                    performedActions: this._performedActions,
+                })
+            );
 
-        this._performedActions.push(action);
-        this._logs.push(...logs);
+            this._performedActions.push(action);
+            this._logs.push(...logs);
+        } catch (error) {
+            if (!(error instanceof RequiredActionPostponedError)) {
+                throw error;
+            }
+        }
     }
 
     getLogs(): Log[] {

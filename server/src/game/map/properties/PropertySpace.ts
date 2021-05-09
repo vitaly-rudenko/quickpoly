@@ -34,7 +34,9 @@ export abstract class PropertySpace extends Space {
                 : context.hasActionBeenPerformed(ActionType.PAY_PROPERTY_RENT)
                     ? []
                     : [new PayPropertyRentAction(this)]
-            : [new PurchasePropertyAction(this)];
+            : context.player.canPay(this._price)
+                ? [new PurchasePropertyAction(this)]
+                : [];
     }
 
     abstract calculateRent(): number;
