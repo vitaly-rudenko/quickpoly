@@ -17,6 +17,7 @@
     "dependencies": {
         "chai": "^4.3.4",
         "express": "^4.17.1",
+        "gts": "^3.1.0",
         "mocha": "^8.3.2",
         "sinon": "^10.0.0",
         "ws": "^7.4.5"
@@ -27,13 +28,8 @@
         "@types/mocha": "^8.2.2",
         "@types/node": "^15.0.1",
         "@types/ws": "^7.4.2",
-        "@typescript-eslint/eslint-plugin": "^4.22.0",
-        "@typescript-eslint/parser": "^4.22.0",
+        "@typescript-eslint/eslint-plugin": "^4.23.0",
         "eslint": "^7.25.0",
-        "eslint-config-airbnb-base": "^14.2.1",
-        "eslint-plugin-import": "^2.22.1",
-        "eslint-plugin-mocha": "^8.1.0",
-        "esm": "^3.2.25",
         "nodemon": "^2.0.7",
         "rimraf": "^3.0.2",
         "ts-essentials": "^7.0.1",

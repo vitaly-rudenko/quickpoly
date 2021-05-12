@@ -1,20 +1,17 @@
 import type { PropertySpace } from '../map/properties/PropertySpace';
-import type { MoveContext } from '../MoveContext';
-import type { Log } from '../logs/Log';
-import { Action, ActionType } from './Action';
+import type { Context } from '../Context';
+import { Action } from './Action';
 import { PropertyRentPaidLog } from '../logs/PropertyRentPaidLog';
-import { RequiredActionPostponedError } from './RequiredActionPostponedError';
 
 export class PayPropertyRentAction extends Action {
     private _propertySpace: PropertySpace;
 
     constructor(propertySpace: PropertySpace) {
-        super({ type: ActionType.PAY_PROPERTY_RENT, required: true });
-
+        super({ type: 'payPropertyRent', required: true, automatic: true });
         this._propertySpace = propertySpace;
     }
 
-    perform(context: MoveContext): Log[] {
+    perform(context: Context): boolean {
         const landlord = this._propertySpace.landlord;
         if (landlord === null) {
             throw new Error('Property is not owned by anybody');
@@ -22,20 +19,22 @@ export class PayPropertyRentAction extends Action {
 
         const amount = this._propertySpace.calculateRent();
 
-        if (!context.movePlayer.canPay(amount)) {
-            throw new RequiredActionPostponedError();
+        if (!context.move.player.canPay(amount)) {
+            return false;
         }
 
-        context.movePlayer.charge(amount);
+        context.move.player.charge(amount);
         landlord.topUp(amount);
 
-        return [
+        context.log(
             new PropertyRentPaidLog({
                 landlord,
-                tenant: context.movePlayer,
+                tenant: context.move.player,
                 propertySpace: this._propertySpace,
                 amount,
-            }),
-        ];
+            })
+        );
+
+        return true;
     }
 }

@@ -1,5 +1,5 @@
-import { Action } from '../actions/Action';
-import { MoveContext } from '../MoveContext';
+import type { Action } from '../actions/Action';
+import type { Context } from '../Context';
 
 export abstract class Space {
     protected _type: string;
@@ -8,5 +8,5 @@ export abstract class Space {
         this._type = attributes.type;
     }
 
-    abstract getResidenceActions(context: MoveContext): Action[];
+    abstract getResidenceActions(context: Context): Action[];
 }

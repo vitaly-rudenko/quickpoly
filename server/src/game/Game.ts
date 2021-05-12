@@ -1,119 +1,138 @@
 import { Space } from './map/Space';
 import { Player } from './Player';
-import { Action, ActionTypeClass, ActionType } from './actions/Action';
+import { Action } from './actions/Action';
 import { Log } from './logs/Log';
-import { MoveContext } from './MoveContext';
-import { RequiredActionPostponedError } from './actions/RequiredActionPostponedError';
+import { Context } from './Context';
+import { ContextHandler } from './ContextHandler';
+import { PropertySpace } from './map/properties/PropertySpace';
 import { Auction } from './Auction';
-import { RollDiceAction } from './actions/RollDiceAction';
+import { Move } from './Move';
 
-export class Game {
-    private _movePlayer: Player;
-    private _performedActions: Action[];
+export class Game implements ContextHandler {
+    private _move: Move;
 
     private _players: Player[];
     private _map: Space[];
-    private _logs: Log[] = [];
+    private _logs: Log[];
 
     private _auction: Auction | null = null;
 
     constructor(state: {
-        move: { player: Player },
+        move: Move,
         players: Player[],
         map: Space[],
     }) {
-        this._movePlayer = state.move.player;
-        this._performedActions = [];
+        this._move = state.move;
+        this._logs = [];
 
         this._players = state.players;
         this._map = state.map;
     }
 
-    start(): void {
-        this._performRequiredActions();
+    startAuction(auction: Auction): void {
+        this._auction = auction;
+    }
+    endAuction(): void {
+        this._auction = null;
     }
 
-    private _performRequiredActions(): void {
-        const movePlayer = this._movePlayer;
-        const actions = this._getRequiredActions();
+    log(log: Log): void {
+        this._logs.push(log);
+        this._move.log(log);
+    }
+
+    private _performAutomaticActions(): void {
+        const move = this._move;
+        const actions = this._getAutomaticActions();
 
         for (const action of actions) {
-            this.performAction(action.type);
+            this._performAction(action);
 
-            if (movePlayer !== this._movePlayer) { // move changed
+            if (move !== this._move) {
                 break;
             }
         }
-    }
 
-    performAction(type: ActionType): void {
-        const action = this.getAvailableActions().find(a => a.type === type);
-        if (!action) return;
-
-        try {
-            const logs = action.perform(this._createContext(), data);
-
-            this._performedActions.push(action);
-            this._logs.push(...logs);
-        } catch (error) {
-            if (!(error instanceof RequiredActionPostponedError)) {
-                throw error;
-            }
-        }
-
-        this._performRequiredActions();
         this._nextMoveIfNecessary();
     }
 
+    performAction(type: string, data?: any): void {
+        const action = this.getAvailableActions().find(a => a.type === type);
+        if (!action) {
+            throw new Error(`Action is not available: ${type}`);
+        }
 
-    private _getRequiredActions(): Action[] {
-        return this.getAvailableActions().filter(a => a.required);
+        this._performAction(action, data);
+        this._performAutomaticActions();
+    }
+
+    private _performAction(action: Action, data?: any): void {
+        const success = action.perform(this._createContext(), data);
+
+        if (success) {
+            this._move.storeAction(action);
+            this._nextMoveIfNecessary();
+        }
+    }
+
+    private _getAutomaticActions(): Action[] {
+        return this.getAvailableActions().filter(a => a.automatic);
     }
 
     getAvailableActions(): Action[] {
-        return [
-            ...this._getMoveSpace().getResidenceActions(this._createContext()),
-            new RollDiceAction(),
-        ];
+        if (this._move.hasActionBeenPerformed('endAuction')) {
+            return [];
+        }
+
+        if (this._auction !== null) {
+            return this._auction.getActions(this._createContext());
+        }
+
+        return this._getMoveSpace().getResidenceActions(this._createContext());
     }
 
-    getLogs(): Log[] {
+    get logs(): Log[] {
         return this._logs;
-    }
-
-    getPerformedActions(): Action[] {
-        return this._performedActions;
     }
 
     private _nextMoveIfNecessary(): void {
         if (this.getAvailableActions().length === 0) {
+            // console.log('Move #' + this._move.number
+            //     + ' of ' + this._move.player.id
+            //     + ' has ended'
+            //     + '\n   with actions: [' + this._move.actions.map(a => a.constructor.name).join(', ') + ']'
+            //     + '\n       and logs: [' + this._move.logs.map(a => a.constructor.name).join(', ') + ']');
+
             this._nextMove();
         }
     }
 
     private _nextMove(): void {
-        const index = this._players.indexOf(this._movePlayer);
+        const index = this._players.indexOf(this._move.player);
         const nextIndex = (index + 1) % this._players.length;
 
-        this._movePlayer = this._players[nextIndex];
-        this._performedActions = [];
+        this._move = new Move({
+            number: this._move.number + 1,
+            player: this._players[nextIndex],
+        });
 
-        this._performRequiredActions();
+        this._performAutomaticActions();
     }
 
-    private _createContext(): MoveContext {
-        return new MoveContext({
-            player: this._movePlayer,
-            performedActions: this._performedActions,
+    private _createContext(): Context {
+        return new Context({
+            move: this._move,
             map: this._map,
-        });
+            auction: this._auction,
+            players: this._players,
+        }, this);
     }
 
     private _getMoveSpace(): Space {
-        return this._map[this._movePlayer.position];
+        return this._map[this._move.player.position];
     }
 
-    get movePlayer(): Player {
-        return this._movePlayer;
+    get move(): Move {
+        return this._move;
     }
 }

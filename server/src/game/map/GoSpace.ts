@@ -1,4 +1,5 @@
 import { Action } from '../actions/Action';
+import { RollDiceAction } from '../actions/RollDiceAction';
 import { Space } from './Space';
 
 export class GoSpace extends Space {
@@ -11,6 +12,8 @@ export class GoSpace extends Space {
     }
 
     getResidenceActions(): Action[] {
-        return [];
+        return [
+            new RollDiceAction(),
+        ];
     }
 }

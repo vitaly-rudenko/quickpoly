@@ -1,29 +1,27 @@
-import type { MoveContext } from '../MoveContext';
-import type { Log } from '../logs/Log';
-
-export enum ActionType {
-    ROLL_DICE = 'rollDice',
-    PURCHASE_PROPERTY = 'purchaseProperty',
-    PUT_PROPERTY_UP_FOR_AUCTION = 'putPropertyUpForAuction',
-    PAY_PROPERTY_RENT = 'payPropertyRent',
-}
+import type { Move } from '../Move';
 
 export abstract class Action {
-    protected _type: ActionType;
-    protected _required: boolean;
+    private _type: string;
+    private _required: boolean;
+    private _automatic: boolean;
 
-    constructor(attributes: { type: ActionType, required: boolean }) {
+    constructor(attributes: { type: string, required?: boolean, automatic?: boolean }) {
         this._type = attributes.type;
-        this._required = attributes.required;
+        this._required = attributes?.required ?? false;
+        this._automatic = attributes?.automatic ?? false;
     }
 
-    abstract perform(context: MoveContext): Log[];
+    abstract perform(context: Context, data?: any): boolean;
 
-    get type(): ActionType {
+    get type(): string {
         return this._type;
     }
 
     get required(): boolean {
         return this._required;
+    }
+
+    get automatic(): boolean {
+        return this._automatic;
     }
 }

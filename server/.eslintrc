@@ -1,57 +1,54 @@
 {
-    "root": true,
-    "parser": "@typescript-eslint/parser",
-    "plugins": [
-        "@typescript-eslint",
-        "mocha",
-        "import"
-    ],
-    "extends": [
-        "eslint:recommended",
-        "plugin:@typescript-eslint/eslint-recommended",
-        "plugin:@typescript-eslint/recommended",
-        "plugin:mocha/recommended",
-        "plugin:import/errors",
-        "plugin:import/warnings",
-        "airbnb-base",
-        "plugin:import/typescript"
-    ],
-    "rules": {
-        "indent": ["error", 4],
-        "import/prefer-default-export": ["off"],
-        "import/extensions": ["error", "never"],
-        "mocha/no-mocha-arrows": ["off"],
-        "class-methods-use-this": "off",
-        "no-underscore-dangle": "off",
-        "lines-between-class-members": "off",
-        "no-shadow": "off",
-        "@typescript-eslint/no-shadow": ["error"],
-        "comma-dangle": ["error", {
-            "arrays": "always-multiline",
-            "objects": "always-multiline",
-            "imports": "only-multiline",
-            "exports": "only-multiline",
-            "functions": "only-multiline"
-        }],
-        "max-classes-per-file": "off",
-        "no-use-before-define": "off",
-        "arrow-body-style": "off",
-        "arrow-parens": "off",
-        "max-len": ["warn", 120],
-        "no-plusplus": "off",
-        "one-var": "off",
-        "one-var-declaration-per-line": "off",
-        "prefer-destructuring": "off",
-        "no-unused-vars": "off",
-        "object-curly-newline": "off",
-        "no-restricted-syntax": "off",
-        "prefer-template": "off",
-        "quote-props": "off",
-        "dot-notation": "off",
-        "operator-linebreak": "off",
-        "@typescript-eslint/ban-types": "off",
-        "function-paren-newline": "off",
-        "no-unused-expressions": "off",
-        "no-nested-ternary": "off"
-    }
+	"root": true,
+	"parser": "@typescript-eslint/parser",
+	"plugins": [
+		"@typescript-eslint"
+	],
+	"rules": {
+		"constructor-super": "error",
+		"eqeqeq": "error",
+		"no-buffer-constructor": "error",
+		"no-caller": "error",
+		"no-debugger": "error",
+		"no-duplicate-case": "error",
+		"no-duplicate-imports": "error",
+		"no-eval": "error",
+		"no-extra-semi": "error",
+		"no-new-wrappers": "error",
+		"no-redeclare": "error",
+		"no-sparse-arrays": "error",
+		"no-throw-literal": "error",
+		"no-unsafe-finally": "error",
+		"no-unused-labels": "error",
+		"no-restricted-globals": [
+			"warn",
+			"name",
+			"length",
+			"event",
+			"closed",
+			"external",
+			"status",
+			"origin",
+			"orientation",
+			"context"
+		], // non-complete list of globals that are easy to access unintentionally
+		"no-var": "error",
+		"semi": "off",
+		"@typescript-eslint/semi": "error",
+		"@typescript-eslint/naming-convention": [
+			"error",
+			{
+				"selector": "class",
+				"format": [
+					"PascalCase"
+				]
+			}
+		],
+		"no-unused-expressions": [
+			"error",
+			{
+				"allowTernary": true
+			}
+		]
+	}
 }

@@ -1,38 +1,33 @@
-import type { PropertySpace } from '../map/properties/PropertySpace';
-import type { MoveContext } from '../MoveContext';
-import type { Log } from '../logs/Log';
-import { Action, ActionType } from './Action';
+import type { Context } from '../Context';
+import { Action } from './Action';
 import { DiceRolledLog } from '../logs/DiceRolledLog';
 import { MovedToSpaceLog } from '../logs/MovedToSpaceLog';
 
-interface RollDiceActionData {
-    dice: [number, number];
-}
-
-export class RollDiceAction extends Action<RollDiceActionData> {
-    private _propertySpace: PropertySpace;
-
-    constructor(propertySpace: PropertySpace) {
-        super({ type: ActionType.PAY_PROPERTY_RENT, required: true });
-
-        this._propertySpace = propertySpace;
+export class RollDiceAction extends Action {
+    constructor() {
+        super({ type: 'rollDice', required: true });
     }
 
-    perform(context: MoveContext, { dice }: RollDiceActionData): Log[] {
-        const position = context.movePlayer.position;
-        const nextPosition = context.getNextPosition(position, dice[0] + dice[1]);
+    perform(context: Context, data: { dice: [number, number] }): boolean {
+        const position = context.move.player.position;
+        const nextPosition = context.getNextPosition(position, data.dice[0] + data.dice[1]);
 
-        context.movePlayer.moveTo(nextPosition);
+        context.move.player.moveTo(nextPosition);
 
-        return [
+        context.log(
             new DiceRolledLog({
-                player: context.movePlayer,
-                dice,
-            }),
+                player: context.move.player,
+                dice: data.dice,
+            })
+        );
+
+        context.log(
             new MovedToSpaceLog({
-                player: context.movePlayer,
+                player: context.move.player,
                 space: context.getSpace(nextPosition),
-            }),
-        ];
+            })
+        );
+
+        return true;
     }
 }

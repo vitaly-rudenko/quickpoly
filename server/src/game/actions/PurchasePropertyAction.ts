@@ -1,27 +1,27 @@
 import type { PropertySpace } from '../map/properties/PropertySpace';
-import type { MoveContext } from '../MoveContext';
-import type { Log } from '../logs/Log';
+import type { Context } from '../Context';
 import { PropertyPurchasedLog } from '../logs/PropertyPurchasedLog';
-import { Action, ActionType } from './Action';
+import { Action } from './Action';
 
 export class PurchasePropertyAction extends Action {
     private _propertySpace: PropertySpace;
 
     constructor(propertySpace: PropertySpace) {
-        super({ type: ActionType.PURCHASE_PROPERTY, required: false });
-
+        super({ type: 'purchaseProperty', required: true });
         this._propertySpace = propertySpace;
     }
 
-    perform(context: MoveContext): Log[] {
-        context.movePlayer.charge(this._propertySpace.price);
-        this._propertySpace.setLandlord(context.movePlayer);
+    perform(context: Context): boolean {
+        context.move.player.charge(this._propertySpace.price);
+        this._propertySpace.setLandlord(context.move.player);
 
-        return [
+        context.log(
             new PropertyPurchasedLog({
-                player: context.movePlayer,
+                player: context.move.player,
                 propertySpace: this._propertySpace,
-            }),
-        ];
+            })
+        );
+
+        return true;
     }
 }

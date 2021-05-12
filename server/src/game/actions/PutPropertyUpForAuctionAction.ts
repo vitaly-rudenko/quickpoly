@@ -1,23 +1,32 @@
 import type { PropertySpace } from '../map/properties/PropertySpace';
-import { MoveContext } from '../MoveContext';
-import { Log } from '../logs/Log';
-import { Action, ActionType } from './Action';
+import { Context } from '../Context';
+import { Action } from './Action';
 import { PropertyPutUpForAuctionLog } from '../logs/PropertyPutUpForAuctionLog';
+import { Auction } from '../Auction';
 
 export class PutPropertyUpForAuctionAction extends Action {
     private _propertySpace: PropertySpace;
 
     constructor(propertySpace: PropertySpace) {
-        super({ type: ActionType.PUT_PROPERTY_UP_FOR_AUCTION, required: false });
-
+        super({ type: 'putPropertyUpForAuction', required: true });
         this._propertySpace = propertySpace;
     }
 
-    perform(context: MoveContext): Log[] {
-        return [
+    perform(context: Context): boolean {
+        context.startAuction(
+            new Auction({
+                initialMove: context.move,
+                players: context.players,
+                propertySpace: this._propertySpace,
+            })
+        );
+
+        context.log(
             new PropertyPutUpForAuctionLog({
                 propertySpace: this._propertySpace,
-            }),
-        ];
+            })
+        );
+
+        return true;
     }
 }
