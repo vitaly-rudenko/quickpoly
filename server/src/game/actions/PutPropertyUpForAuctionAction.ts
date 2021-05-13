@@ -15,6 +15,7 @@ export class PutPropertyUpForAuctionAction extends Action {
     perform(context: Context): boolean {
         context.startAuction(
             new Auction({
+                initialBidAmount: 10,
                 initialMove: context.move,
                 players: context.players,
                 propertySpace: this._propertySpace,

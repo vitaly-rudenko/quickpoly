@@ -205,14 +205,14 @@ describe('[basic property actions]', () => {
             ]);
     });
 
-    it('should skip players who don\'t have enough money to bid', () => {
+    it('should skip players who don\'t have enough money to bid higher than the current bid', () => {
         const player1 = mocker.create(Player, { money: 100 });
         const player2 = mocker.create(Player, { money: 200 });
         const player3 = mocker.create(Player, { money: 300 });
         const player4 = mocker.create(Player, { money: 400 });
         const player5 = mocker.create(Player, { money: 500 });
 
-        const streetSpace = mocker.create(StreetSpace, { price: 200 });
+        const streetSpace = mocker.create(StreetSpace);
 
         const game = mocker.create(Game, {
             players: [player1, player2, player3, player4, player5],
@@ -250,5 +250,35 @@ describe('[basic property actions]', () => {
 
         expect(streetSpace.landlord).to.eq(player5);
         expect(player5.money).to.eq(100);
+    });
+
+    it('should end the auction prematurely when nobody has enough money to bid', () => {
+        const player1 = mocker.create(Player, { money: 10 });
+        const player2 = mocker.create(Player, { money: 0 });
+        const player3 = mocker.create(Player, { money: 3 });
+        const player4 = mocker.create(Player, { money: 5 });
+        const player5 = mocker.create(Player, { money: 9 });
+
+        const streetSpace = mocker.create(StreetSpace);
+
+        const game = mocker.create(Game, {
+            players: [player1, player2, player3, player4, player5],
+            map: [
+                mocker.create(GoSpace),
+                mocker.create(StreetSpace),
+                streetSpace,
+            ],
+        });
+
+        game.performAction('rollDice', { dice: [1, 1] }); // player 1
+        game.performAction('putPropertyUpForAuction'); // player 1
+
+        expect(streetSpace.landlord).to.be.null;
+        expect(game.move.player).to.eq(player2);
+        expect(game.move.actions).to.deep.eq([]);
+        expect(game.getAvailableActions())
+            .to.deep.eq([
+                new RollDiceAction(),
+            ]);
     });
 });

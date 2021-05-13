@@ -3,8 +3,12 @@ import { PassedLog } from '../logs/PassedLog';
 import { Action } from './Action';
 
 export class PassAction extends Action {
-    constructor() {
-        super({ type: 'pass' });
+    constructor(attributes?: { automatic?: boolean }) {
+        super({
+            type: 'pass',
+            required: true,
+            automatic: attributes?.automatic ?? false
+        });
     }
 
     perform(context: Context): boolean {

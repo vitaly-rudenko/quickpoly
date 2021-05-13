@@ -23,6 +23,7 @@ export class Auction {
 
     constructor(attributes: {
         initialMove: Move,
+        initialBidAmount: number,
         players: Player[],
         propertySpace: PropertySpace,
     }) {
@@ -30,7 +31,7 @@ export class Auction {
         this._initialMove = attributes.initialMove;
         this._players = attributes.players;
 
-        this._highestBidAmount = 10;
+        this._highestBidAmount = attributes.initialBidAmount;
         for (const player of this._players) {
             this._playerStatuses.set(player, Status.READY);
         }
@@ -41,12 +42,6 @@ export class Auction {
         this._highestBidAmount = amount;
 
         this._playerStatuses.set(player, Status.BID);
-
-        for (const player of this._players) {
-            if (!player.canPay(amount + 1)) {
-                this._playerStatuses.set(player, Status.PASSED);
-            }
-        }
     }
 
     pass(player: Player): void {
@@ -74,10 +69,11 @@ export class Auction {
             return [];
         }
 
-        return [
-            new BidAction(),
-            new PassAction(),
-        ];
+        if (context.move.player.canPay(this._highestBidAmount + 1)) {
+            return [new BidAction(), new PassAction()];
+        }
+
+        return [new PassAction({ automatic: true })];
     }
 
     isDone(): boolean {
