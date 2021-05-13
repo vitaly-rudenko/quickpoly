@@ -6,11 +6,13 @@ import { PayPropertyRentAction } from '../../actions/PayPropertyRentAction';
 import { PurchasePropertyAction } from '../../actions/PurchasePropertyAction';
 import { PutPropertyUpForAuctionAction } from '../../actions/PutPropertyUpForAuctionAction';
 import { RollDiceAction } from '../../actions/RollDiceAction';
+import { MortgagePropertyAction } from '../../actions/MortgagePropertyAction';
 
 export abstract class PropertySpace extends Space {
     protected _landlord: Player | null;
     protected _name: string;
     protected _price: number;
+    protected _isMortgaged = false;
 
     constructor(attributes: {
         landlord: Player | null,
@@ -26,6 +28,20 @@ export abstract class PropertySpace extends Space {
     }
 
     abstract calculateRent(): number;
+
+    abstract calculateMortgageValue(): number;
+
+    abstract getTypeSpecificGlobalActions(context: Context): Action[];
+
+    abstract canBeMortgaged(): boolean;
+
+    mortgage(): void {
+        if (!this._landlord) return;
+
+        this._landlord.topUp(this.calculateMortgageValue());
+        this._landlord = null;
+        this._isMortgaged = true;
+    }
 
     getResidenceActions(context: Context): Action[] {
         const actions: Action[] = [];
@@ -53,6 +69,19 @@ export abstract class PropertySpace extends Space {
         }
 
         return actions;
+    }
+
+    getGlobalActions(context: Context): Action[] {
+        const actions: Action[] = [];
+
+        // if (this.canBeMortgaged()) {
+        //     actions.push(new MortgagePropertyAction(this));
+        // }
+
+        return [
+            ...this.getTypeSpecificGlobalActions(context),
+            ...actions,
+        ];
     }
 
     setLandlord(player: Player): void {

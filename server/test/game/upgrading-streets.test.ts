@@ -6,7 +6,7 @@ import { GoSpace } from '../../src/game/map/GoSpace';
 import { expect } from 'chai';
 import { RollDiceAction } from '../../src/game/actions/RollDiceAction';
 import { UpgradeStreetSpaceAction } from '../../src/game/actions/UpgradeStreetSpaceAction';
-import { PropertyUpgradedLog } from '../../src/game/logs/PropertyUpgradedLog';
+import { StreetSpaceUpgradedLog } from '../../src/game/logs/StreetSpaceUpgradedLog';
 
 describe('[upgrading streets]', () => {
     let player1: Player;
@@ -25,7 +25,7 @@ describe('[upgrading streets]', () => {
             landlord: player1,
             titleDeed: {
                 housePrice: 16,
-                hotelBasePrice: 35
+                hotelPrice: 35
             }
         });
 
@@ -34,7 +34,7 @@ describe('[upgrading streets]', () => {
             landlord: player1,
             titleDeed: {
                 housePrice: 18,
-                hotelBasePrice: 48
+                hotelPrice: 48
             }
         });
 
@@ -43,7 +43,7 @@ describe('[upgrading streets]', () => {
             landlord: player1,
             titleDeed: {
                 housePrice: 22,
-                hotelBasePrice: 62
+                hotelPrice: 62
             }
         });
 
@@ -141,21 +141,21 @@ describe('[upgrading streets]', () => {
 
         expect(game.logs)
             .to.deep.eq([
-                new PropertyUpgradedLog({ player: player1, streetSpace: orangeStreet2, price: 18 }),
-                new PropertyUpgradedLog({ player: player1, streetSpace: orangeStreet2, price: 18 }),
-                new PropertyUpgradedLog({ player: player1, streetSpace: orangeStreet2, price: 18 }),
-                new PropertyUpgradedLog({ player: player1, streetSpace: orangeStreet2, price: 18 }),
-                new PropertyUpgradedLog({ player: player1, streetSpace: orangeStreet2, price: 48 }),
-                new PropertyUpgradedLog({ player: player1, streetSpace: orangeStreet1, price: 16 }),
-                new PropertyUpgradedLog({ player: player1, streetSpace: orangeStreet3, price: 22 }),
-                new PropertyUpgradedLog({ player: player1, streetSpace: orangeStreet1, price: 16 }),
-                new PropertyUpgradedLog({ player: player1, streetSpace: orangeStreet3, price: 22 }),
-                new PropertyUpgradedLog({ player: player1, streetSpace: orangeStreet1, price: 16 }),
-                new PropertyUpgradedLog({ player: player1, streetSpace: orangeStreet3, price: 22 }),
-                new PropertyUpgradedLog({ player: player1, streetSpace: orangeStreet1, price: 16 }),
-                new PropertyUpgradedLog({ player: player1, streetSpace: orangeStreet3, price: 22 }),
-                new PropertyUpgradedLog({ player: player1, streetSpace: orangeStreet1, price: 35 }),
-                new PropertyUpgradedLog({ player: player1, streetSpace: orangeStreet3, price: 62 })
+                new StreetSpaceUpgradedLog({ landlord: player1, streetSpace: orangeStreet2, price: 18 }),
+                new StreetSpaceUpgradedLog({ landlord: player1, streetSpace: orangeStreet2, price: 18 }),
+                new StreetSpaceUpgradedLog({ landlord: player1, streetSpace: orangeStreet2, price: 18 }),
+                new StreetSpaceUpgradedLog({ landlord: player1, streetSpace: orangeStreet2, price: 18 }),
+                new StreetSpaceUpgradedLog({ landlord: player1, streetSpace: orangeStreet2, price: 48 }),
+                new StreetSpaceUpgradedLog({ landlord: player1, streetSpace: orangeStreet1, price: 16 }),
+                new StreetSpaceUpgradedLog({ landlord: player1, streetSpace: orangeStreet3, price: 22 }),
+                new StreetSpaceUpgradedLog({ landlord: player1, streetSpace: orangeStreet1, price: 16 }),
+                new StreetSpaceUpgradedLog({ landlord: player1, streetSpace: orangeStreet3, price: 22 }),
+                new StreetSpaceUpgradedLog({ landlord: player1, streetSpace: orangeStreet1, price: 16 }),
+                new StreetSpaceUpgradedLog({ landlord: player1, streetSpace: orangeStreet3, price: 22 }),
+                new StreetSpaceUpgradedLog({ landlord: player1, streetSpace: orangeStreet1, price: 16 }),
+                new StreetSpaceUpgradedLog({ landlord: player1, streetSpace: orangeStreet3, price: 22 }),
+                new StreetSpaceUpgradedLog({ landlord: player1, streetSpace: orangeStreet1, price: 35 }),
+                new StreetSpaceUpgradedLog({ landlord: player1, streetSpace: orangeStreet3, price: 62 })
             ]);
     });
 

@@ -1,7 +1,11 @@
 import type { Context } from '../Context';
 import { Action } from './Action';
 import { StreetSpace } from '../map/properties/StreetSpace';
-import { PropertyUpgradedLog } from '../logs/PropertyUpgradedLog';
+import { StreetSpaceUpgradedLog } from '../logs/StreetSpaceUpgradedLog';
+
+interface UpgradeStreetSpaceActionData {
+    streetSpace: StreetSpace;
+}
 
 export class UpgradeStreetSpaceAction extends Action {
     private _streetSpace: StreetSpace;
@@ -19,8 +23,8 @@ export class UpgradeStreetSpaceAction extends Action {
         this._streetSpace.upgrade();
 
         context.log(
-            new PropertyUpgradedLog({
-                player: context.move.player,
+            new StreetSpaceUpgradedLog({
+                landlord: context.move.player,
                 streetSpace: this._streetSpace,
                 price,
             })
@@ -29,7 +33,7 @@ export class UpgradeStreetSpaceAction extends Action {
         return true;
     }
 
-    applies(data?: any): boolean {
+    applies(data: UpgradeStreetSpaceActionData): boolean {
         return data.streetSpace === this._streetSpace;
     }
 }

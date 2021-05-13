@@ -2,20 +2,20 @@ import type { StreetSpace } from '../map/properties/StreetSpace';
 import { Player } from '../Player';
 import { Log } from './Log';
 
-export class PropertyUpgradedLog extends Log {
-    private _player: Player;
+export class StreetSpaceDowngradedLog extends Log {
+    private _landlord: Player;
     private _streetSpace: StreetSpace;
-    private _price: number;
+    private _refund: number;
 
     constructor(attributes: {
-        player: Player,
+        landlord: Player,
         streetSpace: StreetSpace,
-        price: number,
+        refund: number,
     }) {
-        super({ type: 'propertyUpgraded' });
+        super({ type: 'streetSpaceDowngraded' });
 
-        this._player = attributes.player;
+        this._landlord = attributes.landlord;
         this._streetSpace = attributes.streetSpace;
-        this._price = attributes.price;
+        this._refund = attributes.refund;
     }
 }

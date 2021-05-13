@@ -3,6 +3,7 @@ import type { Player } from '../../Player';
 import type { Action } from '../../actions/Action';
 import { PropertySpace } from './PropertySpace';
 import { UpgradeStreetSpaceAction } from '../../actions/UpgradeStreetSpaceAction';
+import { SellStreetBuildingAction } from '../../actions/DowngradeStreetSpaceAction';
 
 const MAX_HOUSES = 4;
 
@@ -34,7 +35,27 @@ export class StreetSpace extends PropertySpace {
         this._hotel = attributes.hotel;
     }
 
-    getGlobalActions(context: Context): Action[] {
+    downgrade(): void {
+        if (!this._landlord) return;
+        if (this._hotel) {
+            this._hotel = false;
+            this._houses = 4;
+        } else if (this._houses > 0) {
+            this._houses--;
+        }
+    }
+
+    calculateDowngradeRefund(): number {
+        return this._hotel
+            ? this._titleDeed.hotelPrice / 2
+            : this._titleDeed.housePrice / 2;
+    }
+
+    canBeMortgaged(): boolean {
+        return !this._hotel && this._houses === 0;
+    }
+
+    getTypeSpecificGlobalActions(context: Context): Action[] {
         const actions: Action[] = [];
 
         if (
@@ -52,6 +73,13 @@ export class StreetSpace extends PropertySpace {
             }
         }
 
+        // if (
+        //     this.canBuildingBeSold() &&
+        //     this._landlord === context.move.player
+        // ) {
+        //     actions.push(new SellStreetBuildingAction(this));
+        // }
+
         return actions;
     }
 
@@ -59,19 +87,24 @@ export class StreetSpace extends PropertySpace {
         return !this._hotel;
     }
 
-    calculateUpgradePrice(): number {
-        return this._houses === MAX_HOUSES
-            ? this._titleDeed.hotelBasePrice
-            : this._titleDeed.housePrice;
+    canBuildingBeSold(): boolean {
+        return this._hotel || this._houses > 0;
     }
 
     upgrade(): void {
+        if (!this._landlord) return;
         if (this._houses === MAX_HOUSES) {
             this._houses = 0;
             this._hotel = true;
         } else {
             this._houses++;
         }
+    }
+
+    calculateUpgradePrice(): number {
+        return this._houses === MAX_HOUSES
+            ? this._titleDeed.hotelPrice
+            : this._titleDeed.housePrice;
     }
 
     calculateRent(): number {
@@ -101,7 +134,7 @@ export class StreetTitleDeed {
     private _hotelRent: number;
     private _mortgageValue: number;
     private _housePrice: number;
-    private _hotelBasePrice: number;
+    private _hotelPrice: number;
 
     constructor(attributes: {
         baseRent: number,
@@ -109,14 +142,14 @@ export class StreetTitleDeed {
         hotelRent: number,
         mortgageValue: number,
         housePrice: number,
-        hotelBasePrice: number,
+        hotelPrice: number,
     }) {
         this._baseRent = attributes.baseRent;
         this._perHouseRents = attributes.perHouseRents;
         this._hotelRent = attributes.hotelRent;
         this._mortgageValue = attributes.mortgageValue;
         this._housePrice = attributes.housePrice;
-        this._hotelBasePrice = attributes.hotelBasePrice;
+        this._hotelPrice = attributes.hotelPrice;
     }
 
     get baseRent(): number {
@@ -139,8 +172,8 @@ export class StreetTitleDeed {
         return this._housePrice;
     }
 
-    get hotelBasePrice(): number {
-        return this._hotelBasePrice;
+    get hotelPrice(): number {
+        return this._hotelPrice;
     }
 }
 

@@ -50,7 +50,7 @@ async function parse(url) {
     const hotelRent = Number(additional[0].match(/with +hotel +\$(\d+)/i)[1]);
     const mortgageValue = Number(additional[1].match(/mortgage +value +\$(\d+)\./i)[1]);
     const housePrice = Number(additional[2].match(/houses cost +\$(\d+)\. +each/i)[1]);
-    const hotelBasePrice = Number(additional[3].match(/hotels, +\$(\d+)\. +plus +\d+ +houses/i)[1]);
+    const hotelPrice = Number(additional[3].match(/hotels, +\$(\d+)\. +plus +\d+ +houses/i)[1]);
 
     return {
         price,
@@ -61,7 +61,7 @@ async function parse(url) {
         hotelRent,
         mortgageValue,
         housePrice,
-        hotelBasePrice
+        hotelPrice
     };
 }
 
@@ -74,7 +74,7 @@ function format({
     hotelRent,
     mortgageValue,
     housePrice,
-    hotelBasePrice
+    hotelPrice
 }) {
     return `\
 new StreetSpace({
@@ -87,7 +87,7 @@ new StreetSpace({
         hotelRent: ${hotelRent},
         mortgageValue: ${mortgageValue},
         housePrice: ${housePrice},
-        hotelBasePrice: ${hotelBasePrice},
+        hotelPrice: ${hotelPrice},
     }),
 }),`;
 }

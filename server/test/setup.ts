@@ -17,7 +17,7 @@ mocker.register(GoSpace, () => new GoSpace({ salary: 0 }));
 
 mocker.register(StreetTitleDeed, (_, attributes) => new StreetTitleDeed({
     baseRent: attributes?.baseRent ?? 50,
-    hotelBasePrice: 100,
+    hotelPrice: 100,
     hotelRent: 150,
     housePrice: 200,
     mortgageValue: 250,

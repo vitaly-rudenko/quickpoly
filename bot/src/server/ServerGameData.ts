@@ -110,7 +110,7 @@ export interface StreetTitleDeed {
     hotelRent: number;
     mortgageValue: number;
     housePrice: number;
-    hotelBasePrice: number;
+    hotelPrice: number;
 }
 
 export enum StreetColor {
