@@ -5,7 +5,7 @@ import { Log } from './Log';
 export class AuctionEndedLog extends Log {
     private _highestBidder: Player | null;
     private _propertySpace: PropertySpace;
-    private _amount: number;
+    private _highestBidAmount: number;
 
     constructor(attributes: {
         highestBidder: Player | null,
@@ -16,6 +16,6 @@ export class AuctionEndedLog extends Log {
 
         this._highestBidder = attributes.highestBidder;
         this._propertySpace = attributes.propertySpace;
-        this._amount = attributes.highestBidAmount;
+        this._highestBidAmount = attributes.highestBidAmount;
     }
 }

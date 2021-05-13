@@ -12,6 +12,10 @@ import { MovedToSpaceLog } from '../../src/game/logs/MovedToSpaceLog';
 import { RollDiceAction } from '../../src/game/actions/RollDiceAction';
 import { PropertyPurchasedLog } from '../../src/game/logs/PropertyPurchasedLog';
 import { Move } from '../../src/game/Move';
+import { AuctionEndedLog } from '../../src/game/logs/AuctionEndedLog';
+import { PassedLog } from '../../src/game/logs/PassedLog';
+import { BidLog } from '../../src/game/logs/BidLog';
+import { PropertyPutUpForAuctionLog } from '../../src/game/logs/PropertyPutUpForAuctionLog';
 
 describe('[basic property actions]', () => {
     let mocker: Mocker;
@@ -250,6 +254,40 @@ describe('[basic property actions]', () => {
 
         expect(streetSpace.landlord).to.eq(player5);
         expect(player5.money).to.eq(100);
+
+        expect(game.logs)
+            .to.deep.eq([
+                new DiceRolledLog({ player: player1, dice: [1, 1] }),
+                new MovedToSpaceLog({ player: player1, space: streetSpace }),
+                new PropertyPutUpForAuctionLog({ propertySpace: streetSpace }),
+                new BidLog({ player: player2, amount: 50 }),
+                new BidLog({ player: player3, amount: 55 }),
+                new BidLog({ player: player4, amount: 60 }),
+                new BidLog({ player: player5, amount: 65 }),
+                new BidLog({ player: player1, amount: 70 }),
+                new BidLog({ player: player2, amount: 80 }),
+                new BidLog({ player: player3, amount: 85 }),
+                new BidLog({ player: player4, amount: 90 }),
+                new BidLog({ player: player5, amount: 100 }),
+                new PassedLog({ player: player1 }),
+                new BidLog({ player: player2, amount: 125 }),
+                new BidLog({ player: player3, amount: 150 }),
+                new BidLog({ player: player4, amount: 175 }),
+                new BidLog({ player: player5, amount: 200 }),
+                new PassedLog({ player: player2 }),
+                new BidLog({ player: player3, amount: 233 }),
+                new BidLog({ player: player4, amount: 266 }),
+                new BidLog({ player: player5, amount: 300 }),
+                new PassedLog({ player: player3 }),
+                new BidLog({ player: player4, amount: 350 }),
+                new BidLog({ player: player5, amount: 400 }),
+                new PassedLog({ player: player4 }),
+                new AuctionEndedLog({
+                    highestBidder: player5,
+                    propertySpace: streetSpace,
+                    highestBidAmount: 400
+                })
+            ]);
     });
 
     it('should end the auction prematurely when nobody has enough money to bid', () => {
@@ -279,6 +317,23 @@ describe('[basic property actions]', () => {
         expect(game.getAvailableActions())
             .to.deep.eq([
                 new RollDiceAction(),
+            ]);
+
+        expect(game.logs)
+            .to.deep.eq([
+                new DiceRolledLog({ player: player1, dice: [1, 1] }),
+                new MovedToSpaceLog({ player: player1, space: streetSpace }),
+                new PropertyPutUpForAuctionLog({ propertySpace: streetSpace }),
+                new PassedLog({ player: player2 }),
+                new PassedLog({ player: player3 }),
+                new PassedLog({ player: player4 }),
+                new PassedLog({ player: player5 }),
+                new PassedLog({ player: player1 }),
+                new AuctionEndedLog({
+                    highestBidder: null,
+                    propertySpace: streetSpace,
+                    highestBidAmount: 10,
+                })
             ]);
     });
 });
