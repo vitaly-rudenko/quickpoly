@@ -30,12 +30,10 @@ export class Auction {
         this._initialMove = attributes.initialMove;
         this._players = attributes.players;
 
+        this._highestBidAmount = 10;
         for (const player of this._players) {
             this._playerStatuses.set(player, Status.READY);
         }
-
-        this._playerStatuses.set(attributes.initialMove.player, Status.PASSED);
-        this._highestBidAmount = this._propertySpace.price;
     }
 
     bid(player: Player, amount: number): void {
@@ -43,6 +41,12 @@ export class Auction {
         this._highestBidAmount = amount;
 
         this._playerStatuses.set(player, Status.BID);
+
+        for (const player of this._players) {
+            if (!player.canPay(amount + 1)) {
+                this._playerStatuses.set(player, Status.PASSED);
+            }
+        }
     }
 
     pass(player: Player): void {
@@ -50,16 +54,16 @@ export class Auction {
     }
 
     getActions(context: Context): Action[] {
+        if (context.move.number === this._initialMove.number) {
+            return [];
+        }
+
         if (this.isDone()) {
-            if (context.move.player === this.initialMove.player) {
+            if (context.move.player === this._initialMove.player) {
                 return [new EndAuctionAction()];
             } else {
                 return [];
             }
-        }
-
-        if (context.move.player === this._initialMove.player) {
-            return [];
         }
 
         if (context.move.player === this._highestBidder) {
@@ -78,7 +82,7 @@ export class Auction {
 
     isDone(): boolean {
         return this.getStatuses().every(s => s !== Status.READY) && (
-            this.getStatuses().every(s => s !== Status.PASSED) ||
+            this.getStatuses().every(s => s === Status.PASSED) ||
             this.getStatuses().filter(s => s === Status.BID).length === 1
         );
     }
@@ -97,9 +101,5 @@ export class Auction {
 
     get highestBidAmount(): number {
         return this._highestBidAmount;
-    }
-
-    get initialMove(): Move {
-        return this._initialMove;
     }
 }

@@ -22,23 +22,23 @@ describe('[basic property actions]', () => {
         mocker.register(Player, ({ index }, attributes) => new Player({
             id: attributes?.id ?? `player-${index + 1}`,
             position: attributes?.position ?? 0,
-            money: attributes?.money ?? 0,
+            money: attributes?.money ?? 100,
         }));
 
         mocker.register(GoSpace, () => new GoSpace({ salary: 0 }));
 
         mocker.register(StreetTitleDeed, (_, attributes) => new StreetTitleDeed({
-            baseRent: attributes?.baseRent ?? 0,
-            hotelBasePrice: 0,
-            hotelRent: 0,
-            housePrice: 0,
-            mortgageValue: 0,
-            perHouseRents: [0],
+            baseRent: attributes?.baseRent ?? 50,
+            hotelBasePrice: 100,
+            hotelRent: 150,
+            housePrice: 200,
+            mortgageValue: 250,
+            perHouseRents: [25, 75, 125, 175],
         }));
 
         mocker.register(StreetSpace, ({ index }, attributes) => new StreetSpace({
             landlord: attributes?.landlord ?? null,
-            price: attributes?.price ?? 0,
+            price: attributes?.price ?? 50,
             name: `Street #${index}`,
             color: StreetColor.LIGHT_BLUE,
             titleDeed: attributes?.titleDeed ?? mocker.create(StreetTitleDeed),
@@ -167,7 +167,7 @@ describe('[basic property actions]', () => {
         const player4 = mocker.create(Player, { money: 200 });
         const player5 = mocker.create(Player, { money: 200 });
 
-        const streetSpace = mocker.create(StreetSpace, { price: 46, titleDeed: { baseRent: 154 } });
+        const streetSpace = mocker.create(StreetSpace);
 
         const game = mocker.create(Game, {
             move: new Move({ player: player2 }),
@@ -182,40 +182,73 @@ describe('[basic property actions]', () => {
         game.performAction('rollDice', { dice: [1, 1] }); // player 2
         game.performAction('putPropertyUpForAuction'); // player 2
         game.performAction('pass'); // player 3
-        game.performAction('bid', { amount: 160 }); // player 4
-        game.performAction('bid', { amount: 165 }); // player 5
+        game.performAction('bid', { amount: 11 }); // player 4
+        game.performAction('bid', { amount: 40 }); // player 5
         game.performAction('pass'); // player 1
-        game.performAction('bid', { amount: 170 }); // player 4
-        game.performAction('bid', { amount: 175 }); // player 5
+        game.performAction('bid', { amount: 50 }); // player 2
+        game.performAction('bid', { amount: 60 }); // player 4
+        game.performAction('bid', { amount: 120 }); // player 5
+        game.performAction('pass'); // player 2
         game.performAction('bid', { amount: 180 }); // player 4
         game.performAction('pass'); // player 5
 
         expect(streetSpace.landlord).to.eq(player4);
         expect(player4.money).to.eq(20);
-        expect(player2.money).to.eq(200);
+        expect([player1, player2, player3, player5].every(p => p.money === 200))
+            .to.be.true; // should not charge
 
         expect(game.move.player).to.eq(player3);
-
         expect(game.move.actions).to.deep.eq([]);
         expect(game.getAvailableActions())
             .to.deep.eq([
                 new RollDiceAction(),
             ]);
+    });
 
-        // expect(game.move.player).to.eq(player1);
-        // expect(game.logs)
-        //     .to.deep.eq([
-        //         new DiceRolledLog({ player: player1, dice: [1, 1] }),
-        //         new MovedToSpaceLog({ player: player1, space: streetSpace }),
-        //         new PropertyPurchasedLog({ player: player1, propertySpace: streetSpace }),
-        //         new DiceRolledLog({ player: player2, dice: [1, 1] }),
-        //         new MovedToSpaceLog({ player: player2, space: streetSpace }),
-        //         new PropertyRentPaidLog({
-        //             landlord: player1,
-        //             tenant: player2,
-        //             propertySpace: streetSpace,
-        //             amount: 154,
-        //         }),
-        //     ]);
+    it('should skip players who don\'t have enough money to bid', () => {
+        const player1 = mocker.create(Player, { money: 100 });
+        const player2 = mocker.create(Player, { money: 200 });
+        const player3 = mocker.create(Player, { money: 300 });
+        const player4 = mocker.create(Player, { money: 400 });
+        const player5 = mocker.create(Player, { money: 500 });
+
+        const streetSpace = mocker.create(StreetSpace, { price: 200 });
+
+        const game = mocker.create(Game, {
+            players: [player1, player2, player3, player4, player5],
+            map: [
+                mocker.create(GoSpace),
+                mocker.create(StreetSpace),
+                streetSpace,
+            ],
+        });
+
+        game.performAction('rollDice', { dice: [1, 1] }); // player 1
+        game.performAction('putPropertyUpForAuction'); // player 1
+        game.performAction('bid', { amount: 50 }); // player 2
+        game.performAction('bid', { amount: 55 }); // player 3
+        game.performAction('bid', { amount: 60 }); // player 4
+        game.performAction('bid', { amount: 65 }); // player 5
+        game.performAction('bid', { amount: 70 }); // player 1
+        game.performAction('bid', { amount: 80 }); // player 2
+        game.performAction('bid', { amount: 85 }); // player 3
+        game.performAction('bid', { amount: 90 }); // player 4
+        game.performAction('bid', { amount: 100 }); // player 5
+        // skipped player 1
+        game.performAction('bid', { amount: 125 }); // player 2
+        game.performAction('bid', { amount: 150 }); // player 3
+        game.performAction('bid', { amount: 175 }); // player 4
+        game.performAction('bid', { amount: 200 }); // player 5
+        // skipped player 2
+        game.performAction('bid', { amount: 233 }); // player 3
+        game.performAction('bid', { amount: 266 }); // player 4
+        game.performAction('bid', { amount: 300 }); // player 5
+        // skipped player 3
+        game.performAction('bid', { amount: 350 }); // player 4
+        game.performAction('bid', { amount: 400 }); // player 5
+        // skipped player 4
+
+        expect(streetSpace.landlord).to.eq(player5);
+        expect(player5.money).to.eq(100);
     });
 });
