@@ -1,4 +1,4 @@
-import type { Move } from '../Move';
+import type { Context } from '../Context';
 
 export abstract class Action {
     private _type: string;
@@ -12,6 +12,10 @@ export abstract class Action {
     }
 
     abstract perform(context: Context, data?: any): boolean;
+
+    applies(data?: any): boolean {
+        return true;
+    }
 
     get type(): string {
         return this._type;

@@ -9,4 +9,8 @@ export abstract class Space {
     }
 
     abstract getResidenceActions(context: Context): Action[];
+
+    getGlobalActions(context: Context): Action[] {
+        return [];
+    }
 }

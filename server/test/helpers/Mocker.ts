@@ -5,13 +5,17 @@ export class Mocker {
     private _indexes = new Map<ClassType, number>();
     private _instances = new Map<ClassType, InstanceType<ClassType>>();
 
+    reset(): void {
+        this._indexes.clear();
+    }
+
     register<T extends ClassType>(Class: T, factory: Factory<T>): void {
         this._factories.set(Class, factory);
     }
 
     create<T extends ClassType>(Class: T, ...args: DeepPartial<ConstructorParameters<T>>): InstanceType<T> {
         const factory = this._factories.get(Class);
-        const index = this._indexes.get(Class) ?? 0;
+        const index = this._indexes.get(Class) ?? 1;
         this._indexes.set(Class, index + 1);
 
         const instance = factory ? factory({ index }, ...args) : new Class(...args);

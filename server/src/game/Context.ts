@@ -41,6 +41,10 @@ export class Context {
         this._contextHandler.log(log);
     }
 
+    get map(): Space[] {
+        return this._map;
+    }
+
     get move(): Move {
         return this._move;
     }

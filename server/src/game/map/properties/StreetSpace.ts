@@ -1,5 +1,10 @@
+import type { Context } from '../../Context';
 import type { Player } from '../../Player';
+import type { Action } from '../../actions/Action';
 import { PropertySpace } from './PropertySpace';
+import { UpgradeStreetSpaceAction } from '../../actions/UpgradeStreetSpaceAction';
+
+const MAX_HOUSES = 4;
 
 export class StreetSpace extends PropertySpace {
     private _color: StreetColor;
@@ -29,12 +34,60 @@ export class StreetSpace extends PropertySpace {
         this._hotel = attributes.hotel;
     }
 
+    getGlobalActions(context: Context): Action[] {
+        const actions: Action[] = [];
+
+        if (this.canBeUpgraded()) {
+            const streetSpaces = context.map.filter(s => s instanceof StreetSpace) as StreetSpace[];
+            const isMonopoly = streetSpaces
+                .filter(s => s.color === this._color)
+                .every(s => s.landlord === context.move.player);
+
+            if (isMonopoly && context.move.player.canPay(this.calculateUpgradePrice())) {
+                actions.push(new UpgradeStreetSpaceAction({ streetSpace: this }));
+            }
+        }
+
+        return actions;
+    }
+
+    canBeUpgraded(): boolean {
+        return !this._hotel;
+    }
+
+    calculateUpgradePrice(): number {
+        return this._houses === MAX_HOUSES
+            ? this._titleDeed.hotelBasePrice
+            : this._titleDeed.housePrice;
+    }
+
+    upgrade(): void {
+        if (this._houses === MAX_HOUSES) {
+            this._houses = 0;
+            this._hotel = true;
+        } else {
+            this._houses++;
+        }
+    }
+
     calculateRent(): number {
         return this._hotel
             ? this._titleDeed.hotelRent
             : this._houses > 0
                 ? this._titleDeed.perHouseRents[this._houses]
                 : this._titleDeed.baseRent;
+    }
+
+    get color(): StreetColor {
+        return this._color;
+    }
+
+    get houses(): number {
+        return this._houses;
+    }
+
+    get hotel(): boolean {
+        return this._hotel;
     }
 }
 

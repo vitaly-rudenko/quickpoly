@@ -57,7 +57,13 @@ export class Game implements ContextHandler {
     }
 
     performAction(type: string, data?: any): void {
-        const action = this.getAvailableActions().find(a => a.type === type);
+        if (type === 'upgradeStreetSpace') {
+            // console.log(this.getAvailableActions(), type, data);
+        }
+
+        const action = this.getAvailableActions()
+            .find(a => a.type === type && a.applies(data));
+
         if (!action) {
             throw new Error(`Action is not available: ${type}`);
         }
@@ -80,15 +86,25 @@ export class Game implements ContextHandler {
     }
 
     getAvailableActions(): Action[] {
+        const context = this._createContext();
+
         if (this._move.hasActionBeenPerformed('endAuction')) {
             return [];
         }
 
         if (this._auction !== null) {
-            return this._auction.getActions(this._createContext());
+            return this._auction.getActions(context);
         }
 
-        return this._getMoveSpace().getResidenceActions(this._createContext());
+        const residenceActions = this._getMoveSpace().getResidenceActions(context);
+        const globalActions = this._map
+            .map(space => space.getGlobalActions(context))
+            .reduce((acc, curr) => (acc.push(...curr), acc), []);
+
+        return [
+            ...residenceActions,
+            ...globalActions,
+        ];
     }
 
     get logs(): Log[] {
