@@ -1,9 +1,9 @@
 import { Context } from '../Context';
 import { Action } from './Action';
 
-export class GiveUpAction extends Action {
+export class EndMoveAction extends Action {
     constructor() {
-        super({ type: 'giveUp', required: true });
+        super({ type: 'endMoveAction', required: true });
     }
 
     perform(context: Context): boolean {

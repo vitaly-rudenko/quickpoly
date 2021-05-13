@@ -8,6 +8,7 @@ import { PropertySpace } from './map/properties/PropertySpace';
 import { Auction } from './Auction';
 import { Move } from './Move';
 import { RollDiceAction } from './actions/RollDiceAction';
+import { GiveUpAction } from './actions/GiveUpAction';
 
 export class Game implements ContextHandler {
     private _move: Move;
@@ -98,6 +99,8 @@ export class Game implements ContextHandler {
                 .reduce((acc, curr) => (acc.push(...curr), acc), [])
         );
 
+        actions.push(new GiveUpAction());
+
         return actions;
     }
 
@@ -106,7 +109,7 @@ export class Game implements ContextHandler {
     }
 
     private _nextMoveIfNecessary(): void {
-        if (this.getAvailableActions().length === 0) {
+        if (this.getAvailableActions().every(a => a.skippable)) {
             // console.log('Move #' + this._move.number
             //     + ' of ' + this._move.player.id
             //     + ' has ended'

@@ -7,6 +7,7 @@ import { expect } from 'chai';
 import { RollDiceAction } from '../../src/game/actions/RollDiceAction';
 import { UpgradeStreetSpaceAction } from '../../src/game/actions/UpgradeStreetSpaceAction';
 import { StreetSpaceUpgradedLog } from '../../src/game/logs/StreetSpaceUpgradedLog';
+import { GiveUpAction } from '../../src/game/actions/GiveUpAction';
 
 describe('[upgrading streets]', () => {
     let player1: Player;
@@ -71,6 +72,7 @@ describe('[upgrading streets]', () => {
                 new UpgradeStreetSpaceAction({ streetSpace: orangeStreet1 }),
                 new UpgradeStreetSpaceAction({ streetSpace: orangeStreet2 }),
                 new UpgradeStreetSpaceAction({ streetSpace: orangeStreet3 }),
+                new GiveUpAction(),
             ]);
     });
 
@@ -104,6 +106,7 @@ describe('[upgrading streets]', () => {
                 new RollDiceAction(),
                 new UpgradeStreetSpaceAction({ streetSpace: orangeStreet1 }),
                 new UpgradeStreetSpaceAction({ streetSpace: orangeStreet3 }),
+                new GiveUpAction(),
             ]);
 
         repeat(() => {
@@ -137,6 +140,7 @@ describe('[upgrading streets]', () => {
         expect(game.getAvailableActions())
             .to.deep.eq([
                 new RollDiceAction(),
+                new GiveUpAction(),
             ]);
 
         expect(game.logs)
@@ -191,6 +195,7 @@ describe('[upgrading streets]', () => {
         expect(game.getAvailableActions())
             .to.deep.eq([
                 new RollDiceAction(),
+                new GiveUpAction(),
             ]);
 
         player1.topUp(2); // 17
@@ -199,6 +204,7 @@ describe('[upgrading streets]', () => {
             .to.deep.eq([
                 new RollDiceAction(),
                 new UpgradeStreetSpaceAction({ streetSpace: orangeStreet1 }),
+                new GiveUpAction(),
             ]);
 
         player1.topUp(4); // 21
@@ -208,6 +214,7 @@ describe('[upgrading streets]', () => {
                 new RollDiceAction(),
                 new UpgradeStreetSpaceAction({ streetSpace: orangeStreet1 }),
                 new UpgradeStreetSpaceAction({ streetSpace: orangeStreet2 }),
+                new GiveUpAction(),
             ]);
 
         player1.topUp(1); // 22
@@ -218,6 +225,7 @@ describe('[upgrading streets]', () => {
                 new UpgradeStreetSpaceAction({ streetSpace: orangeStreet1 }),
                 new UpgradeStreetSpaceAction({ streetSpace: orangeStreet2 }),
                 new UpgradeStreetSpaceAction({ streetSpace: orangeStreet3 }),
+                new GiveUpAction(),
             ]);
 
         upgrade(orangeStreet3);
@@ -225,6 +233,7 @@ describe('[upgrading streets]', () => {
         expect(game.getAvailableActions())
             .to.deep.eq([
                 new RollDiceAction(),
+                new GiveUpAction(),
             ]);
 
         player1.topUp(18 * 4);
@@ -238,6 +247,7 @@ describe('[upgrading streets]', () => {
                 new RollDiceAction(),
                 new UpgradeStreetSpaceAction({ streetSpace: orangeStreet1 }),
                 new UpgradeStreetSpaceAction({ streetSpace: orangeStreet3 }),
+                new GiveUpAction(),
             ]);
 
         player1.topUp(1);
@@ -248,6 +258,7 @@ describe('[upgrading streets]', () => {
                 new UpgradeStreetSpaceAction({ streetSpace: orangeStreet1 }),
                 new UpgradeStreetSpaceAction({ streetSpace: orangeStreet2 }),
                 new UpgradeStreetSpaceAction({ streetSpace: orangeStreet3 }),
+                new GiveUpAction(),
             ]);
 
         upgrade(orangeStreet2);
@@ -255,6 +266,7 @@ describe('[upgrading streets]', () => {
         expect(game.getAvailableActions())
             .to.deep.eq([
                 new RollDiceAction(),
+                new GiveUpAction(),
             ]);
     });
 });

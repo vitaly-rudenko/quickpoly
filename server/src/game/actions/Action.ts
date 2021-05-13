@@ -4,11 +4,18 @@ export abstract class Action {
     private _type: string;
     private _required: boolean;
     private _automatic: boolean;
+    private _skippable: boolean;
 
-    constructor(attributes: { type: string, required?: boolean, automatic?: boolean }) {
+    constructor(attributes: {
+        type: string,
+        required?: boolean,
+        automatic?: boolean,
+        skippable?: boolean,
+    }) {
         this._type = attributes.type;
         this._required = attributes?.required ?? false;
         this._automatic = attributes?.automatic ?? false;
+        this._skippable = attributes?.skippable ?? false;
     }
 
     abstract perform(context: Context, data?: any): boolean;
@@ -27,5 +34,9 @@ export abstract class Action {
 
     get automatic(): boolean {
         return this._automatic;
+    }
+
+    get skippable(): boolean {
+        return this._skippable;
     }
 }

@@ -1,10 +1,9 @@
 import { Context } from '../Context';
-import { PassedLog } from '../logs/PassedLog';
 import { Action } from './Action';
 
 export class GiveUpAction extends Action {
     constructor() {
-        super({ type: 'giveUp' });
+        super({ type: 'giveUp', skippable: true });
     }
 
     perform(context: Context): boolean {

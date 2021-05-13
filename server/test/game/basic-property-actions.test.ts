@@ -16,6 +16,7 @@ import { AuctionEndedLog } from '../../src/game/logs/AuctionEndedLog';
 import { PassedLog } from '../../src/game/logs/PassedLog';
 import { BidLog } from '../../src/game/logs/BidLog';
 import { PropertyPutUpForAuctionLog } from '../../src/game/logs/PropertyPutUpForAuctionLog';
+import { GiveUpAction } from '../../src/game/actions/GiveUpAction';
 
 describe('[basic property actions]', () => {
     it('should give player an option to purchase the property or put it up for auction', () => {
@@ -38,6 +39,7 @@ describe('[basic property actions]', () => {
         expect(game.getAvailableActions())
             .to.deep.eq([
                 new RollDiceAction(),
+                new GiveUpAction(),
             ]);
 
         game.performAction('rollDice', { dice: [1, 1] });
@@ -56,6 +58,7 @@ describe('[basic property actions]', () => {
             .to.be.deep.eq([
                 new PurchasePropertyAction(streetSpace),
                 new PutPropertyUpForAuctionAction(streetSpace),
+                new GiveUpAction(),
             ]);
     });
 
@@ -79,6 +82,7 @@ describe('[basic property actions]', () => {
         expect(game.getAvailableActions())
             .to.be.deep.eq([
                 new PutPropertyUpForAuctionAction(streetSpace),
+                new GiveUpAction(),
             ]);
     });
 
@@ -164,6 +168,7 @@ describe('[basic property actions]', () => {
         expect(game.getAvailableActions())
             .to.deep.eq([
                 new RollDiceAction(),
+                new GiveUpAction(),
             ]);
     });
 
@@ -275,6 +280,7 @@ describe('[basic property actions]', () => {
         expect(game.getAvailableActions())
             .to.deep.eq([
                 new RollDiceAction(),
+                new GiveUpAction(),
             ]);
 
         expect(game.logs)
