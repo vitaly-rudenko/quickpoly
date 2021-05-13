@@ -103,6 +103,7 @@ describe('[basic property actions]', () => {
 
         game.performAction('rollDice', { dice: [1, 1] });
         game.performAction('purchaseProperty');
+        game.performAction('endMove');
         game.performAction('rollDice', { dice: [1, 1] });
 
         expect(player1.money).to.eq(200 - 46 + 154);

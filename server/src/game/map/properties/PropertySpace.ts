@@ -78,9 +78,11 @@ export abstract class PropertySpace extends Space {
     getGlobalActions(context: Context): Action[] {
         const actions: Action[] = [];
 
-        // if (this.canBeMortgaged()) {
-        //     actions.push(new MortgagePropertyAction(this));
-        // }
+        if (this._landlord === context.move.player) {
+            if (this.canBeMortgaged()) {
+                actions.push(new MortgagePropertyAction(this));
+            }
+        }
 
         return [
             ...this.getTypeSpecificGlobalActions(context),

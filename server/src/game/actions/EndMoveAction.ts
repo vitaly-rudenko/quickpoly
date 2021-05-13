@@ -3,7 +3,7 @@ import { Action } from './Action';
 
 export class EndMoveAction extends Action {
     constructor() {
-        super({ type: 'endMoveAction', required: true });
+        super({ type: 'endMove', required: true });
     }
 
     perform(context: Context): boolean {

@@ -4,11 +4,10 @@ import { Action } from './actions/Action';
 import { Log } from './logs/Log';
 import { Context } from './Context';
 import { ContextHandler } from './ContextHandler';
-import { PropertySpace } from './map/properties/PropertySpace';
 import { Auction } from './Auction';
 import { Move } from './Move';
-import { RollDiceAction } from './actions/RollDiceAction';
 import { GiveUpAction } from './actions/GiveUpAction';
+import { EndMoveAction } from './actions/EndMoveAction';
 
 export class Game implements ContextHandler {
     private _move: Move;
@@ -84,6 +83,10 @@ export class Game implements ContextHandler {
     }
 
     getAvailableActions(): Action[] {
+        if (this._move.hasActionBeenPerformed('endMove')) {
+            return [];
+        }
+
         const context = this._createContext();
         const actions: Action[] = [];
 
@@ -100,6 +103,14 @@ export class Game implements ContextHandler {
         );
 
         actions.push(new GiveUpAction());
+
+        if (
+            actions.length > 0 &&
+            actions.some(a => !a.skippable) &&
+            actions.every(a => !a.required)
+        ) {
+            actions.push(new EndMoveAction());
+        }
 
         return actions;
     }
