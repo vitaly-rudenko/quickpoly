@@ -16,8 +16,8 @@ describe('[upgrading streets]', () => {
     let game: Game;
 
     beforeEach(() => {
-        player1 = mocker.create(Player, { money: 1500 });
-        player2 = mocker.create(Player, { money: 1500 });
+        player1 = mocker.create(Player, { money: 0 });
+        player2 = mocker.create(Player, { money: 0 });
 
         orangeStreet1 = mocker.create(StreetSpace, {
             color: StreetColor.ORANGE,
@@ -62,6 +62,8 @@ describe('[upgrading streets]', () => {
     }
 
     it('should allow players to upgrade streets when they have monopoly', () => {
+        player1.topUp(1000);
+
         expect(game.getAvailableActions())
             .to.deep.eq([
                 new RollDiceAction(),
@@ -72,6 +74,8 @@ describe('[upgrading streets]', () => {
     });
 
     it('should implement street upgrading', () => {
+        player1.topUp(1000);
+
         repeat(() => upgrade(orangeStreet2)).times(2);
 
         expect(orangeStreet1.houses).to.eq(0);
@@ -85,13 +89,6 @@ describe('[upgrading streets]', () => {
 
         repeat(() => upgrade(orangeStreet2)).times(3);
 
-        expect(game.getAvailableActions())
-            .to.deep.eq([
-                new RollDiceAction(),
-                new UpgradeStreetSpaceAction({ streetSpace: orangeStreet1 }),
-                new UpgradeStreetSpaceAction({ streetSpace: orangeStreet3 }),
-            ]);
-
         expect(orangeStreet1.houses).to.eq(0);
         expect(orangeStreet1.hotel).to.be.false;
 
@@ -100,6 +97,13 @@ describe('[upgrading streets]', () => {
 
         expect(orangeStreet3.houses).to.eq(0);
         expect(orangeStreet3.hotel).to.be.false;
+
+        expect(game.getAvailableActions())
+            .to.deep.eq([
+                new RollDiceAction(),
+                new UpgradeStreetSpaceAction({ streetSpace: orangeStreet1 }),
+                new UpgradeStreetSpaceAction({ streetSpace: orangeStreet3 }),
+            ]);
 
         repeat(() => {
             upgrade(orangeStreet1);
@@ -128,6 +132,105 @@ describe('[upgrading streets]', () => {
 
         expect(orangeStreet3.houses).to.eq(0);
         expect(orangeStreet3.hotel).to.be.true;
+
+        expect(game.getAvailableActions())
+            .to.deep.eq([
+                new RollDiceAction(),
+            ]);
+    });
+
+    it('should charge properly for street upgrading', () => {
+        player1.topUp(1000);
+
+        expect(player1.money).to.eq(1000);
+
+        upgrade(orangeStreet2);
+
+        expect(player1.money).to.eq(1000 - 18);
+
+        repeat(() => upgrade(orangeStreet2)).times(3);
+
+        expect(player1.money).to.eq(1000 - 18 * 4);
+
+        upgrade(orangeStreet2);
+
+        expect(player1.money).to.eq(1000 - 18 * 4 - 48);
+
+        repeat(() => upgrade(orangeStreet1)).times(5);
+
+        expect(player1.money).to.eq(1000 - 18 * 4 - 48 - 16 * 4 - 35);
+
+        repeat(() => upgrade(orangeStreet3)).times(5);
+
+        expect(player1.money).to.eq(1000 - 18 * 4 - 48 - 16 * 4 - 35 - 22 * 4 - 62);
+    });
+
+    it('should not allow upgrade when not enough money', () => {
+        player1.topUp(15); // 15
+
+        expect(game.getAvailableActions())
+            .to.deep.eq([
+                new RollDiceAction(),
+            ]);
+
+        player1.topUp(2); // 17
+
+        expect(game.getAvailableActions())
+            .to.deep.eq([
+                new RollDiceAction(),
+                new UpgradeStreetSpaceAction({ streetSpace: orangeStreet1 }),
+            ]);
+
+        player1.topUp(4); // 21
+
+        expect(game.getAvailableActions())
+            .to.deep.eq([
+                new RollDiceAction(),
+                new UpgradeStreetSpaceAction({ streetSpace: orangeStreet1 }),
+                new UpgradeStreetSpaceAction({ streetSpace: orangeStreet2 }),
+            ]);
+
+        player1.topUp(1); // 22
+
+        expect(game.getAvailableActions())
+            .to.deep.eq([
+                new RollDiceAction(),
+                new UpgradeStreetSpaceAction({ streetSpace: orangeStreet1 }),
+                new UpgradeStreetSpaceAction({ streetSpace: orangeStreet2 }),
+                new UpgradeStreetSpaceAction({ streetSpace: orangeStreet3 }),
+            ]);
+
+        upgrade(orangeStreet3);
+
+        expect(game.getAvailableActions())
+            .to.deep.eq([
+                new RollDiceAction(),
+            ]);
+
+        player1.topUp(18 * 4);
+
+        repeat(() => upgrade(orangeStreet2)).times(4);
+
+        player1.topUp(47);
+
+        expect(game.getAvailableActions())
+            .to.deep.eq([
+                new RollDiceAction(),
+                new UpgradeStreetSpaceAction({ streetSpace: orangeStreet1 }),
+                new UpgradeStreetSpaceAction({ streetSpace: orangeStreet3 }),
+            ]);
+
+        player1.topUp(1);
+
+        expect(game.getAvailableActions())
+            .to.deep.eq([
+                new RollDiceAction(),
+                new UpgradeStreetSpaceAction({ streetSpace: orangeStreet1 }),
+                new UpgradeStreetSpaceAction({ streetSpace: orangeStreet2 }),
+                new UpgradeStreetSpaceAction({ streetSpace: orangeStreet3 }),
+            ]);
+
+        upgrade(orangeStreet2);
 
         expect(game.getAvailableActions())
             .to.deep.eq([

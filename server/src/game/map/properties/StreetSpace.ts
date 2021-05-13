@@ -37,13 +37,17 @@ export class StreetSpace extends PropertySpace {
     getGlobalActions(context: Context): Action[] {
         const actions: Action[] = [];
 
-        if (this.canBeUpgraded()) {
+        if (
+            this.canBeUpgraded() &&
+            this._landlord === context.move.player &&
+            context.move.player.canPay(this.calculateUpgradePrice())
+        ) {
             const streetSpaces = context.map.filter(s => s instanceof StreetSpace) as StreetSpace[];
             const isMonopoly = streetSpaces
                 .filter(s => s.color === this._color)
                 .every(s => s.landlord === context.move.player);
 
-            if (isMonopoly && context.move.player.canPay(this.calculateUpgradePrice())) {
+            if (isMonopoly) {
                 actions.push(new UpgradeStreetSpaceAction({ streetSpace: this }));
             }
         }

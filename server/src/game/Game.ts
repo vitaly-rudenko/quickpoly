@@ -57,10 +57,6 @@ export class Game implements ContextHandler {
     }
 
     performAction(type: string, data?: any): void {
-        if (type === 'upgradeStreetSpace') {
-            // console.log(this.getAvailableActions(), type, data);
-        }
-
         const action = this.getAvailableActions()
             .find(a => a.type === type && a.applies(data));
 
