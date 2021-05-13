@@ -6,6 +6,7 @@ import { GoSpace } from '../../src/game/map/GoSpace';
 import { expect } from 'chai';
 import { RollDiceAction } from '../../src/game/actions/RollDiceAction';
 import { UpgradeStreetSpaceAction } from '../../src/game/actions/UpgradeStreetSpaceAction';
+import { PropertyUpgradedLog } from '../../src/game/logs/PropertyUpgradedLog';
 
 describe('[upgrading streets]', () => {
     let player1: Player;
@@ -136,6 +137,25 @@ describe('[upgrading streets]', () => {
         expect(game.getAvailableActions())
             .to.deep.eq([
                 new RollDiceAction(),
+            ]);
+
+        expect(game.logs)
+            .to.deep.eq([
+                new PropertyUpgradedLog({ player: player1, streetSpace: orangeStreet2, price: 18 }),
+                new PropertyUpgradedLog({ player: player1, streetSpace: orangeStreet2, price: 18 }),
+                new PropertyUpgradedLog({ player: player1, streetSpace: orangeStreet2, price: 18 }),
+                new PropertyUpgradedLog({ player: player1, streetSpace: orangeStreet2, price: 18 }),
+                new PropertyUpgradedLog({ player: player1, streetSpace: orangeStreet2, price: 48 }),
+                new PropertyUpgradedLog({ player: player1, streetSpace: orangeStreet1, price: 16 }),
+                new PropertyUpgradedLog({ player: player1, streetSpace: orangeStreet3, price: 22 }),
+                new PropertyUpgradedLog({ player: player1, streetSpace: orangeStreet1, price: 16 }),
+                new PropertyUpgradedLog({ player: player1, streetSpace: orangeStreet3, price: 22 }),
+                new PropertyUpgradedLog({ player: player1, streetSpace: orangeStreet1, price: 16 }),
+                new PropertyUpgradedLog({ player: player1, streetSpace: orangeStreet3, price: 22 }),
+                new PropertyUpgradedLog({ player: player1, streetSpace: orangeStreet1, price: 16 }),
+                new PropertyUpgradedLog({ player: player1, streetSpace: orangeStreet3, price: 22 }),
+                new PropertyUpgradedLog({ player: player1, streetSpace: orangeStreet1, price: 35 }),
+                new PropertyUpgradedLog({ player: player1, streetSpace: orangeStreet3, price: 62 })
             ]);
     });
 
