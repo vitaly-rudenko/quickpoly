@@ -44,6 +44,10 @@ export abstract class PropertySpace extends Space {
     }
 
     getResidenceActions(context: Context): Action[] {
+        if (context.auction || context.move.hasActionBeenPerformed('endAuction')) {
+            return [];
+        }
+
         const actions: Action[] = [];
 
         if (context.move.hasActionBeenPerformed('rollDice')) {

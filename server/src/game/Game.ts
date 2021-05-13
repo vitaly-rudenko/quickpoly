@@ -7,6 +7,7 @@ import { ContextHandler } from './ContextHandler';
 import { PropertySpace } from './map/properties/PropertySpace';
 import { Auction } from './Auction';
 import { Move } from './Move';
+import { RollDiceAction } from './actions/RollDiceAction';
 
 export class Game implements ContextHandler {
     private _move: Move;
@@ -83,24 +84,21 @@ export class Game implements ContextHandler {
 
     getAvailableActions(): Action[] {
         const context = this._createContext();
-
-        if (this._move.hasActionBeenPerformed('endAuction')) {
-            return [];
-        }
+        const actions: Action[] = [];
 
         if (this._auction !== null) {
-            return this._auction.getActions(context);
+            actions.push(...this._auction.getActions(context));
         }
 
-        const residenceActions = this._getMoveSpace().getResidenceActions(context);
-        const globalActions = this._map
-            .map(space => space.getGlobalActions(context))
-            .reduce((acc, curr) => (acc.push(...curr), acc), []);
+        actions.push(...this._getMoveSpace().getResidenceActions(context));
 
-        return [
-            ...residenceActions,
-            ...globalActions,
-        ];
+        actions.push(
+            ...this._map
+                .map(space => space.getGlobalActions(context))
+                .reduce((acc, curr) => (acc.push(...curr), acc), [])
+        );
+
+        return actions;
     }
 
     get logs(): Log[] {

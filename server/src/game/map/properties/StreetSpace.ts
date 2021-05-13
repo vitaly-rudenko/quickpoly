@@ -3,7 +3,7 @@ import type { Player } from '../../Player';
 import type { Action } from '../../actions/Action';
 import { PropertySpace } from './PropertySpace';
 import { UpgradeStreetSpaceAction } from '../../actions/UpgradeStreetSpaceAction';
-import { SellStreetBuildingAction } from '../../actions/DowngradeStreetSpaceAction';
+import { DowngradeStreetSpaceAction } from '../../actions/DowngradeStreetSpaceAction';
 
 const MAX_HOUSES = 4;
 
@@ -35,24 +35,20 @@ export class StreetSpace extends PropertySpace {
         this._hotel = attributes.hotel;
     }
 
-    downgrade(): void {
-        if (!this._landlord) return;
-        if (this._hotel) {
-            this._hotel = false;
-            this._houses = 4;
-        } else if (this._houses > 0) {
-            this._houses--;
-        }
-    }
-
-    calculateDowngradeRefund(): number {
+    calculateRent(): number {
         return this._hotel
-            ? this._titleDeed.hotelPrice / 2
-            : this._titleDeed.housePrice / 2;
+            ? this._titleDeed.hotelRent
+            : this._houses > 0
+                ? this._titleDeed.perHouseRents[this._houses]
+                : this._titleDeed.baseRent;
     }
 
     canBeMortgaged(): boolean {
         return !this._hotel && this._houses === 0;
+    }
+
+    calculateMortgageValue(): number {
+        return this._titleDeed.mortgageValue;
     }
 
     getTypeSpecificGlobalActions(context: Context): Action[] {
@@ -74,10 +70,10 @@ export class StreetSpace extends PropertySpace {
         }
 
         // if (
-        //     this.canBuildingBeSold() &&
+        //     this.canBeDowngraded() &&
         //     this._landlord === context.move.player
         // ) {
-        //     actions.push(new SellStreetBuildingAction(this));
+        //     actions.push(new DowngradeStreetSpaceAction(this));
         // }
 
         return actions;
@@ -85,10 +81,6 @@ export class StreetSpace extends PropertySpace {
 
     canBeUpgraded(): boolean {
         return !this._hotel;
-    }
-
-    canBuildingBeSold(): boolean {
-        return this._hotel || this._houses > 0;
     }
 
     upgrade(): void {
@@ -107,12 +99,24 @@ export class StreetSpace extends PropertySpace {
             : this._titleDeed.housePrice;
     }
 
-    calculateRent(): number {
+    canBeDowngraded(): boolean {
+        return this._hotel || this._houses > 0;
+    }
+
+    downgrade(): void {
+        if (!this._landlord) return;
+        if (this._hotel) {
+            this._hotel = false;
+            this._houses = 4;
+        } else if (this._houses > 0) {
+            this._houses--;
+        }
+    }
+
+    calculateDowngradeRefund(): number {
         return this._hotel
-            ? this._titleDeed.hotelRent
-            : this._houses > 0
-                ? this._titleDeed.perHouseRents[this._houses]
-                : this._titleDeed.baseRent;
+            ? this._titleDeed.hotelPrice / 2
+            : this._titleDeed.housePrice / 2;
     }
 
     get color(): StreetColor {

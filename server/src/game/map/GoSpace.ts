@@ -1,5 +1,6 @@
 import { Action } from '../actions/Action';
 import { RollDiceAction } from '../actions/RollDiceAction';
+import { Context } from '../Context';
 import { Space } from './Space';
 
 export class GoSpace extends Space {
@@ -11,9 +12,15 @@ export class GoSpace extends Space {
         this._salary = attributes.salary;
     }
 
-    getResidenceActions(): Action[] {
-        return [
-            new RollDiceAction(),
-        ];
+    getResidenceActions(context: Context): Action[] {
+        const actions: Action[] = [];
+
+        if (!context.auction) {
+            if (!context.move.hasActionBeenPerformed('rollDice')) {
+                actions.push(new RollDiceAction());
+            }
+        }
+
+        return actions;
     }
 }
