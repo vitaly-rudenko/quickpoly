@@ -7,8 +7,8 @@
         "start": "node build/app.js",
         "build": "rimraf ./build && tsc --pretty --project tsconfig.build.json",
         "debug": "ts-node-dev --transpile-only --rs --respawn --inspect=0.0.0.0:9229 --nolazy -- src/app.ts",
-        "test": "ts-node --transpile-only node_modules/mocha/bin/mocha --register ts-node/register test/**/*.test.ts",
-        "test:watch": "ts-node-dev --transpile-only --respawn --rs --clear node_modules/mocha/bin/mocha --register ts-node/register test/**/*.test.ts",
+        "test": "ts-node --transpile-only node_modules/mocha/bin/mocha 'test/**/*.test.ts'",
+        "test:watch": "ts-node-dev --transpile-only --respawn --rs --clear node_modules/mocha/bin/mocha 'test/**/*.test.ts'",
         "lint": "eslint . --ext .ts",
         "lint:fix": "npm run lint -- --fix"
     },

@@ -1,9 +1,9 @@
+import { mocker } from '../setup';
 import { expect } from 'chai';
 import { Game } from '../../src/game/Game';
 import { GoSpace } from '../../src/game/map/GoSpace';
-import { StreetColor, StreetSpace, StreetTitleDeed } from '../../src/game/map/properties/StreetSpace';
+import { StreetSpace } from '../../src/game/map/properties/StreetSpace';
 import { Player } from '../../src/game/Player';
-import { Mocker } from '../helpers/Mocker';
 import { PurchasePropertyAction } from '../../src/game/actions/PurchasePropertyAction';
 import { PropertyRentPaidLog } from '../../src/game/logs/PropertyRentPaidLog';
 import { DiceRolledLog } from '../../src/game/logs/DiceRolledLog';
@@ -18,47 +18,6 @@ import { BidLog } from '../../src/game/logs/BidLog';
 import { PropertyPutUpForAuctionLog } from '../../src/game/logs/PropertyPutUpForAuctionLog';
 
 describe('[basic property actions]', () => {
-    let mocker: Mocker;
-
-    beforeEach(() => {
-        mocker = new Mocker();
-
-        mocker.register(Player, ({ index }, attributes) => new Player({
-            id: attributes?.id ?? `player-${index + 1}`,
-            position: attributes?.position ?? 0,
-            money: attributes?.money ?? 100,
-        }));
-
-        mocker.register(GoSpace, () => new GoSpace({ salary: 0 }));
-
-        mocker.register(StreetTitleDeed, (_, attributes) => new StreetTitleDeed({
-            baseRent: attributes?.baseRent ?? 50,
-            hotelBasePrice: 100,
-            hotelRent: 150,
-            housePrice: 200,
-            mortgageValue: 250,
-            perHouseRents: [25, 75, 125, 175],
-        }));
-
-        mocker.register(StreetSpace, ({ index }, attributes) => new StreetSpace({
-            landlord: attributes?.landlord ?? null,
-            price: attributes?.price ?? 50,
-            name: `Street #${index}`,
-            color: StreetColor.LIGHT_BLUE,
-            titleDeed: attributes?.titleDeed ?? mocker.create(StreetTitleDeed),
-            houses: 0,
-            hotel: false,
-        }));
-
-        mocker.register(Game, (_, attributes) => new Game({
-            move: attributes?.move ?? new Move({
-                player: attributes?.players?.[0] ?? mocker.create(Player)
-            }),
-            players: attributes?.players ?? [mocker.reuse(Player), mocker.create(Player)],
-            map: attributes?.map ?? [mocker.create(GoSpace)],
-        }));
-    });
-
     it('should give player an option to purchase the property or put it up for auction', () => {
         const player1 = mocker.create(Player, { money: 100 });
         const player2 = mocker.create(Player);
@@ -73,7 +32,6 @@ describe('[basic property actions]', () => {
                 streetSpace,
             ],
         });
-
 
         expect(game.move.logs).to.deep.eq([]);
         expect(game.move.actions).to.deep.eq([]);
