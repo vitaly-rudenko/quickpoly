@@ -100,4 +100,8 @@ export abstract class PropertySpace extends Space {
     get landlord(): Player | null {
         return this._landlord;
     }
+
+    get isMortgaged(): boolean {
+        return this._isMortgaged;
+    }
 }

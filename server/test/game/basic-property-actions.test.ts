@@ -308,42 +308,74 @@ describe('[basic property actions]', () => {
         const player1 = mocker.create(Player, { money: 50 });
         const player2 = mocker.create(Player);
 
-        const streetSpace = mocker.create(StreetSpace, {
+        const streetSpace1 = mocker.create(StreetSpace, {
             landlord: player1,
             titleDeed: { mortgageValue: 146 }
+        });
+
+        const streetSpace2 = mocker.create(StreetSpace, {
+            landlord: player1,
+            titleDeed: { mortgageValue: 204 }
+        });
+
+        const streetSpace3 = mocker.create(StreetSpace, {
+            landlord: player2,
+            titleDeed: { mortgageValue: 204 }
         });
 
         const game = mocker.create(Game, {
             players: [player1, player2],
             map: [
                 mocker.create(GoSpace),
+                streetSpace1,
                 mocker.create(StreetSpace),
-                streetSpace,
+                streetSpace2,
+                streetSpace3,
+                mocker.create(StreetSpace),
             ],
         });
 
         expect(game.getAvailableActions())
             .to.deep.eq([
                 new RollDiceAction(),
-                new MortgagePropertyAction(streetSpace),
+                new MortgagePropertyAction(streetSpace1),
+                new MortgagePropertyAction(streetSpace2),
                 new GiveUpAction(),
             ]);
 
-        game.performAction('mortgageProperty', { propertySpace: streetSpace });
+        game.performAction('mortgageProperty', { propertySpace: streetSpace2 });
 
-        expect(streetSpace.landlord).to.be.null;
-        expect(player1.money).to.eq(196);
+        expect(streetSpace1.landlord).to.eq(player1);
+        expect(streetSpace1.isMortgaged).to.be.false;
+        expect(streetSpace2.landlord).to.be.null;
+        expect(streetSpace2.isMortgaged).to.be.true;
+        expect(player1.money).to.eq(254);
 
-        expect(game.logs)
+        expect(game.getAvailableActions())
             .to.deep.eq([
-                new PropertyMortgagedLog({
-                    propertySpace: streetSpace
-                })
+                new RollDiceAction(),
+                new MortgagePropertyAction(streetSpace1),
+                new GiveUpAction(),
             ]);
+
+        game.performAction('mortgageProperty', { propertySpace: streetSpace1 });
+
+        expect(streetSpace1.landlord).to.be.null;
+        expect(streetSpace1.isMortgaged).to.be.true;
+        expect(streetSpace2.landlord).to.be.null;
+        expect(streetSpace2.isMortgaged).to.be.true;
+        expect(player1.money).to.eq(400);
+
         expect(game.getAvailableActions())
             .to.deep.eq([
                 new RollDiceAction(),
                 new GiveUpAction(),
+            ]);
+
+        expect(game.logs)
+            .to.deep.eq([
+                new PropertyMortgagedLog({ landlord: player1, propertySpace: streetSpace2, mortgageValue: 204 }),
+                new PropertyMortgagedLog({ landlord: player1, propertySpace: streetSpace1, mortgageValue: 146 })
             ]);
     });
 });

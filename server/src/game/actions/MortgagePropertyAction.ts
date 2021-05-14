@@ -29,14 +29,16 @@ export class MortgagePropertyAction extends Action {
 
         context.log(
             new PropertyMortgagedLog({
-                propertySpace: this._propertySpace
+                propertySpace: this._propertySpace,
+                mortgageValue,
+                landlord,
             })
         );
 
         return true;
     }
 
-    applies(data?: MortgagePropertyActionData): boolean {
-        return data?.propertySpace === this._propertySpace;
+    applies(data: MortgagePropertyActionData): boolean {
+        return data.propertySpace === this._propertySpace;
     }
 }
