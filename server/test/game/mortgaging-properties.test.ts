@@ -84,4 +84,6 @@ describe('[mortgaging properties]', () => {
                 new PropertyMortgagedLog({ landlord: player1, propertySpace: streetSpace1, mortgageValue: 146 })
             ]);
     });
+
+    it('should not charge for the rent on mortgaged properties');
 });

@@ -9,7 +9,7 @@ import { DiceRolledLog } from '../../src/game/logs/DiceRolledLog';
 import { MovedToSpaceLog } from '../../src/game/logs/MovedToSpaceLog';
 
 describe('[paying street rent]', () => {
-    it('should implement street rent paying (base rent)', () => {
+    it('should charge the base rent', () => {
         const player1 = mocker.create(Player, { money: 200 });
         const player2 = mocker.create(Player, { money: 200 });
 
@@ -45,4 +45,7 @@ describe('[paying street rent]', () => {
                 }),
             ]);
     });
+
+    it('should charge per house count');
+    it('should charge for the hotel');
 });
