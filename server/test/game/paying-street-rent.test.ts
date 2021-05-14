@@ -2,14 +2,11 @@ import { mocker } from '../setup';
 import { expect } from 'chai';
 import { Game } from '../../src/game/Game';
 import { GoSpace } from '../../src/game/map/GoSpace';
-import { StreetSpace } from '../../src/game/map/properties/StreetSpace';
+import { StreetSpace, StreetTitleDeed } from '../../src/game/map/properties/StreetSpace';
 import { Player } from '../../src/game/Player';
 import { PropertyRentPaidLog } from '../../src/game/logs/PropertyRentPaidLog';
 import { DiceRolledLog } from '../../src/game/logs/DiceRolledLog';
 import { MovedToSpaceLog } from '../../src/game/logs/MovedToSpaceLog';
-import { PropertyPurchasedLog } from '../../src/game/logs/PropertyPurchasedLog';
-import { MoveEndedLog } from '../../src/game/logs/MoveEndedLog';
-import { Move } from '../../src/game/Move';
 
 describe('[paying street rent]', () => {
     it('should implement street rent paying (base rent)', () => {
@@ -18,7 +15,7 @@ describe('[paying street rent]', () => {
 
         const streetSpace = mocker.create(StreetSpace, {
             landlord: player2,
-            titleDeed: { baseRent: 154 }
+            titleDeed: mocker.create(StreetTitleDeed, { baseRent: 154 })
         });
 
         const game = mocker.create(Game, {

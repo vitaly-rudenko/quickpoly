@@ -17,11 +17,11 @@ mocker.register(GoSpace, () => new GoSpace({ salary: 0 }));
 
 mocker.register(StreetTitleDeed, (_, attributes) => new StreetTitleDeed({
     baseRent: attributes?.baseRent ?? 50,
-    hotelPrice: 100,
-    hotelRent: 150,
-    housePrice: 200,
-    mortgageValue: 250,
-    perHouseRents: [25, 75, 125, 175],
+    hotelPrice: attributes?.hotelPrice ?? 100,
+    hotelRent: attributes?.hotelRent ?? 150,
+    housePrice: attributes?.housePrice ?? 200,
+    mortgageValue: attributes?.mortgageValue ?? 250,
+    perHouseRents: attributes?.perHouseRents ?? [25, 75, 125, 175],
 }));
 
 mocker.register(StreetSpace, ({ index }, attributes) => new StreetSpace({
@@ -35,7 +35,7 @@ mocker.register(StreetSpace, ({ index }, attributes) => new StreetSpace({
 }));
 
 mocker.register(Game, (_, attributes) => new Game({
-    move: attributes?.move ?? new Move({
+    move: attributes?.move ?? mocker.create(Move, {
         player: attributes?.players?.[0] ?? mocker.create(Player)
     }),
     players: attributes?.players ?? [mocker.reuse(Player), mocker.create(Player)],

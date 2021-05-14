@@ -1,6 +1,6 @@
 import { mocker } from '../setup';
 import { Player } from '../../src/game/Player';
-import { StreetColor, StreetSpace } from '../../src/game/map/properties/StreetSpace';
+import { StreetColor, StreetSpace, StreetTitleDeed } from '../../src/game/map/properties/StreetSpace';
 import { Game } from '../../src/game/Game';
 import { GoSpace } from '../../src/game/map/GoSpace';
 import { expect } from 'chai';
@@ -27,30 +27,30 @@ describe('[downgrading streets]', () => {
             color: StreetColor.ORANGE,
             landlord: player1,
             hotel: true,
-            titleDeed: {
+            titleDeed: mocker.create(StreetTitleDeed, {
                 housePrice: 16,
                 hotelPrice: 36
-            }
+            }),
         });
 
         orangeStreet2 = mocker.create(StreetSpace, {
             color: StreetColor.ORANGE,
             landlord: player1,
             houses: 3,
-            titleDeed: {
+            titleDeed: mocker.create(StreetTitleDeed, {
                 housePrice: 18,
                 hotelPrice: 48
-            }
+            }),
         });
 
         orangeStreet3 = mocker.create(StreetSpace, {
             color: StreetColor.ORANGE,
             landlord: player1,
             houses: 1,
-            titleDeed: {
+            titleDeed: mocker.create(StreetTitleDeed, {
                 housePrice: 22,
                 hotelPrice: 62
-            }
+            }),
         });
 
         game = mocker.create(Game, {

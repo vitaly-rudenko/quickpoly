@@ -2,7 +2,7 @@ import { mocker } from '../setup';
 import { expect } from 'chai';
 import { Game } from '../../src/game/Game';
 import { GoSpace } from '../../src/game/map/GoSpace';
-import { StreetSpace } from '../../src/game/map/properties/StreetSpace';
+import { StreetSpace, StreetTitleDeed } from '../../src/game/map/properties/StreetSpace';
 import { Player } from '../../src/game/Player';
 import { RollDiceAction } from '../../src/game/actions/RollDiceAction';
 import { GiveUpAction } from '../../src/game/actions/GiveUpAction';
@@ -16,17 +16,17 @@ describe('[mortgaging properties]', () => {
 
         const streetSpace1 = mocker.create(StreetSpace, {
             landlord: player1,
-            titleDeed: { mortgageValue: 146 }
+            titleDeed: mocker.create(StreetTitleDeed, { mortgageValue: 146 }),
         });
 
         const streetSpace2 = mocker.create(StreetSpace, {
             landlord: player1,
-            titleDeed: { mortgageValue: 204 }
+            titleDeed: mocker.create(StreetTitleDeed, { mortgageValue: 204 }),
         });
 
         const streetSpace3 = mocker.create(StreetSpace, {
             landlord: player2,
-            titleDeed: { mortgageValue: 204 }
+            titleDeed: mocker.create(StreetTitleDeed, { mortgageValue: 204 }),
         });
 
         const game = mocker.create(Game, {

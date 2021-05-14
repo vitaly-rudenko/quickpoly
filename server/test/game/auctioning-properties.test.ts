@@ -25,7 +25,7 @@ describe('[auctioning properties]', () => {
         const streetSpace = mocker.create(StreetSpace);
 
         const game = mocker.create(Game, {
-            move: new Move({ player: player2 }),
+            move: mocker.create(Move, { player: player2 }),
             players: [player1, player2, player3, player4, player5],
             map: [
                 mocker.create(GoSpace),
