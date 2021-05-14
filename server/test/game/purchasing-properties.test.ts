@@ -12,6 +12,7 @@ import { MovedToSpaceLog } from '../../src/game/logs/MovedToSpaceLog';
 import { RollDiceAction } from '../../src/game/actions/RollDiceAction';
 import { PropertyPurchasedLog } from '../../src/game/logs/PropertyPurchasedLog';
 import { GiveUpAction } from '../../src/game/actions/GiveUpAction';
+import { MoveEndedLog } from '../../src/game/logs/MoveEndedLog';
 
 describe('[purchasing properties]', () => {
     it('should give player an option to purchase the property or put it up for auction', () => {
@@ -81,7 +82,7 @@ describe('[purchasing properties]', () => {
             ]);
     });
 
-    it('should implement property purchase and rent', () => {
+    it('should implement property purchasing', () => {
         const player1 = mocker.create(Player, { money: 200 });
         const player2 = mocker.create(Player, { money: 200 });
 
@@ -99,26 +100,18 @@ describe('[purchasing properties]', () => {
         game.performAction('rollDice', { dice: [1, 1] });
         game.performAction('purchaseProperty');
         game.performAction('endMove');
-        game.performAction('rollDice', { dice: [1, 1] });
 
-        expect(player1.money).to.eq(200 - 46 + 154);
-        expect(player2.money).to.eq(200 - 154);
+        expect(player1.money).to.eq(200 - 46);
+        expect(player2.money).to.eq(200);
         expect(streetSpace.landlord).to.eq(player1);
 
-        expect(game.move.player).to.eq(player1);
+        expect(game.move.player).to.eq(player2);
         expect(game.logs)
             .to.deep.eq([
                 new DiceRolledLog({ player: player1, dice: [1, 1] }),
                 new MovedToSpaceLog({ player: player1, space: streetSpace }),
                 new PropertyPurchasedLog({ player: player1, propertySpace: streetSpace }),
-                new DiceRolledLog({ player: player2, dice: [1, 1] }),
-                new MovedToSpaceLog({ player: player2, space: streetSpace }),
-                new PropertyRentPaidLog({
-                    landlord: player1,
-                    tenant: player2,
-                    propertySpace: streetSpace,
-                    amount: 154,
-                }),
+                new MoveEndedLog({ player: player1 }),
             ]);
     });
 });

@@ -8,6 +8,7 @@ import { Auction } from './Auction';
 import { Move } from './Move';
 import { GiveUpAction } from './actions/GiveUpAction';
 import { EndMoveAction } from './actions/EndMoveAction';
+import { MoveEndedLog } from './logs/MoveEndedLog';
 
 export class Game implements ContextHandler {
     private _move: Move;
