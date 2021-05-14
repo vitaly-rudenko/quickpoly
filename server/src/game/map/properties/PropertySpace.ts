@@ -38,7 +38,6 @@ export abstract class PropertySpace extends Space {
     mortgage(): void {
         if (!this._landlord) return;
 
-        this._landlord.topUp(this.calculateMortgageValue());
         this._landlord = null;
         this._isMortgaged = true;
     }

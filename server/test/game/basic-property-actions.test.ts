@@ -17,6 +17,8 @@ import { PassedLog } from '../../src/game/logs/PassedLog';
 import { BidLog } from '../../src/game/logs/BidLog';
 import { PropertyPutUpForAuctionLog } from '../../src/game/logs/PropertyPutUpForAuctionLog';
 import { GiveUpAction } from '../../src/game/actions/GiveUpAction';
+import { MortgagePropertyAction } from '../../src/game/actions/MortgagePropertyAction';
+import { PropertyMortgagedLog } from '../../src/game/logs/PropertyMortgagedLog';
 
 describe('[basic property actions]', () => {
     it('should give player an option to purchase the property or put it up for auction', () => {
@@ -299,6 +301,49 @@ describe('[basic property actions]', () => {
                     propertySpace: streetSpace,
                     highestBidAmount: 10,
                 })
+            ]);
+    });
+
+    it('should allow you to mortgage the property', () => {
+        const player1 = mocker.create(Player, { money: 50 });
+        const player2 = mocker.create(Player);
+
+        const streetSpace = mocker.create(StreetSpace, {
+            landlord: player1,
+            titleDeed: { mortgageValue: 146 }
+        });
+
+        const game = mocker.create(Game, {
+            players: [player1, player2],
+            map: [
+                mocker.create(GoSpace),
+                mocker.create(StreetSpace),
+                streetSpace,
+            ],
+        });
+
+        expect(game.getAvailableActions())
+            .to.deep.eq([
+                new RollDiceAction(),
+                new MortgagePropertyAction(streetSpace),
+                new GiveUpAction(),
+            ]);
+
+        game.performAction('mortgageProperty', { propertySpace: streetSpace });
+
+        expect(streetSpace.landlord).to.be.null;
+        expect(player1.money).to.eq(196);
+
+        expect(game.logs)
+            .to.deep.eq([
+                new PropertyMortgagedLog({
+                    propertySpace: streetSpace
+                })
+            ]);
+        expect(game.getAvailableActions())
+            .to.deep.eq([
+                new RollDiceAction(),
+                new GiveUpAction(),
             ]);
     });
 });
