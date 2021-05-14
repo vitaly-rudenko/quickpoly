@@ -28,7 +28,7 @@ describe('[upgrading streets]', () => {
             landlord: player1,
             titleDeed: {
                 housePrice: 16,
-                hotelPrice: 35
+                hotelPrice: 36
             }
         });
 
@@ -169,7 +169,7 @@ describe('[upgrading streets]', () => {
                 new StreetSpaceUpgradedLog({ landlord: player1, streetSpace: orangeStreet3, price: 22 }),
                 new StreetSpaceUpgradedLog({ landlord: player1, streetSpace: orangeStreet1, price: 16 }),
                 new StreetSpaceUpgradedLog({ landlord: player1, streetSpace: orangeStreet3, price: 22 }),
-                new StreetSpaceUpgradedLog({ landlord: player1, streetSpace: orangeStreet1, price: 35 }),
+                new StreetSpaceUpgradedLog({ landlord: player1, streetSpace: orangeStreet1, price: 36 }),
                 new StreetSpaceUpgradedLog({ landlord: player1, streetSpace: orangeStreet3, price: 62 })
             ]);
     });
@@ -193,11 +193,11 @@ describe('[upgrading streets]', () => {
 
         repeat(() => upgrade(orangeStreet1)).times(5);
 
-        expect(player1.money).to.eq(1000 - 18 * 4 - 48 - 16 * 4 - 35);
+        expect(player1.money).to.eq(1000 - 18 * 4 - 48 - 16 * 4 - 36);
 
         repeat(() => upgrade(orangeStreet3)).times(5);
 
-        expect(player1.money).to.eq(1000 - 18 * 4 - 48 - 16 * 4 - 35 - 22 * 4 - 62);
+        expect(player1.money).to.eq(1000 - 18 * 4 - 48 - 16 * 4 - 36 - 22 * 4 - 62);
     });
 
     it('should not allow upgrade when not enough money', () => {

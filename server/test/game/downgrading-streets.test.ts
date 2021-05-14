@@ -9,6 +9,7 @@ import { UpgradeStreetSpaceAction } from '../../src/game/actions/UpgradeStreetSp
 import { GiveUpAction } from '../../src/game/actions/GiveUpAction';
 import { MortgagePropertyAction } from '../../src/game/actions/MortgagePropertyAction';
 import { DowngradeStreetSpaceAction } from '../../src/game/actions/DowngradeStreetSpaceAction';
+import { StreetSpaceDowngradedLog } from '../../src/game/logs/StreetSpaceDowngradedLog';
 
 describe('[downgrading streets]', () => {
     let player1: Player;
@@ -28,7 +29,7 @@ describe('[downgrading streets]', () => {
             hotel: true,
             titleDeed: {
                 housePrice: 16,
-                hotelPrice: 35
+                hotelPrice: 36
             }
         });
 
@@ -45,6 +46,7 @@ describe('[downgrading streets]', () => {
         orangeStreet3 = mocker.create(StreetSpace, {
             color: StreetColor.ORANGE,
             landlord: player1,
+            houses: 1,
             titleDeed: {
                 housePrice: 22,
                 hotelPrice: 62
@@ -72,8 +74,99 @@ describe('[downgrading streets]', () => {
                 new RollDiceAction(),
                 new DowngradeStreetSpaceAction(orangeStreet1),
                 new DowngradeStreetSpaceAction(orangeStreet2),
+                new DowngradeStreetSpaceAction(orangeStreet3),
+                new GiveUpAction(),
+            ]);
+    });
+
+    it('should implement street downgrading', () => {
+        expect(player1.money).to.eq(0);
+
+        downgrade(orangeStreet2);
+
+        expect(player1.money).to.eq(18 / 2);
+
+        expect(orangeStreet1.houses).to.eq(0);
+        expect(orangeStreet1.hotel).to.be.true;
+
+        expect(orangeStreet2.houses).to.eq(2);
+        expect(orangeStreet2.hotel).to.be.false;
+
+        expect(orangeStreet3.houses).to.eq(1);
+        expect(orangeStreet3.hotel).to.be.false;
+
+        downgrade(orangeStreet1);
+
+        expect(player1.money).to.eq(18 / 2 + 36 / 2);
+
+        expect(orangeStreet1.houses).to.eq(4);
+        expect(orangeStreet1.hotel).to.be.false;
+
+        expect(orangeStreet2.houses).to.eq(2);
+        expect(orangeStreet2.hotel).to.be.false;
+
+        expect(orangeStreet3.houses).to.eq(1);
+        expect(orangeStreet3.hotel).to.be.false;
+
+        downgrade(orangeStreet3);
+
+        expect(game.getAvailableActions())
+            .to.deep.eq([
+                new RollDiceAction(),
+                new UpgradeStreetSpaceAction(orangeStreet1),
+                new DowngradeStreetSpaceAction(orangeStreet1),
+                new UpgradeStreetSpaceAction(orangeStreet2),
+                new DowngradeStreetSpaceAction(orangeStreet2),
+                new UpgradeStreetSpaceAction(orangeStreet3),
                 new MortgagePropertyAction(orangeStreet3),
                 new GiveUpAction(),
+            ]);
+
+        expect(player1.money).to.eq(18 / 2 + 36 / 2 + 22 / 2);
+
+        expect(orangeStreet1.houses).to.eq(4);
+        expect(orangeStreet1.hotel).to.be.false;
+
+        expect(orangeStreet2.houses).to.eq(2);
+        expect(orangeStreet2.hotel).to.be.false;
+
+        expect(orangeStreet3.houses).to.eq(0);
+        expect(orangeStreet3.hotel).to.be.false;
+
+        repeat(() => downgrade(orangeStreet1)).times(4);
+        repeat(() => downgrade(orangeStreet2)).times(2);
+
+        expect(player1.money).to.eq((16 / 2) * 4 + (18 / 2) * 3 + 36 / 2 + 22 / 2);
+
+        expect(orangeStreet1.houses).to.eq(0);
+        expect(orangeStreet1.hotel).to.be.false;
+
+        expect(orangeStreet2.houses).to.eq(0);
+        expect(orangeStreet2.hotel).to.be.false;
+
+        expect(game.getAvailableActions())
+            .to.deep.eq([
+                new RollDiceAction(),
+                new UpgradeStreetSpaceAction(orangeStreet1),
+                new MortgagePropertyAction(orangeStreet1),
+                new UpgradeStreetSpaceAction(orangeStreet2),
+                new MortgagePropertyAction(orangeStreet2),
+                new UpgradeStreetSpaceAction(orangeStreet3),
+                new MortgagePropertyAction(orangeStreet3),
+                new GiveUpAction(),
+            ]);
+
+        expect(game.logs)
+            .to.deep.eq([
+                new StreetSpaceDowngradedLog({ landlord: player1, streetSpace: orangeStreet2, refund: 18 / 2 }),
+                new StreetSpaceDowngradedLog({ landlord: player1, streetSpace: orangeStreet1, refund: 36 / 2 }),
+                new StreetSpaceDowngradedLog({ landlord: player1, streetSpace: orangeStreet3, refund: 22 / 2 }),
+                new StreetSpaceDowngradedLog({ landlord: player1, streetSpace: orangeStreet1, refund: 16 / 2 }),
+                new StreetSpaceDowngradedLog({ landlord: player1, streetSpace: orangeStreet1, refund: 16 / 2 }),
+                new StreetSpaceDowngradedLog({ landlord: player1, streetSpace: orangeStreet1, refund: 16 / 2 }),
+                new StreetSpaceDowngradedLog({ landlord: player1, streetSpace: orangeStreet1, refund: 16 / 2 }),
+                new StreetSpaceDowngradedLog({ landlord: player1, streetSpace: orangeStreet2, refund: 18 / 2 }),
+                new StreetSpaceDowngradedLog({ landlord: player1, streetSpace: orangeStreet2, refund: 18 / 2 }),
             ]);
     });
 });
