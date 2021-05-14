@@ -10,10 +10,10 @@ interface UpgradeStreetSpaceActionData {
 export class UpgradeStreetSpaceAction extends Action {
     private _streetSpace: StreetSpace;
 
-    constructor(attributes: { streetSpace: StreetSpace }) {
+    constructor(streetSpace: StreetSpace) {
         super({ type: 'upgradeStreetSpace' });
 
-        this._streetSpace = attributes.streetSpace;
+        this._streetSpace = streetSpace;
     }
 
     perform(context: Context): boolean {

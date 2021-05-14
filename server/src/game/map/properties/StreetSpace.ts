@@ -65,7 +65,7 @@ export class StreetSpace extends PropertySpace {
                 .every(s => s.landlord === context.move.player);
 
             if (isMonopoly) {
-                actions.push(new UpgradeStreetSpaceAction({ streetSpace: this }));
+                actions.push(new UpgradeStreetSpaceAction(this));
             }
         }
 
