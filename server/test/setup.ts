@@ -30,8 +30,8 @@ mocker.register(StreetSpace, ({ index }, attributes) => new StreetSpace({
     name: `Street #${index}`,
     color: StreetColor.LIGHT_BLUE,
     titleDeed: attributes?.titleDeed ?? mocker.create(StreetTitleDeed),
-    houses: 0,
-    hotel: false,
+    houses: attributes?.houses ?? 0,
+    hotel: attributes?.hotel ?? false,
 }));
 
 mocker.register(Game, (_, attributes) => new Game({

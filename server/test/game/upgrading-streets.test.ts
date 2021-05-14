@@ -9,6 +9,7 @@ import { UpgradeStreetSpaceAction } from '../../src/game/actions/UpgradeStreetSp
 import { StreetSpaceUpgradedLog } from '../../src/game/logs/StreetSpaceUpgradedLog';
 import { GiveUpAction } from '../../src/game/actions/GiveUpAction';
 import { MortgagePropertyAction } from '../../src/game/actions/MortgagePropertyAction';
+import { DowngradeStreetSpaceAction } from '../../src/game/actions/DowngradeStreetSpaceAction';
 
 describe('[upgrading streets]', () => {
     let player1: Player;
@@ -110,6 +111,7 @@ describe('[upgrading streets]', () => {
                 new RollDiceAction(),
                 new UpgradeStreetSpaceAction(orangeStreet1),
                 new MortgagePropertyAction(orangeStreet1),
+                new DowngradeStreetSpaceAction(orangeStreet2),
                 new UpgradeStreetSpaceAction(orangeStreet3),
                 new MortgagePropertyAction(orangeStreet3),
                 new GiveUpAction(),
@@ -146,6 +148,9 @@ describe('[upgrading streets]', () => {
         expect(game.getAvailableActions())
             .to.deep.eq([
                 new RollDiceAction(),
+                new DowngradeStreetSpaceAction(orangeStreet1),
+                new DowngradeStreetSpaceAction(orangeStreet2),
+                new DowngradeStreetSpaceAction(orangeStreet3),
                 new GiveUpAction(),
             ]);
 
@@ -253,6 +258,7 @@ describe('[upgrading streets]', () => {
                 new RollDiceAction(),
                 new MortgagePropertyAction(orangeStreet1),
                 new MortgagePropertyAction(orangeStreet2),
+                new DowngradeStreetSpaceAction(orangeStreet3),
                 new GiveUpAction(),
             ]);
 
@@ -267,7 +273,9 @@ describe('[upgrading streets]', () => {
                 new RollDiceAction(),
                 new UpgradeStreetSpaceAction(orangeStreet1),
                 new MortgagePropertyAction(orangeStreet1),
+                new DowngradeStreetSpaceAction(orangeStreet2),
                 new UpgradeStreetSpaceAction(orangeStreet3),
+                new DowngradeStreetSpaceAction(orangeStreet3),
                 new GiveUpAction(),
             ]);
 
@@ -279,7 +287,9 @@ describe('[upgrading streets]', () => {
                 new UpgradeStreetSpaceAction(orangeStreet1),
                 new MortgagePropertyAction(orangeStreet1),
                 new UpgradeStreetSpaceAction(orangeStreet2),
+                new DowngradeStreetSpaceAction(orangeStreet2),
                 new UpgradeStreetSpaceAction(orangeStreet3),
+                new DowngradeStreetSpaceAction(orangeStreet3),
                 new GiveUpAction(),
             ]);
 
@@ -289,6 +299,8 @@ describe('[upgrading streets]', () => {
             .to.deep.eq([
                 new RollDiceAction(),
                 new MortgagePropertyAction(orangeStreet1),
+                new DowngradeStreetSpaceAction(orangeStreet2),
+                new DowngradeStreetSpaceAction(orangeStreet3),
                 new GiveUpAction(),
             ]);
     });

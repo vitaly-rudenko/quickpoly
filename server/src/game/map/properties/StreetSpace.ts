@@ -69,12 +69,12 @@ export class StreetSpace extends PropertySpace {
             }
         }
 
-        // if (
-        //     this.canBeDowngraded() &&
-        //     this._landlord === context.move.player
-        // ) {
-        //     actions.push(new DowngradeStreetSpaceAction(this));
-        // }
+        if (
+            this.canBeDowngraded() &&
+            this._landlord === context.move.player
+        ) {
+            actions.push(new DowngradeStreetSpaceAction(this));
+        }
 
         return actions;
     }
